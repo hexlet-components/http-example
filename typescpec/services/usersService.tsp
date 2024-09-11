@@ -9,5 +9,16 @@ using TypeSpec.Rest;
 
 @tag("Users")
 @route("/users")
-interface UserService extends Resource.ResourceOperations<User, Error> {
+interface UserService {
+  @get list(@query skip?: string, @query limit?: string): Users | Error;
+  @get get(@path id: string): User | Error;
+
+  @useAuth(BearerAuth)
+  @post create(...User): User | Error;
+
+  @useAuth(BearerAuth)
+  @patch update(...User): User | Error;
+
+  @useAuth(BearerAuth)
+  @delete delete(@path id: string): void | Error;
 }

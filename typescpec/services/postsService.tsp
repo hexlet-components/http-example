@@ -8,5 +8,16 @@ using TypeSpec.Rest;
 
 @tag("Posts")
 @route("/posts")
-interface PostService extends Resource.ResourceOperations<Post, Error> {
+interface PostService {
+  @get list(@query skip?: string, @query limit?: string): Posts | Error;
+  @get get(@path id: string): Post | Error;
+
+  @useAuth(BearerAuth)
+  @post create(...Post): Post | Error;
+
+  @useAuth(BearerAuth)
+  @patch update(...Post): Post | Error;
+
+  @useAuth(BearerAuth)
+  @delete delete(@path id: string): void | Error;
 }

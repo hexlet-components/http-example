@@ -9,5 +9,16 @@ using TypeSpec.Rest;
 
 @tag("Comments")
 @route("/comments")
-interface CommentService extends Resource.ResourceOperations<Comment, Error> {
+interface CommentService {
+  @get list(@query skip?: string, @query limit?: string): Comments | Error;
+  @get get(@path id: string): Comment | Error;
+
+  @useAuth(BearerAuth)
+  @post create(...Comment): Comment | Error;
+
+  @useAuth(BearerAuth)
+  @patch update(...Comment): Comment | Error;
+
+  @useAuth(BearerAuth)
+  @delete delete(@path id: string): void | Error;
 }

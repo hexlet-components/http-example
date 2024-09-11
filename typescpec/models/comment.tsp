@@ -1,12 +1,17 @@
 model Comment {
   @key
-  id: int32;
+  id: string;
 
-  userId: int32;
-
-  @minLength(1)
-  title: string;
+  userId: string;
+  postId: string;
 
   @minLength(1)
   body: string;
+}
+
+model Comments {
+  comments: Comment[];
+  total: integer;
+  skip: integer;
+  limit: integer;
 }

@@ -1,6 +1,7 @@
 {
   "name": "http-server",
   "version": "0.1.0",
+  "type": "module",
   "devDependencies": {
     "@typespec/compiler": "latest",
     "@typespec/http": "latest",
@@ -9,6 +10,11 @@
   },
   "private": true,
   "dependencies": {
-    "@stoplight/prism-cli": "^5.9.0"
+    "@faker-js/faker": "^9.0.0",
+    "@fastify/express": "^3.0.0",
+    "@fastify/middie": "^8.3.1",
+    "fastify": "^4.28.1",
+    "openapi-backend": "^5.10.6",
+    "openapi-client-axios": "^7.5.5"
   }
 }

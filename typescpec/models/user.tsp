@@ -1,16 +1,20 @@
 model User {
   @key
-  id: int32;
+  id: string;
 
   @minLength(1)
   email: string;
 
   @minLength(1)
-  password: string;
-
-  @minLength(1)
   firstName: string;
 
-  @minValue(0)
-  age: int32;
+  @minLength(1)
+  lastName: string;
+}
+
+model Users {
+  users: User[];
+  total: integer;
+  skip: integer;
+  limit: integer;
 }

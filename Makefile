@@ -2,7 +2,7 @@ compile:
 	npx tsp compile ./typescpec/main.tsp
 
 dev:
-	npx tsp compile . --watch
+	npx tsp compile ./typescpec/main.tsp --watch
 
 start:
-	npx prism mock tsp-output/@typespec/openapi3/openapi.yaml
+	node --watch server/bin/index.js
