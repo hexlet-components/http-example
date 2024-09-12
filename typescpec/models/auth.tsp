@@ -1,4 +1,4 @@
-model AuthRequest {
+model AuthLogin {
   @minLength(1)
   login: string;
 
@@ -6,7 +6,7 @@ model AuthRequest {
   password: string;
 }
 
-model AuthResponse {
+model AuthToken {
   @minLength(1)
   token: string;
 }

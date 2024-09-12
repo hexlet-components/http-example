@@ -6,6 +6,8 @@ import "../models/error.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
+namespace ForumService;
+
 @tag("Posts")
 @route("/posts")
 interface PostService {

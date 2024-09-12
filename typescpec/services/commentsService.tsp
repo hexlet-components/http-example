@@ -7,6 +7,8 @@ import "../models/error.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
+namespace ForumService;
+
 @tag("Comments")
 @route("/comments")
 interface CommentService {

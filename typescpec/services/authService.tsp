@@ -4,8 +4,10 @@ import "../models/auth.tsp";
 
 using TypeSpec.Http;
 
+namespace ForumService;
+
 @tag("Auth")
 @route("/login")
 interface AuthService {
-  @post create(...AuthRequest): AuthResponse;
+  @post create(...AuthLogin): AuthToken;
 }

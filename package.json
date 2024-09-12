@@ -17,8 +17,11 @@
     "@faker-js/faker": "^9.0.0",
     "@fastify/express": "^3.0.0",
     "@fastify/middie": "^8.3.1",
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^4.1.0",
     "fastify": "^4.28.1",
     "openapi-backend": "^5.10.6",
-    "openapi-client-axios": "^7.5.5"
+    "openapi-client-axios": "^7.5.5",
+    "swagger-ui-dist": "^5.17.14"
   }
 }

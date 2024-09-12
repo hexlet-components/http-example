@@ -1,16 +1,20 @@
 import { OpenAPIBackend } from 'openapi-backend';
 import fastify from 'fastify';
 import path from 'node:path';
+import fastifySwagger from '@fastify/swagger';
+import swaggerUI from '@fastify/swagger-ui';
 import { getInitData, getId, getToken } from './utils.js';
 
+const title = 'Forum HTTP Api Example';
 const { dirname } = import.meta;
-const openapiFilePath = 'tsp-output/@typespec/openapi3/openapi.yaml';
+const openapiFilePath = path.join(dirname, '..', 'tsp-output/@typespec/openapi3/openapi.yaml');
+const swaggerRoute = '/swagger';
 
-const app = (host, port) => {
+const app = async (host, port) => {
   const state = getInitData();
 
   const api = new OpenAPIBackend({
-    definition: path.join(dirname, '..', openapiFilePath),
+    definition: openapiFilePath,
     handlers: {
       // Login handlers
       AuthService_create: (c, req, res) => {
@@ -51,7 +55,7 @@ const app = (host, port) => {
         const { id } = c.request.params;
         const user = state.users.find((item) => item.id === id);
         if (!user) {
-          return res.status(404).send({ status: 404, err: 'Not found' });
+          return res.status(404).send({ code: 404, message: 'Not found' });
         }
         return res.status(200).send(user);
       },
@@ -107,7 +111,7 @@ const app = (host, port) => {
         const { id } = c.request.params;
         const post = state.posts.find((item) => item.id === id);
         if (!post) {
-          return res.status(404).send({ status: 404, err: 'Not found' });
+          return res.status(404).send({ code: 404, message: 'Not found' });
         }
         return res.status(200).send(post);
       },
@@ -161,7 +165,7 @@ const app = (host, port) => {
         const { id } = c.request.params;
         const comment = state.comments.find((item) => item.id === id);
         if (!comment) {
-          return res.status(404).send({ status: 404, err: 'Not found' });
+          return res.status(404).send({ code: 404, message: 'Not found' });
         }
         return res.status(200).send(comment);
       },
@@ -183,13 +187,13 @@ const app = (host, port) => {
         return res.status(200).send(id);
       },
 
-      validationFail: (c, _req, res) => res.status(400).send({ status: 400, err: c.validation.errors }),
+      validationFail: (c, _req, res) => res.status(400).send({ code: 400, message: c.validation.errors }),
       unauthorizedHandler: (c, req, res) => res
         .status(401)
-        .send({ status: 401, err: 'Please authenticate first. Header example: "Authorization: Bearer token"' }),
+        .send({ code: 401, message: 'Please authenticate first. Header example: "Authorization: Bearer token"' }),
       notImplementedHandler: (c, req, res) => res
         .status(404)
-        .send({ status: 501, err: 'No handler registered for operation' }),
+        .send({ code: 501, message: 'No handler registered for operation' }),
     },
   });
 
@@ -214,7 +218,34 @@ const app = (host, port) => {
       ),
   });
 
-  app.listen({ host, port }, (err, address) => console.log(`Listen ${address}`));
+  await app.register(fastifySwagger, {
+    mode: 'static',
+    title,
+    exposeRoute: true,
+    specification: {
+      path: openapiFilePath,
+    },
+    routePrefix: swaggerRoute,
+  });
+
+
+  await app.register(swaggerUI, {
+    routePrefix: swaggerRoute,
+    title,
+    staticCSP: true,
+    transformSpecificationClone: true,
+    theme: {
+      title,
+    },
+  });
+
+  app.listen({ host, port }, (err, address) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log(`Listen ${address}`);
+  });
 };
 
 export default app;
