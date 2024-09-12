@@ -7,7 +7,8 @@ import { getInitData, getId, getToken } from './utils.js';
 
 const title = 'Forum HTTP Api Example';
 const { dirname } = import.meta;
-const openapiFilePath = path.join(dirname, '..', 'tsp-output/@typespec/openapi3/openapi.yaml');
+const version = '1.0';
+const openapiFilePath = path.join(dirname, '..', `tsp-output/@typespec/openapi3/openapi.${version}.yaml`);
 const swaggerRoute = '/swagger';
 
 const app = async (host, port) => {
