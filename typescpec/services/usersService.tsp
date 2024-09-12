@@ -16,10 +16,10 @@ interface UserService {
   @get get(@path id: string): User | Error;
 
   @useAuth(BearerAuth)
-  @post create(...User): User | Error;
+  @post create(...UserDto): User | Error;
 
   @useAuth(BearerAuth)
-  @patch update(...User): User | Error;
+  @patch update(...UserDto): User | Error;
 
   @useAuth(BearerAuth)
   @delete delete(@path id: string): void | Error;

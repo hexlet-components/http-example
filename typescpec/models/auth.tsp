@@ -1,4 +1,4 @@
-model AuthLogin {
+model AuthData {
   @minLength(1)
   login: string;
 

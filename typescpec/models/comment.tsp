@@ -1,8 +1,16 @@
+model CommentDto {
+  authorId: string;
+  postId: string;
+
+  @minLength(1)
+  body: string;
+}
+
 model Comment {
   @key
   id: string;
 
-  userId: string;
+  authorId: string;
   postId: string;
 
   @minLength(1)

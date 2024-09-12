@@ -16,10 +16,10 @@ interface CommentService {
   @get get(@path id: string): Comment | Error;
 
   @useAuth(BearerAuth)
-  @post create(...Comment): Comment | Error;
+  @post create(...CommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
-  @patch update(...Comment): Comment | Error;
+  @patch update(...CommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
   @delete delete(@path id: string): void | Error;

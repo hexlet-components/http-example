@@ -15,10 +15,10 @@ interface PostService {
   @get get(@path id: string): Post | Error;
 
   @useAuth(BearerAuth)
-  @post create(...Post): Post | Error;
+  @post create(...PostDto): Post | Error;
 
   @useAuth(BearerAuth)
-  @patch update(...Post): Post | Error;
+  @patch update(...PostDto): Post | Error;
 
   @useAuth(BearerAuth)
   @delete delete(@path id: string): void | Error;

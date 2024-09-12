@@ -1,8 +1,18 @@
+model PostDto {
+  authorId: string;
+
+  @minLength(1)
+  title: string;
+
+  @minLength(1)
+  body: string;
+}
+
 model Post {
   @key
   id: string;
 
-  userId: string;
+  authorId: string;
 
   @minLength(1)
   title: string;

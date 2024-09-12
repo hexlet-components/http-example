@@ -200,6 +200,13 @@ const app = async (host, port) => {
 
   api.init();
 
+  api.registerSecurityHandler('BearerAuth', (c) => {
+    const authHeader = c.request.headers['authorization'];
+    const token = authHeader.replace('Bearer ', '');
+    const authorized = !!token; //state.tokens.includes(token);
+    return authorized;
+  });
+
   const app = fastify();
 
   app.route({

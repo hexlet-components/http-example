@@ -1,3 +1,14 @@
+model UserDto {
+  @minLength(1)
+  email: string;
+
+  @minLength(1)
+  firstName: string;
+
+  @minLength(1)
+  lastName: string;
+}
+
 model User {
   @key
   id: string;
