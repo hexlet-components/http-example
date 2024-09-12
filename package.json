@@ -2,6 +2,10 @@
   "name": "http-server",
   "version": "0.1.0",
   "type": "module",
+  "scripts": {
+    "start": "node server/bin/index.js",
+    "build": "tsp compile ./typescpec/main.tsp"
+  },
   "devDependencies": {
     "@typespec/compiler": "latest",
     "@typespec/http": "latest",

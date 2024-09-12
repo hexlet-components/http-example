@@ -1,14 +1,16 @@
 import { OpenAPIBackend } from 'openapi-backend';
 import fastify from 'fastify';
+import path from 'node:path';
 import { getInitData, getId, getToken } from './utils.js';
 
-const app = () => {
-  const port = 5000;
+const { dirname } = import.meta;
+const openapiFilePath = 'tsp-output/@typespec/openapi3/openapi.yaml';
 
+const app = (host, port) => {
   const state = getInitData();
 
   const api = new OpenAPIBackend({
-    definition: 'tsp-output/@typespec/openapi3/openapi.yaml',
+    definition: path.join(dirname, '..', openapiFilePath),
     handlers: {
       // Login handlers
       AuthService_create: (c, req, res) => {
@@ -35,8 +37,8 @@ const app = () => {
         return res.status(200).send(user);
       },
       UserService_list: (c, req, res) => {
-        const skip = parseInt(c.request.query.skip, 10) ?? 0;
-        const limit = parseInt(c.request.query.limit, 10) ?? 100;
+        const skip = parseInt(c.request.query.skip ?? 0, 10)
+        const limit = parseInt(c.request.query.limit ?? 100, 10);
         const users = state.users.slice(skip, skip + limit);
         res.status(200).send({
           users,
@@ -91,8 +93,8 @@ const app = () => {
         return res.status(200).send(post);
       },
       PostService_list: (c, req, res) => {
-        const skip = parseInt(c.request.query.skip, 10) ?? 0;
-        const limit = parseInt(c.request.query.limit, 10) ?? 100;
+        const skip = parseInt(c.request.query.skip ?? 0, 10);
+        const limit = parseInt(c.request.query.limit ?? 100, 10);
         const posts = state.posts.slice(skip, skip + limit);
         res.status(200).send({
           posts,
@@ -145,8 +147,8 @@ const app = () => {
         return res.status(200).send(comment);
       },
       CommentService_list: (c, req, res) => {
-        const skip = parseInt(c.request.query.skip, 10) ?? 0;
-        const limit = parseInt(c.request.query.limit, 10) ?? 100;
+        const skip = parseInt(c.request.query.skip  ?? 0, 10);
+        const limit = parseInt(c.request.query.limit ?? 100, 10);
         const comments = state.comments.slice(skip, skip + limit);
         res.status(200).send({
           comments,
@@ -212,7 +214,7 @@ const app = () => {
       ),
   });
 
-  app.listen({ port }, (err, address) => console.log(`Listen ${address}`));
+  app.listen({ host, port }, (err, address) => console.log(`Listen ${address}`));
 };
 
 export default app;

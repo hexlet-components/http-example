@@ -1,8 +1,12 @@
+setup:
+	npm ci
+	make compile
+
 compile:
 	npx tsp compile ./typescpec/main.tsp
 
 dev:
-	npx tsp compile ./typescpec/main.tsp --watch
+	node --watch server/bin/index.js
 
 start:
-	node --watch server/bin/index.js
+	node server/bin/index.js
