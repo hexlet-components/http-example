@@ -3,8 +3,8 @@ services:
     build:
       context: .
     ports:
-      - '4010:4010'
+      - '5037:5037'
     environment:
-      PORT: 4010
+      PORT: 5037
     volumes:
       - ./:/app
