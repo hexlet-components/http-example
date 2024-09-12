@@ -13,7 +13,7 @@ See [Makefile](./Makefile)
 
 ```bash
 make setup
-make start # Open http://localhost:5037/swagger
+make start # Open http://localhost:5000/swagger
 ```
 
 ---
