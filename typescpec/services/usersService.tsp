@@ -37,12 +37,12 @@ interface UserService {
     @path authorId: string,
     @query skip?: string,
     @query limit?: string
-  ): Posts[] | Error;
+  ): Posts | Error;
 
   @route("/{authorId}/comments")
   op getComments(
     @path authorId: string,
     @query skip?: string,
     @query limit?: string
-  ): Comment[] | Error;
+  ): Comments | Error;
 }

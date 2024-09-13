@@ -66,7 +66,7 @@ const app = async (host, port) => {
         const skip = parseInt(c.request.query.skip ?? 0, 10)
         const limit = parseInt(c.request.query.limit ?? 100, 10);
         const page = posts.slice(skip, skip + limit);
-        return res.status(200).send({ posts: page, skip, limit, authorId });
+        return res.status(200).send({ posts: page, skip, limit, total: posts.length });
       },
       UserService_getComments: (c, req, res) => {
         const { authorId } = c.request.params;
@@ -74,7 +74,7 @@ const app = async (host, port) => {
         const skip = parseInt(c.request.query.skip ?? 0, 10)
         const limit = parseInt(c.request.query.limit ?? 100, 10);
         const page = comments.slice(skip, skip + limit);
-        return res.status(200).send({ comments: page, skip, limit });
+        return res.status(200).send({ comments: page, skip, limit, total: comments.length  });
       },
       UserService_update: (c, req, res) => {
         const { id } = c.request.params;
@@ -138,7 +138,7 @@ const app = async (host, port) => {
         const skip = parseInt(c.request.query.skip ?? 0, 10)
         const limit = parseInt(c.request.query.limit ?? 100, 10);
         const page = comments.slice(skip, skip + limit);
-        return res.status(200).send({ comments: page, skip, limit });
+        return res.status(200).send({ comments: page, skip, limit, total: comments.length });
       },
       PostService_update: (c, req, res) => {
         const { id } = c.request.params;
