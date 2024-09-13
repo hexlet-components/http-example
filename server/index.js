@@ -30,7 +30,7 @@ const app = async (host, port) => {
           firstName,
           lastName,
           email,
-        } = JSON.parse(c.request.body);
+        } = c.request.body;
         const user = {
           id: getId(),
           firstName,
@@ -60,6 +60,22 @@ const app = async (host, port) => {
         }
         return res.status(200).send(user);
       },
+      UserService_getPosts: (c, req, res) => {
+        const { authorId } = c.request.params;
+        const posts = state.posts.filter((item) => item.authorId === authorId);
+        const skip = parseInt(c.request.query.skip ?? 0, 10)
+        const limit = parseInt(c.request.query.limit ?? 100, 10);
+        const page = posts.slice(skip, skip + limit);
+        return res.status(200).send({ posts: page, skip, limit, authorId });
+      },
+      UserService_getComments: (c, req, res) => {
+        const { authorId } = c.request.params;
+        const comments = state.comments.filter((item) => item.authorId === authorId);
+        const skip = parseInt(c.request.query.skip ?? 0, 10)
+        const limit = parseInt(c.request.query.limit ?? 100, 10);
+        const page = comments.slice(skip, skip + limit);
+        return res.status(200).send({ comments: page, skip, limit });
+      },
       UserService_update: (c, req, res) => {
         const { id } = c.request.params;
         const user = state.users.find((item) => item.id === id);
@@ -67,7 +83,7 @@ const app = async (host, port) => {
           firstName,
           lastName,
           email,
-        } = JSON.parse(c.request.body);
+        } = c.request.body;
         user.firstName = firstName,
         user.lastName = lastName,
         user.email = email;
@@ -86,7 +102,7 @@ const app = async (host, port) => {
           userId,
           title,
           body,
-        } = JSON.parse(c.request.body);
+        } = c.request.body;
         const post = {
           id: getId(),
           userId,
@@ -116,6 +132,14 @@ const app = async (host, port) => {
         }
         return res.status(200).send(post);
       },
+      PostService_getComments: (c, req, res) => {
+        const { postId } = c.request.params;
+        const comments = state.comments.filter((item) => item.postId === postId);
+        const skip = parseInt(c.request.query.skip ?? 0, 10)
+        const limit = parseInt(c.request.query.limit ?? 100, 10);
+        const page = comments.slice(skip, skip + limit);
+        return res.status(200).send({ comments: page, skip, limit });
+      },
       PostService_update: (c, req, res) => {
         const { id } = c.request.params;
         const post = state.posts.find((item) => item.id === id);
@@ -123,7 +147,7 @@ const app = async (host, port) => {
           userId,
           title,
           body,
-        } = JSON.parse(c.request.body);
+        } = c.request.body;
         post.userId = userId,
         post.title = title,
         post.body = body;
@@ -141,7 +165,7 @@ const app = async (host, port) => {
         const {
           userId,
           body,
-        } = JSON.parse(c.request.body);
+        } = c.request.body;
         const comment = {
           id: getId(),
           userId,
@@ -176,7 +200,7 @@ const app = async (host, port) => {
         const {
           userId,
           body,
-        } = JSON.parse(c.request.body);
+        } = c.request.body;
         comment.userId = userId;
         comment.body = body;
         return res.status(200).send(comment);

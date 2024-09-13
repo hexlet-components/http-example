@@ -12,15 +12,21 @@ namespace ForumService;
 @tag("Comments")
 @route("/comments")
 interface CommentService {
-  @get list(@query skip?: string, @query limit?: string): Comments | Error;
-  @get get(@path id: string): Comment | Error;
+  @get
+  op list(@query skip?: string, @query limit?: string): Comments | Error;
+
+  @get
+  op get(@path id: string): Comment | Error;
 
   @useAuth(BearerAuth)
-  @post create(...CommentDto): Comment | Error;
+  @post
+  op create(...CommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
-  @patch update(...CommentDto): Comment | Error;
+  @patch
+  op update(...CommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
-  @delete delete(@path id: string): void | Error;
+  @delete
+  op delete(@path id: string): void | Error;
 }

@@ -11,15 +11,28 @@ namespace ForumService;
 @tag("Posts")
 @route("/posts")
 interface PostService {
-  @get list(@query skip?: string, @query limit?: string): Posts | Error;
-  @get get(@path id: string): Post | Error;
+  @get
+  op list(@query skip?: string, @query limit?: string): Posts | Error;
+
+  @get
+  op get(@path id: string): Post | Error;
 
   @useAuth(BearerAuth)
-  @post create(...PostDto): Post | Error;
+  @post
+  op create(...PostDto): Post | Error;
 
   @useAuth(BearerAuth)
-  @patch update(...PostDto): Post | Error;
+  @patch
+  op update(...PostDto): Post | Error;
 
   @useAuth(BearerAuth)
-  @delete delete(@path id: string): void | Error;
+  @delete
+  op delete(@path id: string): void | Error;
+
+  @route("/{postId}/comments")
+  op getComments(
+    @path postId: string,
+    @query skip?: string,
+    @query limit?: string
+  ): Comments | Error;
 }

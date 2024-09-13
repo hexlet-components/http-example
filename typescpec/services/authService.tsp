@@ -9,5 +9,6 @@ namespace ForumService;
 @tag("Auth")
 @route("/login")
 interface AuthService {
-  @post create(...AuthData): AuthToken;
+  @post
+  op create(...AuthData): AuthToken;
 }

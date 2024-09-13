@@ -9,15 +9,15 @@ const createUser = () => ({
 
 const createPost = (user) => ({
   id: faker.string.uuid(),
-  userId: user.id,
+  authorId: user.id,
   title: faker.lorem.words(),
   body: faker.lorem.paragraphs(),
 });
 
 const createComment = (post) => ({
   id: faker.string.uuid(),
-  userId: post.userId,
-  postId: post.postId,
+  authorId: post.authorId,
+  postId: post.id,
   body: faker.lorem.paragraphs(),
 });
 

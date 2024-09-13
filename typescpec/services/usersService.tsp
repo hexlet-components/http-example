@@ -1,6 +1,8 @@
 import "@typespec/http";
 import "@typespec/rest";
 import "../models/user.tsp";
+import "../models/post.tsp";
+import "../models/comment.tsp";
 import "../models/error.tsp";
 
 
@@ -12,15 +14,35 @@ namespace ForumService;
 @tag("Users")
 @route("/users")
 interface UserService {
-  @get list(@query skip?: string, @query limit?: string): Users | Error;
-  @get get(@path id: string): User | Error;
+  @get
+  op list(@query skip?: string, @query limit?: string): Users | Error;
+
+  @get
+  op get(@path id: string): User | Error;
 
   @useAuth(BearerAuth)
-  @post create(...UserDto): User | Error;
+  @post
+  op create(...UserDto): User | Error;
 
   @useAuth(BearerAuth)
-  @patch update(...UserDto): User | Error;
+  @patch
+  op update(...UserDto): User | Error;
 
   @useAuth(BearerAuth)
-  @delete delete(@path id: string): void | Error;
+  @delete
+  op delete(@path id: string): void | Error;
+
+  @route("/{authorId}/posts")
+  op getPosts(
+    @path authorId: string,
+    @query skip?: string,
+    @query limit?: string
+  ): Posts[] | Error;
+
+  @route("/{authorId}/comments")
+  op getComments(
+    @path authorId: string,
+    @query skip?: string,
+    @query limit?: string
+  ): Comment[] | Error;
 }
