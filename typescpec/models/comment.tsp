@@ -21,5 +21,5 @@ model Comments {
   comments: Comment[];
   total: integer;
   skip: integer;
-  limit: integer;
+  limit: integer = 30;
 }

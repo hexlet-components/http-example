@@ -27,5 +27,5 @@ model Users {
   users: User[];
   total: integer;
   skip: integer;
-  limit: integer;
+  limit: integer = 30;
 }

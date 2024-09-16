@@ -3,7 +3,7 @@ import fastify from 'fastify';
 import path from 'node:path';
 import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
-import { getInitData, getId, getToken } from './utils.js';
+import { getInitData, getId, getToken, prepareListData, prepareItem } from './utils.js';
 
 const title = 'Forum HTTP Api Example';
 const { dirname } = import.meta;
@@ -41,40 +41,25 @@ const app = async (host, port) => {
         state.users.push(user);
         return res.status(200).send(user);
       },
-      UserService_list: (c, req, res) => {
-        const skip = parseInt(c.request.query.skip ?? 0, 10)
-        const limit = parseInt(c.request.query.limit ?? 100, 10);
-        const users = state.users.slice(skip, skip + limit);
-        res.status(200).send({
-          users,
-          total: state.users.length,
-          skip,
-          limit,
-        });
-      },
+      UserService_list: (c, req, res) => res.status(200).send(prepareListData('users', state, c)),
       UserService_get: (c, req, res) => {
         const { id } = c.request.params;
+        const { select } = context.request.query.select ?? [];
         const user = state.users.find((item) => item.id === id);
         if (!user) {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
-        return res.status(200).send(user);
+        return res.status(200).send(prepareItem(user, select));
       },
       UserService_getPosts: (c, req, res) => {
         const { authorId } = c.request.params;
-        const posts = state.posts.filter((item) => item.authorId === authorId);
-        const skip = parseInt(c.request.query.skip ?? 0, 10)
-        const limit = parseInt(c.request.query.limit ?? 100, 10);
-        const page = posts.slice(skip, skip + limit);
-        return res.status(200).send({ posts: page, skip, limit, total: posts.length });
+        const data = prepareListData('posts', state, c, (item) => item.authorId === authorId);
+        return res.status(200).send(data);
       },
       UserService_getComments: (c, req, res) => {
         const { authorId } = c.request.params;
-        const comments = state.comments.filter((item) => item.authorId === authorId);
-        const skip = parseInt(c.request.query.skip ?? 0, 10)
-        const limit = parseInt(c.request.query.limit ?? 100, 10);
-        const page = comments.slice(skip, skip + limit);
-        return res.status(200).send({ comments: page, skip, limit, total: comments.length  });
+        const data = prepareListData('comments', state, c, (item) => item.authorId === authorId);
+        return res.status(200).send(data);
       },
       UserService_update: (c, req, res) => {
         const { id } = c.request.params;
@@ -113,32 +98,20 @@ const app = async (host, port) => {
         state.posts.push(post);
         return res.status(200).send(post);
       },
-      PostService_list: (c, req, res) => {
-        const skip = parseInt(c.request.query.skip ?? 0, 10);
-        const limit = parseInt(c.request.query.limit ?? 100, 10);
-        const posts = state.posts.slice(skip, skip + limit);
-        res.status(200).send({
-          posts,
-          total: state.posts.length,
-          skip,
-          limit,
-        });
-      },
+      PostService_list: (c, req, res) => prepareListData('posts', state, c),
       PostService_get: (c, req, res) => {
         const { id } = c.request.params;
+        const { select } = context.request.query.select ?? [];
         const post = state.posts.find((item) => item.id === id);
         if (!post) {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
-        return res.status(200).send(post);
+        return res.status(200).send(prepareItem(post, select));
       },
       PostService_getComments: (c, req, res) => {
         const { postId } = c.request.params;
-        const comments = state.comments.filter((item) => item.postId === postId);
-        const skip = parseInt(c.request.query.skip ?? 0, 10)
-        const limit = parseInt(c.request.query.limit ?? 100, 10);
-        const page = comments.slice(skip, skip + limit);
-        return res.status(200).send({ comments: page, skip, limit, total: comments.length });
+        const data = prepareListData('comments', state, c, (item) => item.postId === postId);
+        return res.status(200).send(data);
       },
       PostService_update: (c, req, res) => {
         const { id } = c.request.params;
@@ -175,24 +148,15 @@ const app = async (host, port) => {
         state.comments.push(comment);
         return res.status(200).send(comment);
       },
-      CommentService_list: (c, req, res) => {
-        const skip = parseInt(c.request.query.skip  ?? 0, 10);
-        const limit = parseInt(c.request.query.limit ?? 100, 10);
-        const comments = state.comments.slice(skip, skip + limit);
-        res.status(200).send({
-          comments,
-          total: state.comments.length,
-          skip,
-          limit,
-        });
-      },
+      CommentService_list: (c, req, res) => prepareListData('comments', state, c),
       CommentService_get: (c, req, res) => {
         const { id } = c.request.params;
+        const { select } = context.request.query.select ?? [];
         const comment = state.comments.find((item) => item.id === id);
         if (!comment) {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
-        return res.status(200).send(comment);
+        return res.status(200).send(prepareItem(comment, select));
       },
       CommentService_update: (c, req, res) => {
         const { id } = c.request.params;

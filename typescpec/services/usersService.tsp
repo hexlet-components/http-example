@@ -15,10 +15,17 @@ namespace ForumService;
 @route("/users")
 interface UserService {
   @get
-  op list(@query skip?: string, @query limit?: string): Users | Error;
+  op list(
+    @query skip?: string,
+    @query limit?: string,
+    @query select?: string[]
+  ): Users | Error;
 
   @get
-  op get(@path id: string): User | Error;
+  op get(
+    @path id: string,
+    @query select?: string
+  ): User | Error;
 
   @useAuth(BearerAuth)
   @post
@@ -35,14 +42,16 @@ interface UserService {
   @route("/{authorId}/posts")
   op getPosts(
     @path authorId: string,
-    @query skip?: string,
-    @query limit?: string
+    @query skip?: integer,
+    @query limit?: integer = 30,
+    @query select?: string
   ): Posts | Error;
 
   @route("/{authorId}/comments")
   op getComments(
     @path authorId: string,
-    @query skip?: string,
-    @query limit?: string
+    @query skip?: integer,
+    @query limit?: integer = 30,
+    @query select?: string
   ): Comments | Error;
 }

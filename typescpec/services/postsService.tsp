@@ -12,10 +12,17 @@ namespace ForumService;
 @route("/posts")
 interface PostService {
   @get
-  op list(@query skip?: string, @query limit?: string): Posts | Error;
+  op list(
+    @query skip?: integer,
+    @query limit?: integer = 30,
+    @query select?: string
+  ): Posts | Error;
 
   @get
-  op get(@path id: string): Post | Error;
+  op get(
+    @path id: string,
+    @query select?: string
+  ): Post | Error;
 
   @useAuth(BearerAuth)
   @post
@@ -32,7 +39,8 @@ interface PostService {
   @route("/{postId}/comments")
   op getComments(
     @path postId: string,
-    @query skip?: string,
-    @query limit?: string
+    @query skip?: integer,
+    @query limit?: integer = 30,
+    @query select?: string
   ): Comments | Error;
 }

@@ -13,10 +13,17 @@ namespace ForumService;
 @route("/comments")
 interface CommentService {
   @get
-  op list(@query skip?: string, @query limit?: string): Comments | Error;
+  op list(
+    @query skip?: integer,
+    @query limit?: integer = 30,
+    @query select?: string
+  ): Comments | Error;
 
   @get
-  op get(@path id: string): Comment | Error;
+  op get(
+    @path id: string,
+    @query select?: string
+  ): Comment | Error;
 
   @useAuth(BearerAuth)
   @post
