@@ -62,7 +62,7 @@ export const getInitData = () => {
 };
 
 export const prepareItem = (item, selectors = []) => {
-  if (selectors) {
+  if (selectors.length) {
     return {
       id: item.id,
       ..._.pick(item, selectors),

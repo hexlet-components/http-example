@@ -27,13 +27,12 @@ interface UserService {
     @query select?: string
   ): User | Error;
 
-  @useAuth(BearerAuth)
   @post
-  op create(...UserDto): User | Error;
+  op create(...NewUserDto): User | Error;
 
   @useAuth(BearerAuth)
   @patch
-  op update(...UserDto): User | Error;
+  op update(...EditUserDto): User | Error;
 
   @useAuth(BearerAuth)
   @delete

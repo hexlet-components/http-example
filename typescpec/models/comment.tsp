@@ -1,9 +1,17 @@
-model CommentDto {
+model NewCommentDto {
   authorId: string;
   postId: string;
 
   @minLength(1)
   body: string;
+}
+
+model EditCommentDto {
+  authorId?: string;
+  postId?: string;
+
+  @minLength(1)
+  body?: string;
 }
 
 model Comment {

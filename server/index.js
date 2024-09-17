@@ -44,7 +44,7 @@ const app = async (host, port) => {
       UserService_list: (c, req, res) => res.status(200).send(prepareListData('users', state, c)),
       UserService_get: (c, req, res) => {
         const { id } = c.request.params;
-        const { select } = context.request.query.select ?? [];
+        const { select } = c.request.query.select ?? [];
         const user = state.users.find((item) => item.id === id);
         if (!user) {
           return res.status(404).send({ code: 404, message: 'Not found' });
@@ -63,16 +63,15 @@ const app = async (host, port) => {
       },
       UserService_update: (c, req, res) => {
         const { id } = c.request.params;
-        const user = state.users.find((item) => item.id === id);
-        const {
-          firstName,
-          lastName,
-          email,
-        } = c.request.body;
-        user.firstName = firstName,
-        user.lastName = lastName,
-        user.email = email;
-        return res.status(200).send(user);
+        const index = state.users.findIndex((item) => item.id === id);
+        if (index === -1) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        state.users[index] = {
+          ...state.users[index],
+          ...c.request.body,
+        };
+        return res.status(200).send(state.users[index]);
       },
       UserService_delete: (c, req, res) => {
         const { id } = c.request.params;
@@ -101,7 +100,7 @@ const app = async (host, port) => {
       PostService_list: (c, req, res) => prepareListData('posts', state, c),
       PostService_get: (c, req, res) => {
         const { id } = c.request.params;
-        const { select } = context.request.query.select ?? [];
+        const { select } = c.request.query.select ?? [];
         const post = state.posts.find((item) => item.id === id);
         if (!post) {
           return res.status(404).send({ code: 404, message: 'Not found' });
@@ -115,16 +114,15 @@ const app = async (host, port) => {
       },
       PostService_update: (c, req, res) => {
         const { id } = c.request.params;
-        const post = state.posts.find((item) => item.id === id);
-        const {
-          userId,
-          title,
-          body,
-        } = c.request.body;
-        post.userId = userId,
-        post.title = title,
-        post.body = body;
-        return res.status(200).send(post);
+        const index = state.posts.findIndex((item) => item.id === id);
+        if (index === -1) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        state.posts[index] = {
+          ...state.posts[index],
+          ...c.request.body,
+        };
+        return res.status(200).send(state.posts[index]);
       },
       PostService_delete: (c, req, res) => {
         const { id } = c.request.params;
@@ -151,7 +149,7 @@ const app = async (host, port) => {
       CommentService_list: (c, req, res) => prepareListData('comments', state, c),
       CommentService_get: (c, req, res) => {
         const { id } = c.request.params;
-        const { select } = context.request.query.select ?? [];
+        const { select } = c.request.query.select;
         const comment = state.comments.find((item) => item.id === id);
         if (!comment) {
           return res.status(404).send({ code: 404, message: 'Not found' });
@@ -160,14 +158,15 @@ const app = async (host, port) => {
       },
       CommentService_update: (c, req, res) => {
         const { id } = c.request.params;
-        const comment = state.comments.find((item) => item.id === id);
-        const {
-          userId,
-          body,
-        } = c.request.body;
-        comment.userId = userId;
-        comment.body = body;
-        return res.status(200).send(comment);
+        const index = state.comments.findIndex((item) => item.id === id);
+        if (index === -1) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        state.comments[index] = {
+          ...state.comments[index],
+          ...c.request.body,
+        };
+        return res.status(200).send(state.comments[index]);
       },
       CommentService_delete: (c, req, res) => {
         const { id } = c.request.params;

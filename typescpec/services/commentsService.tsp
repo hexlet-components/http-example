@@ -27,11 +27,11 @@ interface CommentService {
 
   @useAuth(BearerAuth)
   @post
-  op create(...CommentDto): Comment | Error;
+  op create(...NewCommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
   @patch
-  op update(...CommentDto): Comment | Error;
+  op update(...EditCommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
   @delete

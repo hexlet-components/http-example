@@ -1,4 +1,14 @@
-model PostDto {
+model NewPostDto {
+  authorId: string;
+
+  @minLength(1)
+  title: string;
+
+  @minLength(1)
+  body: string;
+}
+
+model EditPostDto {
   authorId: string;
 
   @minLength(1)

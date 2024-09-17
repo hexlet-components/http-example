@@ -10,7 +10,8 @@
     "@typespec/compiler": "latest",
     "@typespec/http": "latest",
     "@typespec/openapi3": "latest",
-    "@typespec/rest": "latest"
+    "@typespec/rest": "latest",
+    "dredd": "^14.1.0"
   },
   "private": true,
   "dependencies": {

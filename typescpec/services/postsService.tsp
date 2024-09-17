@@ -26,11 +26,11 @@ interface PostService {
 
   @useAuth(BearerAuth)
   @post
-  op create(...PostDto): Post | Error;
+  op create(...NewPostDto): Post | Error;
 
   @useAuth(BearerAuth)
   @patch
-  op update(...PostDto): Post | Error;
+  op update(...EditPostDto): Post | Error;
 
   @useAuth(BearerAuth)
   @delete
