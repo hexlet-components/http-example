@@ -13,12 +13,15 @@ namespace ForumService;
 interface PostService {
   @get
   op list(
-    @query skip?: integer,
+    @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
   ): Posts | Error;
 
   @get
+  @opExample(
+    #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
+  )
   op get(
     @path id: string,
     @query select?: string
@@ -30,16 +33,22 @@ interface PostService {
 
   @useAuth(BearerAuth)
   @patch
-  op update(...EditPostDto): Post | Error;
+  @opExample(
+    #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
+  )
+  op update(@path id: string, ...EditPostDto): Post | Error;
 
   @useAuth(BearerAuth)
   @delete
+  @opExample(
+    #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
+  )
   op delete(@path id: string): void | Error;
 
   @route("/{postId}/comments")
   op getComments(
     @path postId: string,
-    @query skip?: integer,
+    @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
   ): Comments | Error;

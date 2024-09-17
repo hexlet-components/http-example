@@ -22,6 +22,9 @@ interface UserService {
   ): Users | Error;
 
   @get
+  @opExample(
+    #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
+  )
   op get(
     @path id: string,
     @query select?: string
@@ -32,24 +35,36 @@ interface UserService {
 
   @useAuth(BearerAuth)
   @patch
-  op update(...EditUserDto): User | Error;
+  @opExample(
+    #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
+  )
+  op update(@path id: string, ...EditUserDto): User | Error;
 
   @useAuth(BearerAuth)
   @delete
+  @opExample(
+    #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
+  )
   op delete(@path id: string): void | Error;
 
   @route("/{authorId}/posts")
+  @opExample(
+    #{ parameters: #{ authorId: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
+  )
   op getPosts(
     @path authorId: string,
-    @query skip?: integer,
+    @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
   ): Posts | Error;
 
   @route("/{authorId}/comments")
+  @opExample(
+    #{ parameters: #{ authorId: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
+  )
   op getComments(
     @path authorId: string,
-    @query skip?: integer,
+    @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
   ): Comments | Error;

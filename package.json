@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node server/bin/index.js",
-    "build": "tsp compile ./typescpec/main.tsp"
+    "build": "tsp compile ./typescpec/main.tsp",
+    "test": "npx dredd"
   },
   "devDependencies": {
     "@typespec/compiler": "latest",

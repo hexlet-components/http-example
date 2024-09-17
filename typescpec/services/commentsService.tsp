@@ -14,14 +14,18 @@ namespace ForumService;
 interface CommentService {
   @get
   op list(
-    @query skip?: integer,
+    @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
   ): Comments | Error;
 
   @get
+  @opExample(
+    #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
+  )
   op get(
-    @path id: string,
+    @path
+    id: string,
     @query select?: string
   ): Comment | Error;
 
@@ -31,9 +35,15 @@ interface CommentService {
 
   @useAuth(BearerAuth)
   @patch
-  op update(...EditCommentDto): Comment | Error;
+  @opExample(
+    #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
+  )
+  op update(@path id: string, ...EditCommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
   @delete
+  @opExample(
+    #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
+  )
   op delete(@path id: string): void | Error;
 }

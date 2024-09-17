@@ -10,3 +10,6 @@ dev:
 
 start:
 	node server/bin/index.js
+
+test:
+	npm test
