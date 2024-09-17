@@ -44,7 +44,7 @@ const app = async (host, port) => {
       UserService_list: (c, req, res) => res.status(200).send(prepareListData('users', state, c)),
       UserService_get: (c, req, res) => {
         const { id } = c.request.params;
-        const { select } = c.request.query.select ?? [];
+        const { select } = c.request.query.select ?? {};
         const user = state.users.find((item) => item.id === id);
         if (!user) {
           return res.status(404).send({ code: 404, message: 'Not found' });
@@ -100,7 +100,7 @@ const app = async (host, port) => {
       PostService_list: (c, req, res) => prepareListData('posts', state, c),
       PostService_get: (c, req, res) => {
         const { id } = c.request.params;
-        const { select } = c.request.query.select ?? [];
+        const { select } = c.request.query.select ?? {};
         const post = state.posts.find((item) => item.id === id);
         if (!post) {
           return res.status(404).send({ code: 404, message: 'Not found' });
@@ -149,7 +149,7 @@ const app = async (host, port) => {
       CommentService_list: (c, req, res) => prepareListData('comments', state, c),
       CommentService_get: (c, req, res) => {
         const { id } = c.request.params;
-        const { select } = c.request.query.select;
+        const { select } = c.request.query.select ?? {};
         const comment = state.comments.find((item) => item.id === id);
         if (!comment) {
           return res.status(404).send({ code: 404, message: 'Not found' });

@@ -3,7 +3,6 @@ import "@typespec/rest";
 import "../models/comment.tsp";
 import "../models/error.tsp";
 
-
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
@@ -20,9 +19,6 @@ interface CommentService {
   ): Comments | Error;
 
   @get
-  @opExample(
-    #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
-  )
   op get(
     @path
     id: string,
@@ -38,7 +34,7 @@ interface CommentService {
   @opExample(
     #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
   )
-  op update(@path id: string, ...EditCommentDto): Comment | Error;
+  op update(@path  id: string, ...EditCommentDto): Comment | Error;
 
   @useAuth(BearerAuth)
   @delete
