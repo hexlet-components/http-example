@@ -1,9 +1,8 @@
 {
   "name": "http-server",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
-    "start": "node server/bin/index.js",
+    "start": "node server/bin/index.mjs",
     "build": "tsp compile ./typescpec/main.tsp",
     "test": "npx dredd"
   },

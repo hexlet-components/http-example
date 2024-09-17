@@ -16,30 +16,30 @@ interface CommentService {
     @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
-  ): Comments | Error;
+  ): Comments;
 
   @get
   op get(
     @path
     id: string,
     @query select?: string
-  ): Comment | Error;
+  ): Comment;
 
   @useAuth(BearerAuth)
   @post
-  op create(...NewCommentDto): Comment | Error;
+  op create(...NewCommentDto): Comment;
 
   @useAuth(BearerAuth)
   @patch
   @opExample(
     #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
   )
-  op update(@path  id: string, ...EditCommentDto): Comment | Error;
+  op update(@path  id: string, ...EditCommentDto): void;
 
   @useAuth(BearerAuth)
   @delete
   @opExample(
     #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
   )
-  op delete(@path id: string): void | Error;
+  op delete(@path id: string): void;
 }

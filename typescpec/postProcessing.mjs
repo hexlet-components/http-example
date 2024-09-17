@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'yaml';
-import { getInitData } from '../server/utils.js';
+import { getInitData } from '../server/utils.mjs';
 
 const { dirname } = import.meta;
 
@@ -30,7 +30,6 @@ const processTree = (tree) => {
   for (const { currentPath, idPath } of pathsData) {
     const regex = /^\/\w*/;
     const found = currentPath.match(regex);
-    console.log('found: ', found);
     const name = found[0].replace('/', '');
     const id = state[name][0].id;
     const methods = Object.values(tree.paths[currentPath]);

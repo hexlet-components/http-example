@@ -16,7 +16,7 @@ interface PostService {
     @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
-  ): Posts | Error;
+  ): Posts;
 
   @get
   @opExample(
@@ -25,25 +25,25 @@ interface PostService {
   op get(
     @path id: string,
     @query select?: string
-  ): Post | Error;
+  ): Post;
 
   @useAuth(BearerAuth)
   @post
-  op create(...NewPostDto): Post | Error;
+  op create(...NewPostDto): Post;
 
   @useAuth(BearerAuth)
   @patch
   @opExample(
     #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
   )
-  op update(@path id: string, ...EditPostDto): Post | Error;
+  op update(@path id: string, ...EditPostDto): Post;
 
   @useAuth(BearerAuth)
   @delete
   @opExample(
     #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
   )
-  op delete(@path id: string): void | Error;
+  op delete(@path id: string): void;
 
   @route("/{postId}/comments")
   op getComments(
@@ -51,5 +51,5 @@ interface PostService {
     @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
-  ): Comments | Error;
+  ): Comments;
 }
