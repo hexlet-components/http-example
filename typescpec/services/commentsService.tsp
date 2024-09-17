@@ -34,7 +34,7 @@ interface CommentService {
   @opExample(
     #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
   )
-  op update(@path  id: string, ...EditCommentDto): void;
+  op update(@path  id: string, ...EditCommentDto): Comment;
 
   @useAuth(BearerAuth)
   @delete

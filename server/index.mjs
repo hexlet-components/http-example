@@ -134,11 +134,13 @@ const app = async (host, port) => {
       // Comments handlers
       CommentService_create: (c, req, res) => {
         const {
+          postId,
           authorId,
           body,
         } = c.request.body;
         const comment = {
           id: getId(),
+          postId,
           authorId,
           body
         };
