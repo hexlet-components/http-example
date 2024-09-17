@@ -17,6 +17,9 @@ jobs:
           cache: npm
       - name: Install
         run: make setup
+      
+      - name: Tests
+        run: make tests
 
   deploy:
     needs: build

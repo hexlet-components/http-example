@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node server/bin/index.mjs",
-    "build": "tsp compile ./typescpec/main.tsp",
+    "build": "tsp compile ./typescpec/main.tsp && node ./typescpec/postProcessing.mjs",
     "test": "npx dredd"
   },
   "devDependencies": {

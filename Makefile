@@ -16,4 +16,4 @@ test:
 	npm test
 
 compose-test:
-	docker-compose up --build --abort-on-container-exit
+	docker compose up --build --abort-on-container-exit
