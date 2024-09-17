@@ -3,7 +3,7 @@ import fastify from 'fastify';
 import path from 'node:path';
 import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
-import { getInitData, getId, getToken, prepareListData, prepareItem } from './utils.js';
+import { getInitData, getId, getToken, prepareListData, prepareItem } from './utils.mjs';
 
 const title = 'Forum HTTP Api Example';
 const { dirname } = import.meta;
@@ -77,19 +77,19 @@ const app = async (host, port) => {
         const { id } = c.request.params;
         const users = state.users.filter((item) => item.id !== id);
         state.users = users;
-        return res.status(200).send(id);
+        return res.status(204).send();
       },
 
       // Posts handlers
       PostService_create: (c, req, res) => {
         const {
-          userId,
+          authorId,
           title,
           body,
         } = c.request.body;
         const post = {
           id: getId(),
-          userId,
+          authorId,
           title,
           body,
         };
@@ -128,18 +128,20 @@ const app = async (host, port) => {
         const { id } = c.request.params;
         const posts = state.posts.filter((item) => item.id !== id);
         state.posts = posts;
-        return res.status(200).send(id);
+        return res.status(204).send();
       },
 
       // Comments handlers
       CommentService_create: (c, req, res) => {
         const {
-          userId,
+          postId,
+          authorId,
           body,
         } = c.request.body;
         const comment = {
           id: getId(),
-          userId,
+          postId,
+          authorId,
           body
         };
 
@@ -172,7 +174,7 @@ const app = async (host, port) => {
         const { id } = c.request.params;
         const comments = state.comments.filter((item) => item.id !== id);
         state.comments = comments;
-        return res.status(200).send(id);
+        return res.status(204).send();
       },
 
       validationFail: (c, _req, res) => res.status(400).send({ code: 400, message: c.validation.errors }),

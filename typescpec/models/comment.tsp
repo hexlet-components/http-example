@@ -1,3 +1,11 @@
+@example(
+  #{
+    authorId: "some_user_id",
+    postId: "some_post_id",
+    body: "new comment body"
+  },
+  #{ title: "New comment" }
+)
 model NewCommentDto {
   authorId: string;
   postId: string;
@@ -6,6 +14,14 @@ model NewCommentDto {
   body: string;
 }
 
+@example(
+  #{
+    authorId: "some_user_id",
+    postId: "some_post_id",
+    body: "edit comment body"
+  },
+  #{ title: "Edit comment" }
+)
 model EditCommentDto {
   authorId?: string;
   postId?: string;
@@ -14,6 +30,15 @@ model EditCommentDto {
   body?: string;
 }
 
+@example(
+  #{
+    id: "some-post-id",
+    authorId: "some_user_id",
+    postId: "some_post_id",
+    body: "comment body"
+  },
+  #{ title: "Comment" }
+)
 model Comment {
   @key
   id: string;

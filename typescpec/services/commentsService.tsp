@@ -3,7 +3,6 @@ import "@typespec/rest";
 import "../models/comment.tsp";
 import "../models/error.tsp";
 
-
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
@@ -14,26 +13,33 @@ namespace ForumService;
 interface CommentService {
   @get
   op list(
-    @query skip?: integer,
+    @query skip?: integer = 0,
     @query limit?: integer = 30,
     @query select?: string
-  ): Comments | Error;
+  ): Comments;
 
   @get
   op get(
-    @path id: string,
+    @path
+    id: string,
     @query select?: string
-  ): Comment | Error;
+  ): Comment;
 
   @useAuth(BearerAuth)
   @post
-  op create(...NewCommentDto): Comment | Error;
+  op create(...NewCommentDto): Comment;
 
   @useAuth(BearerAuth)
   @patch
-  op update(...EditCommentDto): Comment | Error;
+  @opExample(
+    #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
+  )
+  op update(@path  id: string, ...EditCommentDto): Comment;
 
   @useAuth(BearerAuth)
   @delete
-  op delete(@path id: string): void | Error;
+  @opExample(
+    #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
+  )
+  op delete(@path id: string): void;
 }

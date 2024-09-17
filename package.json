@@ -1,10 +1,10 @@
 {
   "name": "http-server",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
-    "start": "node server/bin/index.js",
-    "build": "tsp compile ./typescpec/main.tsp"
+    "start": "node server/bin/index.mjs",
+    "build": "tsp compile ./typescpec/main.tsp && node ./typescpec/postProcessing.mjs",
+    "test": "npx dredd"
   },
   "devDependencies": {
     "@typespec/compiler": "latest",
@@ -24,6 +24,7 @@
     "lodash": "^4.17.21",
     "openapi-backend": "^5.10.6",
     "openapi-client-axios": "^7.5.5",
-    "swagger-ui-dist": "^5.17.14"
+    "swagger-ui-dist": "^5.17.14",
+    "yaml": "^2.5.1"
   }
 }
