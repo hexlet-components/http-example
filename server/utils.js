@@ -74,7 +74,7 @@ export const prepareItem = (item, selectors = []) => {
 export const prepareListData = (name, state, context, callbackFilter = () => true) => {
   const skip = parseInt(context.request.query.skip ?? 0, 10)
   const limit = parseInt(context.request.query.limit ?? defaultLimit, 10);
-  const { select } = context.request.query ?? [];
+  const { select } = context.request.query ?? {};
   const totalList = state[name].filter(callbackFilter);
   let list = totalList.slice(skip, skip + limit);
   if (select) {
