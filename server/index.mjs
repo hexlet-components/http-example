@@ -90,7 +90,7 @@ const app = async (host, port) => {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
         const currentUser = getUserByToken(c, state);
-        if (currentUser.id !== id) {
+        if (currentUser?.id !== id) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
@@ -104,7 +104,7 @@ const app = async (host, port) => {
       UserService_delete: (c, req, res) => {
         const { id } = c.request.params;
         const currentUser = getUserByToken(c, state);
-        if (currentUser.id !== id) {
+        if (currentUser?.id !== id) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
@@ -121,6 +121,11 @@ const app = async (host, port) => {
           body,
         } = c.request.body;
         const currentUser = getUserByToken(c, state);
+        if (currentUser) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         const post = {
           id: getId(),
           authorId: currentUser.id,
@@ -153,7 +158,7 @@ const app = async (host, port) => {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
         const currentUser = getUserByToken(c, state);
-        if (currentUser.id !== state.posts[index].authorId) {
+        if (currentUser?.id !== state.posts[index].authorId) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
@@ -168,7 +173,7 @@ const app = async (host, port) => {
         const { id } = c.request.params;
         const index = state.posts.findIndex((item) => item.id === id);
         const currentUser = getUserByToken(c, state);
-        if (currentUser.id !== state.posts[index].authorId) {
+        if (currentUser?.id !== state.posts[index].authorId) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
@@ -185,6 +190,11 @@ const app = async (host, port) => {
           body,
         } = c.request.body;
         const currentUser = getUserByToken(c, state);
+        if (!currentUser) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         const comment = {
           id: getId(),
           postId,
@@ -212,7 +222,7 @@ const app = async (host, port) => {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
         const currentUser = getUserByToken(c, state);
-        if (currentUser.id !== state.comments[index].authorId) {
+        if (currentUser?.id !== state.comments[index].authorId) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
@@ -227,7 +237,7 @@ const app = async (host, port) => {
         const { id } = c.request.params;
         const index = state.comments.findIndex((item) => item.id === id);
         const currentUser = getUserByToken(c, state);
-        if (currentUser.id !== state.comments[index].authorId) {
+        if (currentUser?.id !== state.comments[index].authorId) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
