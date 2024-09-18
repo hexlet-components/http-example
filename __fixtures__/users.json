@@ -3,60 +3,70 @@
       "id": "a788f3fc-0d47-4d55-b18b-09bae52dac7b",
       "email": "Nolan_Connelly@hotmail.com",
       "firstName": "Allison",
-      "lastName": "Bernier"
+      "lastName": "Bernier",
+      "password": "password"
   },
   {
       "id": "11507784-a401-469d-a3a4-01917a5e4ef6",
       "email": "Emil_Mante54@hotmail.com",
       "firstName": "Mylene",
-      "lastName": "Schroeder-Quigley"
+      "lastName": "Schroeder-Quigley",
+      "password": "password"
   },
   {
       "id": "398ce50c-3337-4833-bb0a-41fc70bf6bdd",
       "email": "Toby_Schamberger@gmail.com",
       "firstName": "Rossie",
-      "lastName": "Carter"
+      "lastName": "Carter",
+      "password": "password"
   },
   {
       "id": "d678ab29-861f-421c-9c5b-c2b7645a2c97",
       "email": "Reginald.Hermiston15@hotmail.com",
       "firstName": "Izabella",
-      "lastName": "Beier"
+      "lastName": "Beier",
+      "password": "password"
   },
   {
       "id": "e3785264-ab22-46b8-b5ab-dbeb96499752",
       "email": "Kraig38@hotmail.com",
       "firstName": "Delilah",
-      "lastName": "Littel"
+      "lastName": "Littel",
+      "password": "password"
   },
   {
       "id": "2ef1d550-6394-444b-9e4b-225caa70c456",
       "email": "Ardith_Steuber@gmail.com",
       "firstName": "Jermain",
-      "lastName": "Gottlieb"
+      "lastName": "Gottlieb",
+      "password": "password"
   },
   {
       "id": "dbcec1b4-5104-4fa8-a41b-40978189cb89",
       "email": "Herbert.Daugherty@hotmail.com",
       "firstName": "Rex",
-      "lastName": "Feeney"
+      "lastName": "Feeney",
+      "password": "password"
   },
   {
       "id": "f59d75ae-9062-4d4a-bedc-4e3e6c0b7801",
       "email": "Jan.Greenfelder87@gmail.com",
       "firstName": "Bianka",
-      "lastName": "Bauch"
+      "lastName": "Bauch",
+      "password": "password"
   },
   {
       "id": "eb6c9e76-24e8-432b-bb03-e831dc99ef7e",
       "email": "Jaden_Pollich77@yahoo.com",
       "firstName": "Darien",
-      "lastName": "Toy"
+      "lastName": "Toy",
+      "password": "password"
   },
   {
       "id": "e7e3a2ce-18ca-4b51-b661-49f46202ed5c",
       "email": "Damon98@hotmail.com",
       "firstName": "Tatyana",
-      "lastName": "White"
+      "lastName": "White",
+      "password": "password"
   }
 ]

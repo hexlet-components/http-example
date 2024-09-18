@@ -11,6 +11,17 @@ const version = '1.0';
 const openapiFilePath = path.join(dirname, '..', `tsp-output/@typespec/openapi3/openapi.${version}.yaml`);
 const swaggerRoute = '/swagger';
 
+const getUserByToken = (context, state) => {
+  const authHeader = context.request.headers['authorization'];
+  const token = authHeader.replace('Bearer ', '');
+  const authData = state.tokens.find((item) => item.token === token);
+  if (!authData) {
+    return null;
+  }
+  const user = state.users.find((item) => item.id === authData.userId);
+  return user;
+};
+
 const app = async (host, port) => {
   const state = getInitData();
 
@@ -19,8 +30,17 @@ const app = async (host, port) => {
     handlers: {
       // Login handlers
       AuthService_create: (c, req, res) => {
+        const {
+          email,
+          password,
+        } = c.request.body;
+        const user = state.users.find((u) => u.email === email);
+        if (!user || user.password !== password) {
+          return res.status(401)
+            .send({ code: 401, message: 'Wrong email or password' });
+        }
         const token = getToken();
-        state.tokens.push(token);
+        state.tokens.push({ userId: user.id, token });
         return res.status(200).send({ token });
       },
 
@@ -30,12 +50,14 @@ const app = async (host, port) => {
           firstName,
           lastName,
           email,
+          password,
         } = c.request.body;
         const user = {
           id: getId(),
           firstName,
           lastName,
           email,
+          password,
         };
 
         state.users.push(user);
@@ -67,6 +89,12 @@ const app = async (host, port) => {
         if (index === -1) {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
+        const currentUser = getUserByToken(c, state);
+        if (currentUser.id !== id) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         state.users[index] = {
           ...state.users[index],
           ...c.request.body,
@@ -75,6 +103,12 @@ const app = async (host, port) => {
       },
       UserService_delete: (c, req, res) => {
         const { id } = c.request.params;
+        const currentUser = getUserByToken(c, state);
+        if (currentUser.id !== id) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         const users = state.users.filter((item) => item.id !== id);
         state.users = users;
         return res.status(204).send();
@@ -83,13 +117,13 @@ const app = async (host, port) => {
       // Posts handlers
       PostService_create: (c, req, res) => {
         const {
-          authorId,
           title,
           body,
         } = c.request.body;
+        const currentUser = getUserByToken(c, state);
         const post = {
           id: getId(),
-          authorId,
+          authorId: currentUser.id,
           title,
           body,
         };
@@ -118,6 +152,12 @@ const app = async (host, port) => {
         if (index === -1) {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
+        const currentUser = getUserByToken(c, state);
+        if (currentUser.id !== state.posts[index].authorId) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         state.posts[index] = {
           ...state.posts[index],
           ...c.request.body,
@@ -126,6 +166,13 @@ const app = async (host, port) => {
       },
       PostService_delete: (c, req, res) => {
         const { id } = c.request.params;
+        const index = state.posts.findIndex((item) => item.id === id);
+        const currentUser = getUserByToken(c, state);
+        if (currentUser.id !== state.posts[index].authorId) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         const posts = state.posts.filter((item) => item.id !== id);
         state.posts = posts;
         return res.status(204).send();
@@ -135,13 +182,13 @@ const app = async (host, port) => {
       CommentService_create: (c, req, res) => {
         const {
           postId,
-          authorId,
           body,
         } = c.request.body;
+        const currentUser = getUserByToken(c, state);
         const comment = {
           id: getId(),
           postId,
-          authorId,
+          authorId: currentUser.id,
           body
         };
 
@@ -164,6 +211,12 @@ const app = async (host, port) => {
         if (index === -1) {
           return res.status(404).send({ code: 404, message: 'Not found' });
         }
+        const currentUser = getUserByToken(c, state);
+        if (currentUser.id !== state.comments[index].authorId) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         state.comments[index] = {
           ...state.comments[index],
           ...c.request.body,
@@ -172,6 +225,13 @@ const app = async (host, port) => {
       },
       CommentService_delete: (c, req, res) => {
         const { id } = c.request.params;
+        const index = state.comments.findIndex((item) => item.id === id);
+        const currentUser = getUserByToken(c, state);
+        if (currentUser.id !== state.comments[index].authorId) {
+          return res
+            .status(403)
+            .send({ code: 403, message: 'Forbidden action' })
+        }
         const comments = state.comments.filter((item) => item.id !== id);
         state.comments = comments;
         return res.status(204).send();

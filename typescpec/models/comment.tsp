@@ -1,13 +1,11 @@
 @example(
   #{
-    authorId: "some_user_id",
     postId: "some_post_id",
     body: "new comment body"
   },
   #{ title: "New comment" }
 )
 model NewCommentDto {
-  authorId: string;
   postId: string;
 
   @minLength(1)
@@ -16,14 +14,12 @@ model NewCommentDto {
 
 @example(
   #{
-    authorId: "some_user_id",
     postId: "some_post_id",
     body: "edit comment body"
   },
   #{ title: "Edit comment" }
 )
 model EditCommentDto {
-  authorId?: string;
   postId?: string;
 
   @minLength(1)

@@ -1,7 +1,7 @@
-@example(#{ login: "Max", password: "password" }, #{ title: "Authentication data", description: "Login and password for authentication" })
+@example(#{ email: "max@hotmail.com", password: "password" }, #{ title: "Authentication data", description: "Login and password for authentication" })
 model AuthData {
   @minLength(1)
-  login: string;
+  email: string;
 
   @minLength(1)
   password: string;

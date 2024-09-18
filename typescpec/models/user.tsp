@@ -2,7 +2,8 @@
   #{
     email: "max@yahoo.com",
     firstName: "Max",
-    lastName: "Maxwell"
+    lastName: "Maxwell",
+    password: "password"
   },
   #{ title: "New User" }
 )
@@ -15,6 +16,9 @@ model NewUserDto {
 
   @minLength(1)
   lastName: string;
+
+  @minLength(1)
+  password: string;
 }
 
 @example(

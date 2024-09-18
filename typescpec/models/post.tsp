@@ -1,14 +1,11 @@
 @example(
   #{
-    authorId: "some_user_id",
     title: "new post title",
     body: "new post body"
   },
   #{ title: "New Post" }
 )
 model NewPostDto {
-  authorId: string;
-
   @minLength(1)
   title: string;
 
@@ -18,15 +15,12 @@ model NewPostDto {
 
 @example(
   #{
-    authorId: "some_user_id",
     title: "edit post title",
     body: "edit post body"
   },
   #{ title: "Edit Post" }
 )
 model EditPostDto {
-  authorId?: string;
-
   @minLength(1)
   title?: string;
 
