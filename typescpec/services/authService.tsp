@@ -4,7 +4,7 @@ import "../models/auth.tsp";
 
 using TypeSpec.Http;
 
-namespace ForumService;
+namespace AppService;
 
 @tag("Auth")
 @route("/login")

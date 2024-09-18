@@ -6,14 +6,15 @@ import "./services/usersService.tsp";
 import "./services/postsService.tsp";
 import "./services/commentsService.tsp";
 import "./services/authService.tsp";
+import "./services/coursesService.tsp";
 
 using TypeSpec.Versioning;
 
 @service({
-  title: "Forum HTTP Api Example",
+  title: "HTTP Api Example",
 })
 @versioned(Versions)
-namespace ForumService;
+namespace AppService;
 
 enum Versions {
   v1: "1.0",

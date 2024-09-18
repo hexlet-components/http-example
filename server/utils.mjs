@@ -3,7 +3,9 @@ import _ from 'lodash';
 import users from '../__fixtures__/users.json' with { type: 'json' };
 import posts from '../__fixtures__/posts.json' with { type: 'json' };
 import comments from '../__fixtures__/comments.json' with { type: 'json' };
+import courses from '../__fixtures__/courses.json' with { type: 'json' };
 import tokens from '../__fixtures__/tokens.json' with { type: 'json' };
+import appConfig from '../app.config.json' with { type: 'json' };
 
 const defaultLimit = 30;
 
@@ -14,6 +16,8 @@ export const getInitData = () => ({
   posts,
   comments,
   tokens,
+  courses,
+  appConfig,
 });
 
 export const prepareItem = (item, selectors = []) => {

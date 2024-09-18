@@ -9,7 +9,7 @@ import "../models/error.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 
-namespace ForumService;
+namespace AppService;
 
 @tag("Users")
 @route("/users")

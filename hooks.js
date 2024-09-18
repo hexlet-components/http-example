@@ -11,6 +11,7 @@ hooks.beforeAll(async (ransactions, done) => {
       transaction.request.body = JSON.stringify({ email: state.users[0].email, password: state.users[0].password });
     }
     transaction.request.headers['Authorization'] = `Bearer ${state.tokens[0].token}`;
+    transaction.request.headers['x-api-key'] = state.appConfig.apiKey;
   }
 
   done();

@@ -5,11 +5,7 @@ import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import { getInitData, getId, getToken, prepareListData, prepareItem } from './utils.mjs';
 
-const title = 'Forum HTTP Api Example';
 const { dirname } = import.meta;
-const version = '1.0';
-const openapiFilePath = path.join(dirname, '..', `tsp-output/@typespec/openapi3/openapi.${version}.yaml`);
-const swaggerRoute = '/swagger';
 
 const getUserByToken = (context, state) => {
   const authHeader = context.request.headers['authorization'];
@@ -24,6 +20,7 @@ const getUserByToken = (context, state) => {
 
 const app = async (host, port) => {
   const state = getInitData();
+  const openapiFilePath = path.join(dirname, '..', state.appConfig.openapiFilePath);
 
   const api = new OpenAPIBackend({
     definition: openapiFilePath,
@@ -247,6 +244,50 @@ const app = async (host, port) => {
         return res.status(204).send();
       },
 
+      // Courses handlers
+      CourseService_create: (c, req, res) => {
+        const {
+          title,
+          description,
+        } = c.request.body;
+        const course = {
+          id: getId(),
+          title,
+          description
+        };
+
+        state.courses.push(course);
+        return res.status(200).send(course);
+      },
+      CourseService_list: (c, req, res) => prepareListData('courses', state, c),
+      CourseService_get: (c, req, res) => {
+        const { id } = c.request.params;
+        const { select } = c.request.query.select ?? {};
+        const course = state.courses.find((item) => item.id === id);
+        if (!course) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        return res.status(200).send(prepareItem(course, select));
+      },
+      CourseService_update: (c, req, res) => {
+        const { id } = c.request.params;
+        const index = state.courses.findIndex((item) => item.id === id);
+        if (index === -1) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        state.courses[index] = {
+          ...state.courses[index],
+          ...c.request.body,
+        };
+        return res.status(200).send(state.courses[index]);
+      },
+      CourseService_delete: (c, req, res) => {
+        const { id } = c.request.params;
+        const courses = state.courses.filter((item) => item.id !== id);
+        state.courses = courses;
+        return res.status(204).send();
+      },
+
       validationFail: (c, _req, res) => res.status(400).send({ code: 400, message: c.validation.errors }),
       unauthorizedHandler: (c, req, res) => res
         .status(401)
@@ -263,6 +304,14 @@ const app = async (host, port) => {
     const authHeader = c.request.headers['authorization'];
     const token = authHeader.replace('Bearer ', '');
     const authorized = !!token; //state.tokens.includes(token);
+    return authorized;
+  });
+
+  api.registerSecurityHandler('ApiKeyAuth', (c) => {
+    const authorized =
+      c.request.headers['x-api-key'] === state.appConfig.apiKey;
+    // truthy return values are interpreted as auth success
+    // you can also add any auth information to the return value
     return authorized;
   });
 
@@ -287,22 +336,22 @@ const app = async (host, port) => {
 
   await app.register(fastifySwagger, {
     mode: 'static',
-    title,
+    title: state.appConfig.title,
     exposeRoute: true,
     specification: {
       path: openapiFilePath,
     },
-    routePrefix: swaggerRoute,
+    routePrefix: state.appConfig.docRoute,
   });
 
 
   await app.register(swaggerUI, {
-    routePrefix: swaggerRoute,
-    title,
+    routePrefix: state.appConfig.docRoute,
+    title: state.appConfig.title,
     staticCSP: true,
     transformSpecificationClone: true,
     theme: {
-      title,
+      title: state.appConfig.title,
     },
   });
 
