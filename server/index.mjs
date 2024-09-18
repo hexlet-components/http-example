@@ -121,7 +121,7 @@ const app = async (host, port) => {
           body,
         } = c.request.body;
         const currentUser = getUserByToken(c, state);
-        if (currentUser) {
+        if (!currentUser) {
           return res
             .status(403)
             .send({ code: 403, message: 'Forbidden action' })
