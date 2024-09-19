@@ -288,6 +288,50 @@ const app = async (host, port) => {
         return res.status(204).send();
       },
 
+      // Tasks handlers
+      TaskService_create: (c, req, res) => {
+        const {
+          title,
+          description,
+        } = c.request.body;
+        const task = {
+          id: getId(),
+          title,
+          description
+        };
+
+        state.tasks.push(task);
+        return res.status(200).send(task);
+      },
+      TaskService_list: (c, req, res) => prepareListData('tasks', state, c),
+      TaskService_get: (c, req, res) => {
+        const { id } = c.request.params;
+        const { select } = c.request.query.select ?? {};
+        const task = state.tasks.find((item) => item.id === id);
+        if (!task) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        return res.status(200).send(prepareItem(task, select));
+      },
+      TaskService_update: (c, req, res) => {
+        const { id } = c.request.params;
+        const index = state.tasks.findIndex((item) => item.id === id);
+        if (index === -1) {
+          return res.status(404).send({ code: 404, message: 'Not found' });
+        }
+        state.tasks[index] = {
+          ...state.tasks[index],
+          ...c.request.body,
+        };
+        return res.status(200).send(state.tasks[index]);
+      },
+      TaskService_delete: (c, req, res) => {
+        const { id } = c.request.params;
+        const tasks = state.tasks.filter((item) => item.id !== id);
+        state.tasks = tasks;
+        return res.status(204).send();
+      },
+
       validationFail: (c, _req, res) => res.status(400).send({ code: 400, message: c.validation.errors }),
       unauthorizedHandler: (c, req, res) => res
         .status(401)
