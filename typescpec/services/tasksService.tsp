@@ -1,6 +1,6 @@
 import "@typespec/http";
 import "@typespec/rest";
-import "../models/course.tsp";
+import "../models/task.tsp";
 
 
 using TypeSpec.Http;
@@ -8,16 +8,15 @@ using TypeSpec.Rest;
 
 namespace AppService;
 
-@tag("Courses")
-@route("/courses")
-@useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-API-KEY">)
-interface CourseService {
+@tag("Tasks")
+@route("/tasks")
+interface TaskService {
   @get
   op list(
     @query skip?: string,
     @query limit?: string,
     @query select?: string[]
-  ): Courses;
+  ): Tasks;
 
   @get
   @opExample(
@@ -26,16 +25,16 @@ interface CourseService {
   op get(
     @path id: string,
     @query select?: string
-  ): Course;
+  ): Task;
 
   @post
-  op create(...NewCourseDto): Course;
+  op create(...NewTaskDto): Task;
 
   @patch
   @opExample(
     #{ parameters: #{ id: "some-id" } }
   )
-  op update(@path id: string, ...EditCourseDto): Course;
+  op update(@path id: string, ...EditTaskDto): Task;
 
   @delete
   @opExample(

@@ -4,6 +4,7 @@ import users from '../__fixtures__/users.json' with { type: 'json' };
 import posts from '../__fixtures__/posts.json' with { type: 'json' };
 import comments from '../__fixtures__/comments.json' with { type: 'json' };
 import courses from '../__fixtures__/courses.json' with { type: 'json' };
+import tasks from '../__fixtures__/tasks.json' with { type: 'json' };
 import tokens from '../__fixtures__/tokens.json' with { type: 'json' };
 import appConfig from '../app.config.json' with { type: 'json' };
 
@@ -17,6 +18,7 @@ export const getInitData = () => ({
   comments,
   tokens,
   courses,
+  tasks,
   appConfig,
 });
 
