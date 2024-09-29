@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import path from 'node:path';
 import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
+import fastifyStatic from '@fastify/static';
 import { getInitData, getId, getToken, prepareListData, prepareItem } from './utils.mjs';
 
 const { dirname } = import.meta;
@@ -16,6 +17,14 @@ const getUserByToken = (context, state) => {
   }
   const user = state.users.find((item) => item.id === authData.userId);
   return user;
+};
+
+const setUpStaticAssets = (app) => {
+  const pathPublic = path.join(dirname, 'assets');
+  app.register(fastifyStatic, {
+    root: pathPublic,
+    prefix: '/assets/',
+  });
 };
 
 const app = async (host, port) => {
@@ -293,11 +302,13 @@ const app = async (host, port) => {
         const {
           title,
           description,
+          status,
         } = c.request.body;
         const task = {
           id: getId(),
           title,
-          description
+          description,
+          status,
         };
 
         state.tasks.push(task);
@@ -388,6 +399,7 @@ const app = async (host, port) => {
     routePrefix: state.appConfig.docRoute,
   });
 
+  setUpStaticAssets(app);
 
   await app.register(swaggerUI, {
     routePrefix: state.appConfig.docRoute,
@@ -398,6 +410,8 @@ const app = async (host, port) => {
       title: state.appConfig.title,
     },
   });
+
+  app.get('/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
   app.listen({ host, port }, (err, address) => {
     if (err) {
