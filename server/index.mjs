@@ -411,7 +411,7 @@ const app = async (host, port) => {
     },
   });
 
-  app.get('/users-list', (req, res) => res.sendFile('users-list/index.html'));
+  app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
   app.listen({ host, port }, (err, address) => {
     if (err) {

@@ -1,5 +1,5 @@
 async function fetchUsers() {
-  const response = await fetch('/users');
+  const response = await fetch('/http-api/users');
 
   if (!response.ok) {
     if (response.status === 403) {
