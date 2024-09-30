@@ -28,7 +28,7 @@ const processTree = (tree) => {
     }];
   }, []);
   for (const { currentPath, idPath } of pathsData) {
-    const regex = /^\/\w*/;
+    const regex = /^\/[\w,\-]*/;
     const found = currentPath.match(regex);
     const name = found[0].replace('/', '');
     const id = state[name][0].id;
