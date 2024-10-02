@@ -140,11 +140,14 @@ export default async (app, _options) => {
     });
 
     readStream.on('error', (err) => {
-      // request.log.error(err);
       reply.status(500).send(err);
     });
 
     return reply;
+  });
+
+  app.get('/http-protocol/removed', (request, reply) => {
+    reply.code(301).redirect('/http-protocol/example')
   });
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
