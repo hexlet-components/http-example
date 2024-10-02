@@ -1,7 +1,7 @@
 const hooks = require('hooks');
 
 hooks.beforeAll(async (ransactions, done) => {
-  const utils = await import('./server/utils.mjs');
+  const utils = await import('./server/utils.js');
   const state = utils.getInitData();
   for (const transaction of ransactions) {
     if (transaction.request.method !== 'DELETE') {

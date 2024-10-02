@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { generateInitData } from '../utils.mjs';
+import { generateInitData } from '../src/utils.js';
 
 const { dirname } = import.meta;
 

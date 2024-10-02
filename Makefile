@@ -3,14 +3,15 @@ setup:
 	make compile
 
 compile:
-	npx tsp compile ./typescpec/main.tsp
-	# node typescpec/postProcessing.mjs
+	npx tsp compile ./typespec/http-api/main.tsp --output-dir "./tsp-output/http-api"
+	npx tsp compile ./typespec/postman/main.tsp --output-dir "./tsp-output/postman"
+	npx tsp compile ./typespec/http-protocol/main.tsp --output-dir "./tsp-output/http-protocol"
 
 dev:
-	node --watch server/bin/index.mjs
+	npx fastify start -a 0.0.0.0 server/src/index.js
 
 start:
-	node server/bin/index.mjs
+	npx fastify start -a 0.0.0.0 server/src/index.js
 
 test:
 	echo no tests
@@ -19,4 +20,4 @@ compose-test:
 	docker compose up --build --abort-on-container-exit
 
 generate-fixtures:
-	node server/bin/generateFixtures.mjs
+	node server/bin/generateFixtures.js

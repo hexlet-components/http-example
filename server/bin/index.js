@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import app from '../index.mjs';
+import app from '../src/index.js';
 
 const port = process.env.PORT || 5000;
 const host = process.env.host || '0.0.0.0';
