@@ -8,7 +8,61 @@ import tasks from '../__fixtures__/tasks.json' with { type: 'json' };
 import tokens from '../__fixtures__/tokens.json' with { type: 'json' };
 import appConfig from '../app.config.json' with { type: 'json' };
 
+const listSize = 10;
 const defaultLimit = 30;
+
+export const getId = () => _.uniqueId();
+
+const createUser = () => ({
+  id: getId(),
+  email: faker.internet.email(),
+  firstName: faker.person.firstName(),
+  lastName: faker.person.lastName(),
+});
+
+const createPost = (user) => ({
+  id: getId(),
+  authorId: user.id,
+  title: faker.lorem.words(),
+  body: faker.lorem.paragraphs(),
+});
+
+const createComment = (post) => ({
+  id: getId(),
+  authorId: post.authorId,
+  postId: post.id,
+  body: faker.lorem.paragraphs(),
+});
+
+export const generateInitData = () => {
+  const users = [];
+  
+  for(let i = 1; i <= listSize; i++) {
+    users.push(createUser());
+  }
+
+  const posts = users.map((user) => {
+    const userPosts = [];
+    for(let i = 1; i <= listSize; i++) {
+      userPosts.push(createPost(user));
+    }
+    return userPosts;
+  }).flat();
+
+  const comments = posts.map((post) => {
+    const postComments = [];
+    for(let i = 1; i <= listSize; i++) {
+      postComments.push(createComment(post));
+    }
+    return postComments;
+  }).flat();
+
+  return {
+    users,
+    posts,
+    comments,
+  };
+};
 
 export const getToken = () => faker.string.alphanumeric(120);
 
@@ -40,5 +94,3 @@ export const prepareListData = (name, state, context, callbackFilter = () => tru
     limit,
   };
 };
-
-export const getId = () => faker.string.uuid();

@@ -17,3 +17,6 @@ test:
 
 compose-test:
 	docker compose up --build --abort-on-container-exit
+
+generate-fixtures:
+	node server/bin/generateFixtures.mjs

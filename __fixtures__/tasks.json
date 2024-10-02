@@ -1,30 +1,30 @@
 [
   {
-      "id": "c7c2fa01-3174-4cc4-9a80-092b47ade67d",
-      "title": "Опубликовать курс по основам JavaScript",
-      "description": "Автор подготовил курс по JavaScript. Нужно его опубликовать",
-      "status": "Backlog"
+    "id": "1",
+    "title": "Опубликовать курс по основам JavaScript",
+    "description": "Автор подготовил курс по JavaScript. Нужно его опубликовать",
+    "status": "Backlog"
   },
   {
-    "id": "a0b2bbd9-db89-434d-99bd-cbc04477947f",
+    "id": "2",
     "title": "Опубликовать курс по основам Ruby",
     "description": "Автор подготовил курс по Ruby. Нужно его опубликовать",
       "status": "Ready"
   },
   {
-    "id": "2099a564-4819-499f-a726-97f37613f78d",
+    "id": "3",
     "title": "Опубликовать курс по основам PHP",
     "description": "Автор подготовил курс по PHP. Нужно его опубликовать",
     "status": "In Progress"
   },
   {
-    "id": "6178c6ad-998e-484e-a8d2-cfe10978ea17",
+    "id": "4",
     "title": "Опубликовать курс по основам Java",
     "description": "Автор подготовил курс по Java. Нужно его опубликовать",
     "status": "Done"
   },
   {
-    "id": "2149669f-517c-41a6-8d09-8683fec99eec",
+    "id": "5",
     "title": "Опубликовать курс по основам Python",
     "description": "Автор подготовил курс по Python. Нужно его опубликовать",
     "status": "Archived"
