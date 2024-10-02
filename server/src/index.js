@@ -147,7 +147,7 @@ export default async (app, _options) => {
   });
 
   app.get('/http-protocol/removed', (req, res) => {
-    reply.code(301).redirect('/http-protocol/cookies')
+    reply.code(301).redirect('/http-protocol/example');
   });
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
