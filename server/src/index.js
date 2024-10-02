@@ -9,6 +9,8 @@ import getHandlers from './handlers/openapi.js';
 
 const { dirname } = import.meta;
 
+const apps = ['http-api', 'postman', 'http-protocol', 'js-playwright'];
+
 const setUpStaticAssets = (app) => {
   const pathPublic = path.join(dirname, 'assets');
   app.register(fastifyStatic, {
@@ -93,7 +95,7 @@ const initOpenapi = async (names, app) => {
 
 export default async (app, _options) => {
   setUpStaticAssets(app);
-  await initOpenapi(['http-api', 'postman', 'http-protocol'], app);
+  await initOpenapi(apps, app);
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
