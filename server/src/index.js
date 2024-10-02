@@ -1,6 +1,7 @@
 import { OpenAPIBackend } from 'openapi-backend';
 import fp from 'fastify-plugin';
 import path from 'node:path';
+import fs from 'node:fs';
 import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
@@ -116,7 +117,34 @@ export default async (app, _options) => {
           'NID=196=wsHLMAMfnAaSyF7zduokI8TJeE5UoIKPHYC58HYH93VMnev9Nc2bAjhRdzoc4UhmuOd7ZVCorDnzGDe51yPefsRMeVyOFnYdHYYgQNqI8A1dYuk4pDK4OJurQgL4lX8kiNGSNi_kkUESFQ-MqLCB_YspxA9JRejhZdkTRtGyHNk; expires=Sun, 19-Jul-2020 09:24:50 GMT; path=/; domain=.hexlet.app; HttpOnly',
         ],
       })
-      .send();
+      .send('Done!');
+  });
+
+  app.get('/http-protocol/stream', async (request, reply) => {
+    // Путь к изображению
+    const imagePath = path.join(dirname, '../../__fixtures__/hexlet_logo.png');
+
+    // Устанавливаем заголовок типа изображения
+    reply.type('image/png');
+
+    // Создаем поток для чтения файла изображения
+    const readStream = fs.createReadStream(imagePath, { highWaterMark: 16 * 1024 }); // Чанк 16 КБ
+
+    // Обрабатываем события потока
+    readStream.on('data', (chunk) => {
+      reply.raw.write(chunk);
+    });
+
+    readStream.on('end', () => {
+      reply.raw.end();
+    });
+
+    readStream.on('error', (err) => {
+      // request.log.error(err);
+      reply.status(500).send(err);
+    });
+
+    return reply;
   });
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
