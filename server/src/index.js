@@ -100,7 +100,7 @@ export default async (app, _options) => {
   setUpStaticAssets(app);
   await initOpenapi(apps, app);
 
-  app.get('/http-protocol/cookies', (req, res) => {
+  app.get('/http-protocol/example', (req, res) => {
     res
       .headers({
         Expires: -1,
