@@ -100,7 +100,7 @@ export default async (app, _options) => {
   setUpStaticAssets(app);
   await initOpenapi(apps, app);
 
-  app.get('/http-protocol/example', (req, res) => {
+  app.get('/http-protocol/cookies', (req, res) => {
     res
       .headers({
         Expires: -1,
@@ -120,34 +120,34 @@ export default async (app, _options) => {
       .send('Done!');
   });
 
-  app.get('/http-protocol/stream', async (request, reply) => {
+  app.get('/http-protocol/stream', async (req, res) => {
     // Путь к изображению
     const imagePath = path.join(dirname, '../../__fixtures__/hexlet_logo.png');
 
     // Устанавливаем заголовок типа изображения
-    reply.type('image/png');
+    res.type('image/png');
 
     // Создаем поток для чтения файла изображения
     const readStream = fs.createReadStream(imagePath, { highWaterMark: 16 * 1024 }); // Чанк 16 КБ
 
     // Обрабатываем события потока
     readStream.on('data', (chunk) => {
-      reply.raw.write(chunk);
+      res.raw.write(chunk);
     });
 
     readStream.on('end', () => {
-      reply.raw.end();
+      res.raw.end();
     });
 
     readStream.on('error', (err) => {
-      reply.status(500).send(err);
+      res.status(500).send(err);
     });
 
-    return reply;
+    return res;
   });
 
-  app.get('/http-protocol/removed', (request, reply) => {
-    reply.code(301).redirect('/http-protocol/example')
+  app.get('/http-protocol/removed', (req, res) => {
+    reply.code(301).redirect('/http-protocol/cookies')
   });
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
