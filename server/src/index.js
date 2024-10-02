@@ -4,6 +4,7 @@ import path from 'node:path';
 import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
+import formbody from '@fastify/formbody';
 import { getInitData } from './utils.js';
 import getHandlers from './handlers/openapi.js';
 
@@ -94,8 +95,29 @@ const initOpenapi = async (names, app) => {
 };
 
 export default async (app, _options) => {
+  await app.register(formbody);
   setUpStaticAssets(app);
   await initOpenapi(apps, app);
+
+  app.get('/http-protocol/example', (req, res) => {
+    res
+      .headers({
+        Expires: -1,
+        'Cache-Control': 'private, max-age=0',
+        'Content-Type': 'text/html; charset=ISO-8859-1',
+        'P3P': 'CP="This is not a P3P policy! See g.co/p3phelp for more info."',
+        Server: 'gws',
+        'X-XSS-Protection': 0,
+        'X-Frame-Options': 'SAMEORIGIN',
+        'Accept-Ranges': 'none',
+        Vary: 'Accept-Encoding',
+        'Set-Cookie': [
+          '1P_JAR=2020-01-18-09; expires=Mon, 17-Feb-2020 09:24:50 GMT; path=/; domain=.hexlet.app; Secure',
+          'NID=196=wsHLMAMfnAaSyF7zduokI8TJeE5UoIKPHYC58HYH93VMnev9Nc2bAjhRdzoc4UhmuOd7ZVCorDnzGDe51yPefsRMeVyOFnYdHYYgQNqI8A1dYuk4pDK4OJurQgL4lX8kiNGSNi_kkUESFQ-MqLCB_YspxA9JRejhZdkTRtGyHNk; expires=Sun, 19-Jul-2020 09:24:50 GMT; path=/; domain=.hexlet.app; HttpOnly',
+        ],
+      })
+      .send();
+  });
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
