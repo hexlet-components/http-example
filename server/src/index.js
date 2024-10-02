@@ -152,5 +152,7 @@ export default async (app, _options) => {
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
+  app.get('/js-dom-testing-library/users-list', (req, res) => res.sendFile('users-list/index.html'));
+
   return app;
 };
