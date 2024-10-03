@@ -14,7 +14,7 @@ const { dirname } = import.meta;
 const apps = ['http-api', 'postman', 'http-protocol', 'js-playwright'];
 
 const setUpStaticAssets = (app) => {
-  const pathPublic = path.join(dirname, 'assets');
+  const pathPublic = path.join(dirname, '../assets');
   app.register(fastifyStatic, {
     root: pathPublic,
     prefix: '/assets/',
