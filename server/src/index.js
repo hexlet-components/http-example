@@ -120,6 +120,8 @@ export default async (app, _options) => {
       .send('Done!');
   });
 
+  app.post('/http-protocol/login', (req, res) => res.send('Done!'));
+
   app.get('/http-protocol/stream', async (req, res) => {
     // Путь к изображению
     const imagePath = path.join(dirname, '../../__fixtures__/hexlet_logo.png');
