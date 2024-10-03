@@ -11,7 +11,7 @@ import appConfig from '../../app.config.json' with { type: 'json' };
 const listSize = 10;
 const defaultLimit = 30;
 
-export const getId = () => _.uniqueId();
+export const getId = () => _.uniqueId('1000');
 
 const createUser = () => ({
   id: getId(),
