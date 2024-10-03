@@ -33,14 +33,12 @@ interface UserService {
   @post
   op create(...NewUserDto): User;
 
-  @useAuth(BearerAuth)
   @patch
   @opExample(
     #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
   )
   op update(@path id: string, ...EditUserDto): User;
 
-  @useAuth(BearerAuth)
   @delete
   @opExample(
     #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
