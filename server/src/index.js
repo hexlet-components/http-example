@@ -51,7 +51,7 @@ const initOpenapi = async (names, app) => {
     app.route({
       method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       url: `/${name}/*`,
-      handler: async (request, reply) =>
+      handler: async (request, res) =>
         api.handleRequest(
           {
             method: request.method,
@@ -61,7 +61,7 @@ const initOpenapi = async (names, app) => {
             headers: request.headers,
           },
           request,
-          reply,
+          res,
         ),
     });
 
@@ -123,29 +123,26 @@ export default async (app, _options) => {
   app.post('/http-protocol/login', (req, res) => res.send('Done!'));
 
   app.get('/http-protocol/stream', async (req, res) => {
-    // Путь к изображению
-    const imagePath = path.join(dirname, '../../__fixtures__/hexlet_logo.png');
+    // Установим заголовок для передачи данных в формате текстового потока
+    res.type('text/plain');
 
-    // Устанавливаем заголовок типа изображения
-    res.type('image/png');
-
-    // Создаем поток для чтения файла изображения
-    const readStream = fs.createReadStream(imagePath, { highWaterMark: 16 * 1024 }); // Чанк 16 КБ
-
-    // Обрабатываем события потока
-    readStream.on('data', (chunk) => {
-      res.raw.write(chunk);
-    });
-
-    readStream.on('end', () => {
+    // Функция, которая отправляет чанки данных
+    const sendChunks = async () => {
+      for (let i = 0; i < 5; i++) {
+        // Отправляем чанк данных
+        res.raw.write(`Chunk ${i + 1}\n`);
+        // Имитация задержки между отправками чанков
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      // Завершаем поток
       res.raw.end();
-    });
+    };
 
-    readStream.on('error', (err) => {
-      res.status(500).send(err);
+    // Запускаем отправку чанков
+    sendChunks().catch(err => {
+      request.log.error(err);
+      res.send(err);
     });
-
-    return res;
   });
 
   app.get('/http-protocol/removed', (req, res) => {
