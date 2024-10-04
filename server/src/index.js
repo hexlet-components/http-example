@@ -98,7 +98,6 @@ const initOpenapi = async (names, app) => {
 export default async (app, _options) => {
   await app.register(formbody);
   setUpStaticAssets(app);
-  await initOpenapi(apps, app);
 
   app.get('/http-protocol/example', (req, res) => {
     res
@@ -145,13 +144,15 @@ export default async (app, _options) => {
     });
   });
 
-  app.get('/http-protocol/removed', (req, res) => {
-    res.code(301).redirect('/http-protocol/example');
-  });
+  app.get('/http-protocol', (req, res) => res.sendFile('http-protocol/index.html'));
+
+  app.get('/http-protocol/removed', (req, res) => res.code(301).redirect('/http-protocol/example'));
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
   app.get('/js-dom-testing-library/users-list', (req, res) => res.sendFile('users-list/index.html'));
+
+  await initOpenapi(apps, app);
 
   return app;
 };

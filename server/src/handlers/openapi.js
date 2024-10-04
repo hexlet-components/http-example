@@ -315,9 +315,9 @@ const getHandlers = (state) => {
     unauthorizedHandler: (c, req, res) => res
       .status(401)
       .send({ code: 401, message: 'Please authenticate first. Header example: "Authorization: Bearer token"' }),
-    notImplementedHandler: (c, req, res) => res
-      .status(404)
-      .send({ code: 501, message: 'No handler registered for operation' }),
+    // notImplementedHandler: (c, req, res) => res
+    //   .status(404)
+    //   .send({ code: 501, message: 'No handler registered for operation' }),
   };
 };
 
