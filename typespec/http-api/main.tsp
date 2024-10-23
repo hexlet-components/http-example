@@ -15,7 +15,6 @@ using TypeSpec.Http;
 @service({
   title: "HTTP Api Example",
 })
-@route("/http-api")
 @versioned(Versions)
 namespace AppService;
 

@@ -12,7 +12,12 @@ dev:
 	npx fastify start -a 0.0.0.0 server/src/index.js
 
 start:
-	npx fastify start -a 0.0.0.0 server/src/index.js
+	prism mock -m -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml &
+	prism mock -m -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml &
+	prism mock -m -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml &
+	prism mock -m -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml &
+	npm start &
+	caddy run &
 
 test:
 	echo no tests

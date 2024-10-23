@@ -1,0 +1,53 @@
+http://localhost:8080
+
+route /assets {
+  reverse_proxy localhost:4010
+}
+
+route /http-protocol/example {
+	reverse_proxy localhost:4010
+}
+
+route /http-protocol/login {
+	reverse_proxy localhost:4010
+}
+
+route /http-protocol/stream {
+	reverse_proxy localhost:4010
+}
+
+route /http-protocol/removed {
+	reverse_proxy localhost:4010
+}
+
+route /http-protocol {
+	reverse_proxy localhost:4010
+}
+
+route /js-playwright/users-list {
+	reverse_proxy localhost:4010
+}
+
+route /js-dom-testing-library/users-list {
+	reverse_proxy localhost:4010
+}
+
+route /http-api/* {
+	uri strip_prefix /http-api
+	reverse_proxy localhost:4011
+}
+
+route /http-protocol/* {
+	uri strip_prefix /http-protocol
+	reverse_proxy localhost:4011
+}
+
+route /http-playwright/* {
+	uri strip_prefix /http-playwright
+	reverse_proxy localhost:4012
+}
+
+route /http-postman/* {
+	uri strip_prefix /http-postman
+	reverse_proxy localhost:4013
+}

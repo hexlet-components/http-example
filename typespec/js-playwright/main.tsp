@@ -13,7 +13,6 @@ using TypeSpec.Http;
 @service({
   title: "HTTP Api Example",
 })
-@route("/js-playwright")
 @versioned(Versions)
 namespace AppService;
 
