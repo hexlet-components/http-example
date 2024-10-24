@@ -27,18 +27,18 @@ interface PostService {
     @query select?: string
   ): Post;
 
-  @useAuth(BearerAuth)
+  @useAuth(BearerAuth, BasicAuth)
   @post
   op create(...NewPostDto): Post;
 
-  @useAuth(BearerAuth)
+  @useAuth(BearerAuth, BasicAuth)
   @patch
   @opExample(
     #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
   )
   op update(@path id: string, ...EditPostDto): Post;
 
-  @useAuth(BearerAuth)
+  @useAuth(BearerAuth, BasicAuth)
   @delete
   @opExample(
     #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
