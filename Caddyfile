@@ -1,10 +1,34 @@
 http://localhost:8080
 
+route / {
+	reverse_proxy localhost:4010
+}
+
+route /http-api/echo {
+  reverse_proxy localhost:4010
+}
+
+route /http-api/openapi {
+	reverse_proxy localhost:4010
+}
+
+route /http-protocol/openapi {
+	reverse_proxy localhost:4010
+}
+
+route /js-playwright/openapi {
+	reverse_proxy localhost:4010
+}
+
+route /postman/openapi {
+	reverse_proxy localhost:4010
+}
+
 route /assets {
   reverse_proxy localhost:4010
 }
 
-route /http-protocol/example {
+route /http-api/example {
 	reverse_proxy localhost:4010
 }
 
@@ -42,12 +66,12 @@ route /http-protocol/* {
 	reverse_proxy localhost:4011
 }
 
-route /http-playwright/* {
-	uri strip_prefix /http-playwright
+route /js-playwright/* {
+	uri strip_prefix /playwright
 	reverse_proxy localhost:4012
 }
 
-route /http-postman/* {
-	uri strip_prefix /http-postman
+route /postman/* {
+	uri strip_prefix /postman
 	reverse_proxy localhost:4013
 }

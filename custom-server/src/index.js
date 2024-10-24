@@ -2,6 +2,8 @@ import path from 'node:path';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
 
+import appConfig from '../../app.config.json'  with {type: 'json'}
+
 const { dirname } = import.meta;
 
 const setUpStaticAssets = (app) => {
@@ -12,9 +14,15 @@ const setUpStaticAssets = (app) => {
   });
 };
 
+const setupDocs = (app) => appConfig.apps.forEach((name) => {
+  app.get(`/${name}/${appConfig.docRoute}`, (req, res) => res.sendFile(`docs/${name}/index.html`));
+});
+
 export default async (app, _options) => {
   await app.register(formbody);
   setUpStaticAssets(app);
+
+  setupDocs(app);
 
   app.get('/http-protocol/example', (req, res) => {
     res
@@ -38,6 +46,8 @@ export default async (app, _options) => {
 
   app.post('/http-protocol/login', (req, res) => res.send('Done!'));
 
+  app.get('/http-api/example', (req, res) => res.send('Done!'));
+
   app.get('/http-protocol/stream', async (req, res) => {
     // Установим заголовок для передачи данных в формате текстового потока
     res.type('text/plain');
@@ -56,7 +66,7 @@ export default async (app, _options) => {
 
     // Запускаем отправку чанков
     sendChunks().catch(err => {
-      request.log.error(err);
+      req.log.error(err);
       res.send(err);
     });
   });
@@ -68,6 +78,10 @@ export default async (app, _options) => {
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));
 
   app.get('/js-dom-testing-library/users-list', (req, res) => res.sendFile('users-list/index.html'));
+
+  app.get('/', (req, res) => res.sendFile('main/index.html'));
+
+  app.post('/http-api/echo', (req, res) => res.send(req.body));
 
   return app;
 };

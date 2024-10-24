@@ -4,5 +4,11 @@
   "version": "1.0",
   "openapiFilePath": "tsp-output/@typespec/openapi3/openapi.1.0.yaml",
   "docRoute": "openapi",
-  "apiKey": "tybRrq0Te4tBtQAubh9Qs9qprLyTc2kbBn4laQFPzYxtWymhMZRt5gTQ8a3aBegrgW5FZoEcmijz8micMRFUglLJDAv2QtqSZwzaWugMlyfLvnsIAWhrLS8y"
+  "apiKey": "tybRrq0Te4tBtQAubh9Qs9qprLyTc2kbBn4laQFPzYxtWymhMZRt5gTQ8a3aBegrgW5FZoEcmijz8micMRFUglLJDAv2QtqSZwzaWugMlyfLvnsIAWhrLS8y",
+  "apps": [
+    "http-api",
+    "http-protocol",
+    "js-playwright",
+    "postman"
+  ]
 }

@@ -14,6 +14,7 @@ using TypeSpec.Http;
   title: "HTTP Api Example",
 })
 @versioned(Versions)
+@server("/js-playwright", "Server endpoint")
 namespace AppService;
 
 enum Versions {
