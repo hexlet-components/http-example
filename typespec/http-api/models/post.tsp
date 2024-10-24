@@ -1,8 +1,7 @@
+import "../../examples/posts.tsp";
+
 @example(
-  #{
-    title: "new post title",
-    body: "new post body"
-  },
+  newPostDtoExample,
   #{ title: "New Post" }
 )
 model NewPostDto {
@@ -14,10 +13,7 @@ model NewPostDto {
 }
 
 @example(
-  #{
-    title: "edit post title",
-    body: "edit post body"
-  },
+  editPostDtoExample,
   #{ title: "Edit Post" }
 )
 model EditPostDto {
@@ -29,12 +25,7 @@ model EditPostDto {
 }
 
 @example(
-  #{
-    id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61",
-    authorId: "some_user_id",
-    title: "post title",
-    body: "post body"
-  },
+  postExample,
   #{ title: "Post" }
 )
 model Post {
@@ -50,6 +41,15 @@ model Post {
   body: string;
 }
 
+@example(
+  #{
+    posts: postsExample,
+    total: totalPostsExample,
+    skip: skipPostsExample,
+    limit: limitPostsExample,
+  },
+  #{ title: "posts" }
+)
 model Posts {
   posts: Post[];
   total: integer;

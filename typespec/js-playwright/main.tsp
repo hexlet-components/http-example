@@ -13,8 +13,8 @@ using TypeSpec.Http;
 @service({
   title: "HTTP Api Example",
 })
-@route("/js-playwright")
 @versioned(Versions)
+@server("/js-playwright", "Server endpoint")
 namespace AppService;
 
 enum Versions {

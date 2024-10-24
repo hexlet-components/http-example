@@ -15,8 +15,8 @@ using TypeSpec.Http;
 @service({
   title: "HTTP Api Example",
 })
-@route("/http-protocol")
 @versioned(Versions)
+@server("/http-protocol", "Server endpoint")
 namespace AppService;
 
 enum Versions {

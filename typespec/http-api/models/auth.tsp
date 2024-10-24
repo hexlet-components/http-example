@@ -1,4 +1,13 @@
-@example(#{ email: "max@hotmail.com", password: "password" }, #{ title: "Authentication data", description: "Login and password for authentication" })
+import "../../examples/auth.tsp";
+
+@example(
+  authDataExample,
+  #{
+    title:
+      "Authentication data",
+      description: "Login and password for authentication"
+  }
+)
 model AuthData {
   @minLength(1)
   email: string;
@@ -8,9 +17,7 @@ model AuthData {
 }
 
 @example(
-  #{
-    token: "secret_token"
-  },
+  authTokenExample,
   #{ title: "Authorisation data", description: "Token for authorisation" }
 )
 model AuthToken {
