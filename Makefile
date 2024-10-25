@@ -1,5 +1,5 @@
 IMAGE_ID := ghcr.io/hexlet-components/rest-api-example
-PORT := 8080
+PORT := 5000
 
 setup:
 	npm ci
@@ -30,7 +30,7 @@ docker-build:
 
 docker-run:
 	docker rm -f rest-api-example
-	docker run -p $(PORT):$(PORT) --name rest-api-example $(IMAGE_ID)
+	docker run -e PORT=$(PORT) -p $(PORT):$(PORT) --name rest-api-example $(IMAGE_ID)
 
 docker-sh:
 	docker run -e PORT=$(PORT) -it --entrypoint sh $(IMAGE_ID)
