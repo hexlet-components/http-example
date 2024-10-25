@@ -1,5 +1,5 @@
 IMAGE_ID := ghcr.io/hexlet-components/rest-api-example
-PORT := 5037
+PORT := 8080
 
 setup:
 	npm ci
