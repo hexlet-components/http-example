@@ -1,4 +1,5 @@
 IMAGE_ID := ghcr.io/hexlet-components/rest-api-example
+PORT := 5037
 
 setup:
 	npm ci
@@ -11,7 +12,7 @@ compile:
 	npx tsp compile ./typespec/js-playwright/main.tsp --output-dir "./tsp-output/js-playwright"
 
 dev:
-	docker run -v ./custom-server:/custom-server -p 8080:8080 $(IMAGE_ID)
+	docker run -v ./custom-server:/custom-server -p $(PORT):$(PORT) $(IMAGE_ID)
 
 start:
 	prism mock -m -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml &
@@ -29,7 +30,7 @@ docker-build:
 
 docker-run:
 	docker rm -f rest-api-example
-	docker run -p 8080:8080 --name rest-api-example $(IMAGE_ID)
+	docker run -p $(PORT):$(PORT) --name rest-api-example $(IMAGE_ID)
 
 docker-sh:
-	docker run -it --entrypoint sh $(IMAGE_ID)
+	docker run -e PORT=$(PORT) -it --entrypoint sh $(IMAGE_ID)
