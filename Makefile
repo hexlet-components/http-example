@@ -12,7 +12,7 @@ compile:
 	npx tsp compile ./typespec/js-playwright/main.tsp --output-dir "./tsp-output/js-playwright"
 
 dev:
-	docker run -v ./custom-server:/custom-server -p $(PORT):$(PORT) $(IMAGE_ID)
+	docker run -e PORT=$(PORT) -v ./custom-server:/custom-server -p $(PORT):$(PORT) $(IMAGE_ID)
 
 start:
 	prism mock -m -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml &

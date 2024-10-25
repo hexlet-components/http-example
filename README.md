@@ -2,18 +2,16 @@ https://twirl.github.io/The-API-Book/API.ru.html
 
 ## Prerequisites
 
-* Nodejs 20+
-* Ubuntu/Macos
 * Make
-* Docker (for deploy)
+* Docker
 
 ## Commands
 
 See [Makefile](./Makefile)
 
 ```bash
-make setup
-make dev # Open http://localhost:8080
+make docker-build
+make docker-run # Open http://localhost:8080
 ```
 
 ---
