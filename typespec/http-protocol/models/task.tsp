@@ -1,9 +1,7 @@
+import "../../examples/tasks.tsp";
+
 @example(
-  #{
-    title: "New Task",
-    description: "description",
-    status: Status.Ready,
-  },
+  newTaskDtoExample,
   #{ title: "New Task" }
 )
 model NewTaskDto {
@@ -17,11 +15,7 @@ model NewTaskDto {
 }
 
 @example(
-  #{
-    title: "Edited Task",
-    description: "new description",
-    status: Status.Ready,
-  },
+  editTaskDtoExample,
   #{ title: "Edit Task" }
 )
 model EditTaskDto {
@@ -35,12 +29,7 @@ model EditTaskDto {
 }
 
 @example(
-  #{
-    id: "some-id",
-    title: "Edited Task",
-    description: "new description",
-    status: Status.Ready,
-  },
+  taskExample,
   #{ title: "Task" }
 )
 model Task {
@@ -56,6 +45,15 @@ model Task {
   status: Status;
 }
 
+@example(
+  #{
+    tasks: tasksExample,
+    total: totalTasksExample,
+    skip: skipTasksExample,
+    limit: limitTasksExample,
+  },
+  #{ title: "Tasks" }
+)
 model Tasks {
   tasks: Task[];
   total: integer;

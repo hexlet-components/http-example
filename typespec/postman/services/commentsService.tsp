@@ -25,18 +25,18 @@ interface CommentService {
     @query select?: string
   ): Comment;
 
-  @useAuth([BearerAuth, BasicAuth])
+  @useAuth(BearerAuth)
   @post
   op create(...NewCommentDto): Comment;
 
-  @useAuth([BearerAuth, BasicAuth])
+  @useAuth(BearerAuth)
   @patch
   @opExample(
     #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }
   )
   op update(@path  id: string, ...EditCommentDto): Comment;
 
-  @useAuth([BearerAuth, BasicAuth])
+  @useAuth(BearerAuth)
   @delete
   @opExample(
     #{ parameters: #{ id: "238593a0-b8d4-4bf6-beda-48ce6ba093bc" } }

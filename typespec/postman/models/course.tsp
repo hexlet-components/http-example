@@ -1,8 +1,7 @@
+import "../../examples/courses.tsp";
+
 @example(
-  #{
-    title: "New course",
-    description: "description"
-  },
+  newCourseDtoExample,
   #{ title: "New Course" }
 )
 model NewCourseDto {
@@ -15,10 +14,7 @@ model NewCourseDto {
 }
 
 @example(
-  #{
-    title: "Edited course",
-    description: "new description",
-  },
+  editCourseDtoExample,
   #{ title: "Edit Course" }
 )
 model EditCourseDto {
@@ -30,11 +26,7 @@ model EditCourseDto {
 }
 
 @example(
-  #{
-    id: "some-id",
-    title: "Edited course",
-    description: "new description"
-  },
+  courseExample,
   #{ title: "Course" }
 )
 model Course {
@@ -49,6 +41,15 @@ model Course {
 
 }
 
+@example(
+  #{
+    courses: coursesExample,
+    total: totalCoursesExample,
+    skip: skipCoursesExample,
+    limit: limitCoursesExample,
+  },
+  #{ title: "Courses" }
+)
 model Courses {
   courses: Course[];
   total: integer;

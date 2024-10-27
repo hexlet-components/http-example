@@ -1,10 +1,7 @@
+import "../../examples/users.tsp";
+
 @example(
-  #{
-    email: "max@yahoo.com",
-    firstName: "Max",
-    lastName: "Maxwell",
-    password: "password"
-  },
+  newUserDtoExample,
   #{ title: "New User" }
 )
 model NewUserDto {
@@ -22,11 +19,7 @@ model NewUserDto {
 }
 
 @example(
-  #{
-    email: "maria@yahoo.com",
-    firstName: "Maria",
-    lastName: "Marvel"
-  },
+  editUserDtoExample,
   #{ title: "Edit User" }
 )
 model EditUserDto {
@@ -41,12 +34,7 @@ model EditUserDto {
 }
 
 @example(
-  #{
-    id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b",
-    email: "max@yahoo.com",
-    firstName: "Max",
-    lastName: "Maxwell"
-  },
+  userExample,
   #{ title: "User" }
 )
 model User {
@@ -63,6 +51,15 @@ model User {
   lastName: string;
 }
 
+@example(
+  #{
+    users: usersExample,
+    total: totalUsersExample,
+    skip: skipUsersExample,
+    limit: limitUsersExample,
+  },
+  #{ title: "Users" }
+)
 model Users {
   users: User[];
   total: integer;

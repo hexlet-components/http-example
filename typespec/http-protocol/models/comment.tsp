@@ -1,8 +1,7 @@
+import "../../examples/comments.tsp";
+
 @example(
-  #{
-    postId: "some_post_id",
-    body: "new comment body"
-  },
+  newCommentDtoExample,
   #{ title: "New comment" }
 )
 model NewCommentDto {
@@ -13,10 +12,7 @@ model NewCommentDto {
 }
 
 @example(
-  #{
-    postId: "some_post_id",
-    body: "edit comment body"
-  },
+  editCommentDtoExample,
   #{ title: "Edit comment" }
 )
 model EditCommentDto {
@@ -27,12 +23,7 @@ model EditCommentDto {
 }
 
 @example(
-  #{
-    id: "some-post-id",
-    authorId: "some_user_id",
-    postId: "some_post_id",
-    body: "comment body"
-  },
+  commentExample,
   #{ title: "Comment" }
 )
 model Comment {
@@ -46,6 +37,15 @@ model Comment {
   body: string;
 }
 
+@example(
+  #{
+    comments: commentsExample,
+    total: totalCommentsExample,
+    skip: skipCommentsExample,
+    limit: limitCommentsExample,
+ },
+  #{ title: "Comments" }
+)
 model Comments {
   comments: Comment[];
   total: integer;
