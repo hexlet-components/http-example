@@ -1,4 +1,4 @@
-const totalCoursesExample = 1000;
+const totalCoursesExample = 5;
 
 const skipCoursesExample = 0;
 

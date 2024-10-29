@@ -1,8 +1,8 @@
-const totalPostsExample = 1000;
+const totalPostsExample = 40;
 
 const skipPostsExample = 0;
 
-const limitPostsExample = 30;
+const limitPostsExample = 40;
 
 const newPostDtoExample = #{
   title: "New post",

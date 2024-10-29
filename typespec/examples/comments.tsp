@@ -1,8 +1,8 @@
-const totalCommentsExample = 1000;
+const totalCommentsExample = 40;
 
 const skipCommentsExample = 0;
 
-const limitCommentsExample = 30;
+const limitCommentsExample = 40;
 
 const newCommentDtoExample = #{
   postId: "11",
