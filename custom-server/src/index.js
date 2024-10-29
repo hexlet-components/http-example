@@ -1,4 +1,7 @@
 import path from 'node:path';
+import fp from 'fastify-plugin';
+import fastifySwagger from '@fastify/swagger';
+import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
 
@@ -14,15 +17,39 @@ const setUpStaticAssets = (app) => {
   });
 };
 
-const setupDocs = (app) => appConfig.apps.forEach((name) => {
-  app.get(`/${name}/${appConfig.docRoute}`, (req, res) => res.sendFile(`docs/${name}/index.html`));
-});
+const setupDocs = async (app) => {
+  const getPromises = (instance) => appConfig.apps.map(async (name) => {
+    const openapiFilePath = path.join(dirname, '../../tsp-output/', name, '/@typespec/openapi3/openapi.1.0.yaml');
+    return await instance.register(async (innerInstance) => {
+      await instance.register(fastifySwagger, {
+        mode: 'static',
+        title: appConfig.title,
+        exposeRoute: true,
+        specification: {
+          path: openapiFilePath,
+        },
+        // routePrefix: `${name}-${appConfig.docRoute}`,
+      });
 
+      await instance.register(swaggerUI, {
+        routePrefix: `${name}-${appConfig.docRoute}`,
+        title: appConfig.title,
+        staticCSP: true,
+        transformSpecificationClone: true,
+        theme: {
+          title: appConfig.title,
+        },
+      });
+    });
+  })
+
+  await app.register(fp((instance) => Promise.all(getPromises(instance))));
+};
 export default async (app, _options) => {
   await app.register(formbody);
   setUpStaticAssets(app);
 
-  setupDocs(app);
+  await setupDocs(app);
 
   app.get('/http-protocol/example', (req, res) => {
     res
