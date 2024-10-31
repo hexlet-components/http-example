@@ -8,6 +8,10 @@ route /http-api/echo {
   reverse_proxy localhost:4010
 }
 
+route /http-protocol/example {
+  reverse_proxy localhost:4010
+}
+
 route /http-api-openapi {
 	reverse_proxy localhost:4010
 }
