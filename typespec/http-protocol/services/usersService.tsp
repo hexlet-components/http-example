@@ -50,16 +50,16 @@ interface UserService {
   @route("/{authorId}/posts")
   op getPosts(
     @path authorId: string,
-    @query skip?: integer = 0,
-    @query limit?: integer = 30,
+    @query skip?: uint16 = 0,
+    @query limit?: uint16 = 30,
     @query select?: string
   ): Posts;
 
   @route("/{authorId}/comments")
   op getComments(
     @path authorId: string,
-    @query skip?: integer = 0,
-    @query limit?: integer = 30,
+    @query skip?: uint16 = 0,
+    @query limit?: uint16 = 30,
     @query select?: string
   ): Comments;
 }

@@ -1,9 +1,3 @@
-import "../../examples/courses.tsp";
-
-@example(
-  newCourseDtoExample,
-  #{ title: "New Course" }
-)
 model NewCourseDto {
   @minLength(1)
   title: string;
@@ -13,10 +7,6 @@ model NewCourseDto {
 
 }
 
-@example(
-  editCourseDtoExample,
-  #{ title: "Edit Course" }
-)
 model EditCourseDto {
   @minLength(1)
   title?: string;
@@ -25,13 +15,9 @@ model EditCourseDto {
   description?: string;
 }
 
-@example(
-  courseExample,
-  #{ title: "Course" }
-)
 model Course {
   @key
-  id: string;
+  id: uint16;
 
   @minLength(1)
   title: string;
@@ -41,18 +27,9 @@ model Course {
 
 }
 
-@example(
-  #{
-    courses: coursesExample,
-    total: totalCoursesExample,
-    skip: skipCoursesExample,
-    limit: limitCoursesExample,
-  },
-  #{ title: "Courses" }
-)
 model Courses {
   courses: Course[];
-  total: integer;
-  skip: integer = 0;
-  limit: integer = 30;
+  total: uint16;
+  skip: uint16 = 0;
+  limit: uint16 = 30;
 }

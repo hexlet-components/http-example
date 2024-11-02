@@ -13,8 +13,8 @@ namespace AppService;
 interface PostService {
   @get
   op list(
-    @query skip?: integer = 0,
-    @query limit?: integer = 30,
+    @query skip?: uint16 = 0,
+    @query limit?: uint16 = 30,
     @query select?: string
   ): Posts;
 
@@ -48,8 +48,8 @@ interface PostService {
   @route("/{postId}/comments")
   op getComments(
     @path postId: string,
-    @query skip?: integer = 0,
-    @query limit?: integer = 30,
+    @query skip?: uint16 = 0,
+    @query limit?: uint16 = 30,
     @query select?: string
   ): Comments;
 }

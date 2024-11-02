@@ -1,9 +1,3 @@
-import "../../examples/users.tsp";
-
-@example(
-  newUserDtoExample,
-  #{ title: "New User" }
-)
 model NewUserDto {
   @minLength(1)
   email: string;
@@ -18,10 +12,6 @@ model NewUserDto {
   password: string;
 }
 
-@example(
-  editUserDtoExample,
-  #{ title: "Edit User" }
-)
 model EditUserDto {
   @minLength(1)
   email?: string;
@@ -33,13 +23,9 @@ model EditUserDto {
   lastName?: string;
 }
 
-@example(
-  userExample,
-  #{ title: "User" }
-)
 model User {
   @key
-  id: string;
+  id: uint16;
 
   @minLength(1)
   email: string;
@@ -51,18 +37,9 @@ model User {
   lastName: string;
 }
 
-@example(
-  #{
-    users: usersExample,
-    total: totalUsersExample,
-    skip: skipUsersExample,
-    limit: limitUsersExample,
-  },
-  #{ title: "Users" }
-)
 model Users {
   users: User[];
-  total: integer;
-  skip: integer = 0;
-  limit: integer = 30;
+  total: uint16;
+  skip: uint16 = 0;
+  limit: uint16 = 30;
 }

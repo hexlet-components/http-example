@@ -1,9 +1,3 @@
-import "../../examples/posts.tsp";
-
-@example(
-  newPostDtoExample,
-  #{ title: "New Post" }
-)
 model NewPostDto {
   @minLength(1)
   title: string;
@@ -12,10 +6,6 @@ model NewPostDto {
   body: string;
 }
 
-@example(
-  editPostDtoExample,
-  #{ title: "Edit Post" }
-)
 model EditPostDto {
   @minLength(1)
   title?: string;
@@ -24,15 +14,11 @@ model EditPostDto {
   body?: string;
 }
 
-@example(
-  postExample,
-  #{ title: "Post" }
-)
 model Post {
   @key
-  id: string;
+  id: uint16;
 
-  authorId: string;
+  authorId: uint16;
 
   @minLength(1)
   title: string;
@@ -41,18 +27,9 @@ model Post {
   body: string;
 }
 
-@example(
-  #{
-    posts: postsExample,
-    total: totalPostsExample,
-    skip: skipPostsExample,
-    limit: limitPostsExample,
-  },
-  #{ title: "posts" }
-)
 model Posts {
   posts: Post[];
-  total: integer;
-  skip: integer;
-  limit: integer = 30;
+  total: uint16;
+  skip: uint16;
+  limit: uint16 = 30;
 }

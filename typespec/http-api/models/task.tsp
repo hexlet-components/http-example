@@ -1,9 +1,3 @@
-import "../../examples/tasks.tsp";
-
-@example(
-  newTaskDtoExample,
-  #{ title: "New Task" }
-)
 model NewTaskDto {
   @minLength(1)
   title: string;
@@ -14,10 +8,6 @@ model NewTaskDto {
   status?: Status = Status.Backlog;
 }
 
-@example(
-  editTaskDtoExample,
-  #{ title: "Edit Task" }
-)
 model EditTaskDto {
   @minLength(1)
   title?: string;
@@ -28,13 +18,9 @@ model EditTaskDto {
   status?: Status;
 }
 
-@example(
-  taskExample,
-  #{ title: "Task" }
-)
 model Task {
   @key
-  id: string;
+  id: uint16;
 
   @minLength(1)
   title: string;
@@ -45,20 +31,11 @@ model Task {
   status: Status;
 }
 
-@example(
-  #{
-    tasks: tasksExample,
-    total: totalTasksExample,
-    skip: skipTasksExample,
-    limit: limitTasksExample,
-  },
-  #{ title: "Tasks" }
-)
 model Tasks {
   tasks: Task[];
-  total: integer;
-  skip: integer = 0;
-  limit: integer = 30;
+  total: uint16;
+  skip: uint16 = 0;
+  limit: uint16 = 30;
 }
 
 enum Status {
