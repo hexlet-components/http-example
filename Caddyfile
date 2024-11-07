@@ -83,15 +83,15 @@ route /http-api/* {
 
 route /http-protocol/* {
 	uri strip_prefix /http-protocol
-	reverse_proxy localhost:4011
+	reverse_proxy localhost:4012
 }
 
 route /js-playwright/* {
 	uri strip_prefix /playwright
-	reverse_proxy localhost:4012
+	reverse_proxy localhost:4013
 }
 
 route /postman/* {
 	uri strip_prefix /postman
-	reverse_proxy localhost:4013
+	reverse_proxy localhost:4014
 }
