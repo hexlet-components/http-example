@@ -20,9 +20,6 @@ interface CourseService {
   ): Courses;
 
   @get
-  @opExample(
-    #{ parameters: #{ id: "some-id" } }
-  )
   op get(
     @path id: string,
     @query select?: string
@@ -32,14 +29,8 @@ interface CourseService {
   op create(...NewCourseDto): Course;
 
   @patch
-  @opExample(
-    #{ parameters: #{ id: "some-id" } }
-  )
   op update(@path id: string, ...EditCourseDto): Course;
 
   @delete
-  @opExample(
-    #{ parameters: #{ id: "some-id" } }
-  )
   op delete(@path id: string): void;
 }

@@ -19,9 +19,6 @@ interface PostService {
   ): Posts;
 
   @get
-  @opExample(
-    #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
-  )
   op get(
     @path id: string,
     @query select?: string
@@ -33,16 +30,10 @@ interface PostService {
 
   @useAuth(BearerAuth)
   @patch
-  @opExample(
-    #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
-  )
   op update(@path id: string, ...EditPostDto): Post;
 
   @useAuth(BearerAuth)
   @delete
-  @opExample(
-    #{ parameters: #{ id: "fb5e19a3-ab33-423b-9cec-8ee4ef211c61" } }
-  )
   op delete(@path id: string): void;
 
   @route("/{postId}/comments")

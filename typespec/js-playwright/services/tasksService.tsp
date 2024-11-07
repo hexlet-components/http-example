@@ -19,9 +19,6 @@ interface TaskService {
   ): Tasks;
 
   @get
-  @opExample(
-    #{ parameters: #{ id: "some-id" } }
-  )
   op get(
     @path id: string,
     @query select?: string
@@ -31,14 +28,8 @@ interface TaskService {
   op create(...NewTaskDto): Task;
 
   @patch
-  @opExample(
-    #{ parameters: #{ id: "some-id" } }
-  )
   op update(@path id: string, ...EditTaskDto): Task;
 
   @delete
-  @opExample(
-    #{ parameters: #{ id: "some-id" } }
-  )
   op delete(@path id: string): void;
 }

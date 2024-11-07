@@ -22,9 +22,6 @@ interface UserService {
   ): Users;
 
   @get
-  @opExample(
-    #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
-  )
   op get(
     @path id: string,
     @query select?: string
@@ -35,16 +32,10 @@ interface UserService {
 
   @useAuth(BearerAuth)
   @patch
-  @opExample(
-    #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
-  )
   op update(@path id: string, ...EditUserDto): User;
 
   @useAuth(BearerAuth)
   @delete
-  @opExample(
-    #{ parameters: #{ id: "a788f3fc-0d47-4d55-b18b-09bae52dac7b" } }
-  )
   op delete(@path id: string): void;
 
   @route("/{authorId}/posts")
