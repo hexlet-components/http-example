@@ -4,6 +4,10 @@ route / {
 	reverse_proxy localhost:4010
 }
 
+route /postman/cookie {
+	reverse_proxy localhost:4010
+}
+
 route /http-api/echo {
   reverse_proxy localhost:4010
 }

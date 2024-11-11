@@ -4,6 +4,7 @@ import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
+import fastifyCookie from '@fastify/cookie';
 
 import appConfig from '../../app.config.json'  with {type: 'json'}
 
@@ -47,6 +48,9 @@ const setupDocs = async (app) => {
 };
 export default async (app, _options) => {
   await app.register(formbody);
+  await app.register(fastifyCookie, {
+    secret: 'my-secret',
+  });
   setUpStaticAssets(app);
 
   await setupDocs(app);
@@ -109,6 +113,16 @@ export default async (app, _options) => {
   app.get('/', (req, res) => res.sendFile('main/index.html'));
 
   app.post('/http-api/echo', (req, res) => res.send(req.body));
+
+  app.get('/postman/cookie', (req, res) => {
+    res.setCookie('myCookie', 'cookieValue', {
+      path: '/',
+      httpOnly: true,
+      secure: true, // Используйте true, если вы работаете с HTTPS
+      maxAge: 3600 // Время жизни куки в секундах
+    })
+    .send('Done!');
+  });
 
   return app;
 };
