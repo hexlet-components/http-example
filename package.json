@@ -26,6 +26,6 @@
     "fastify-cli": "^7.0.1",
     "fastify-plugin": "^5.0.1",
     "lodash": "^4.17.21",
-    "openapi-backend": "^5.11.0"
+    "openapi-backend": "^5.11.1"
   }
 }
