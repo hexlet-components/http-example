@@ -18,18 +18,22 @@ interface TaskService {
     @query select?: string[]
   ): Tasks;
 
+  @useAuth(BasicAuth)
   @get
   op get(
     @path id: string,
     @query select?: string
   ): Task;
 
+  @useAuth(BasicAuth)
   @post
   op create(...NewTaskDto): Task;
 
+  @useAuth(BasicAuth)
   @patch
   op update(@path id: string, ...EditTaskDto): Task;
 
+  @useAuth(BasicAuth)
   @delete
   op delete(@path id: string): void;
 }
