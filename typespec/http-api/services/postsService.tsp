@@ -26,11 +26,11 @@ interface PostService {
 
   @useAuth(BearerAuth)
   @post
-  op create(...NewPostDto): Post;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewPostDto): Post;
 
   @useAuth(BearerAuth)
   @patch
-  op update(@path id: string, ...EditPostDto): Post;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditPostDto): Post;
 
   @useAuth(BearerAuth)
   @delete

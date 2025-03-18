@@ -27,11 +27,11 @@ interface CommentService {
 
   @useAuth(BearerAuth)
   @post
-  op create(...NewCommentDto): Comment;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): Comment;
 
   @useAuth(BearerAuth)
   @patch
-  op update(@path  id: string, ...EditCommentDto): Comment;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment;
 
   @useAuth(BearerAuth)
   @delete

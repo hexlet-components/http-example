@@ -25,10 +25,10 @@ interface TaskService {
   ): Task;
 
   @post
-  op create(...NewTaskDto): Task;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewTaskDto): Task;
 
   @patch
-  op update(@path id: string, ...EditTaskDto): Task;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditTaskDto): Task;
 
   @delete
   op delete(@path id: string): void;

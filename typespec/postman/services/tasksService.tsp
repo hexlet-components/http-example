@@ -27,11 +27,11 @@ interface TaskService {
 
   @useAuth(BasicAuth)
   @post
-  op create(...NewTaskDto): Task;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewTaskDto): Task;
 
   @useAuth(BasicAuth)
   @patch
-  op update(@path id: string, ...EditTaskDto): Task;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditTaskDto): Task;
 
   @useAuth(BasicAuth)
   @delete

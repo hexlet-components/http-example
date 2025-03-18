@@ -26,10 +26,10 @@ interface UserService {
   ): User;
 
   @post
-  op create(...NewUserDto): User;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewUserDto): User;
 
   @patch
-  op update(@path id: string, ...EditUserDto): User;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditUserDto): User;
  
   @delete
   op delete(@path id: string): void;

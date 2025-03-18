@@ -26,10 +26,10 @@ interface CourseService {
   ): Course;
 
   @post
-  op create(...NewCourseDto): Course;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCourseDto): Course;
 
   @patch
-  op update(@path id: string, ...EditCourseDto): Course;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditCourseDto): Course;
 
   @delete
   op delete(@path id: string): void;

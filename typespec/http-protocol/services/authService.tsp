@@ -10,5 +10,5 @@ namespace AppService;
 @route("/login")
 interface AuthService {
   @post
-  op create(...AuthData): AuthToken;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...AuthData): AuthToken;
 }
