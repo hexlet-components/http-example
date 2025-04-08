@@ -11,7 +11,7 @@ See [Makefile](./Makefile)
 
 ```bash
 make docker-build
-make docker-run # Open http://localhost:5037
+make docker-run # Open http://localhost:8080
 ```
 
 ---

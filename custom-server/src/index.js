@@ -29,7 +29,7 @@ const setupDocs = async (app) => {
         specification: {
           path: openapiFilePath,
         },
-        // routePrefix: `${name}-${appConfig.docRoute}`,
+        routePrefix: `${name}-${appConfig.docRoute}`,
       });
 
       await instance.register(swaggerUI, {

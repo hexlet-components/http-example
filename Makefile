@@ -1,5 +1,5 @@
-IMAGE_ID := ghcr.io/hexlet-components/rest-api-example
-PORT := 5037
+IMAGE_ID := ghcr.io/hexlet-components/http-example
+PORT := 8080
 
 setup:
 	npm ci
@@ -12,14 +12,14 @@ compile:
 	npx tsp compile ./typespec/js-playwright/main.tsp --output-dir "./tsp-output/js-playwright"
 
 dev:
-	docker rm -f rest-api-example
-	docker run -e PORT=$(PORT) -v ./custom-server:/custom-server -p $(PORT):$(PORT) --name rest-api-example $(IMAGE_ID)
+	docker rm -f http-example
+	docker run -e PORT=$(PORT) -v ./custom-server:/custom-server -p $(PORT):$(PORT) --name http-example $(IMAGE_ID)
 
 start:
-	prism mock -m -d --json-schema-faker-fillProperties=false -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml &
-	prism mock -m -d --json-schema-faker-fillProperties=false -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml &
-	prism mock -m -d --json-schema-faker-fillProperties=false -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml &
-	prism mock -m -d --json-schema-faker-fillProperties=false -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml &
+	npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml &
+	npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml &
+	npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml &
+	npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml &
 	npm start &
 	caddy run
 
@@ -30,8 +30,8 @@ docker-build:
 	docker build . -t $(IMAGE_ID)
 
 docker-run:
-	docker rm -f rest-api-example
-	docker run -e PORT=$(PORT) -p $(PORT):$(PORT) --name rest-api-example $(IMAGE_ID)
+	docker rm -f http-example
+	docker run -e PORT=$(PORT) -p $(PORT):$(PORT) --name http-example $(IMAGE_ID)
 
 docker-sh:
 	docker run -e PORT=$(PORT) -it --entrypoint sh $(IMAGE_ID)

@@ -1,4 +1,4 @@
-:5037
+:{$PORT}
 
 route / {
 	reverse_proxy localhost:4010
