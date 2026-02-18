@@ -1,5 +1,5 @@
 IMAGE_ID := ghcr.io/hexlet-components/http-example
-PORT := 8080
+PORT ?= 8080
 
 setup:
 	npm ci
