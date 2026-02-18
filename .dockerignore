@@ -7,3 +7,5 @@ dist/
 
 # Dependency directories
 node_modules/
+docker-compose.yaml
+Dockerfile

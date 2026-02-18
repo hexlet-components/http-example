@@ -35,3 +35,18 @@ docker-run:
 
 docker-sh:
 	docker run -e PORT=$(PORT) -it --entrypoint sh $(IMAGE_ID)
+
+compose-build:
+	docker compose build
+
+compose:
+	docker compose up
+
+compose-down:
+	docker compose down
+
+compose-logs:
+	docker compose logs -f --tail=200
+
+compose-ps:
+	docker compose ps
