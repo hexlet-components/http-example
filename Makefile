@@ -39,6 +39,12 @@ docker-sh:
 compose-build:
 	docker compose build
 
+compose-bash:
+	docker compose run --rm app sh
+
+compose-setup:
+	docker compose run --rm app setup
+
 compose:
 	docker compose up
 
@@ -50,3 +56,6 @@ compose-logs:
 
 compose-ps:
 	docker compose ps
+
+update-deps:
+	npx ncu -u

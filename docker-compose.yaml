@@ -6,6 +6,8 @@ services:
     ports:
       - '8080:8080'
     mem_limit: 768m
+    volumes:
+      - .:/app
     # mem_reservation: 384m
     # mem_swappiness: 512m
     # cpus: 0.5
