@@ -1,101 +1,84 @@
 :{$PORT}
 
-route / {
+# http-api course
+handle /http-api/echo {
 	reverse_proxy localhost:4010
 }
 
-route /postman/cookie {
+handle /http-api-openapi* {
 	reverse_proxy localhost:4010
 }
 
-route /http-api/echo {
-  reverse_proxy localhost:4010
-}
-
-route /http-protocol/example {
-  reverse_proxy localhost:4010
-}
-
-route /http-api-openapi {
-	reverse_proxy localhost:4010
-}
-
-route /http-protocol-openapi {
-	reverse_proxy localhost:4010
-}
-
-route /js-playwright-openapi {
-	reverse_proxy localhost:4010
-}
-
-route /postman-openapi {
-	reverse_proxy localhost:4010
-}
-
-route /http-api-openapi/* {
-	reverse_proxy localhost:4010
-}
-
-route /http-protocol-openapi/* {
-	reverse_proxy localhost:4010
-}
-
-route /js-playwright-openapi/* {
-	reverse_proxy localhost:4010
-}
-
-route /postman-openapi/* {
-	reverse_proxy localhost:4010
-}
-
-route /assets {
-  reverse_proxy localhost:4010
-}
-
-route /http-api/example {
-	reverse_proxy localhost:4010
-}
-
-route /http-protocol/login {
-	reverse_proxy localhost:4010
-}
-
-route /http-protocol/stream {
-	reverse_proxy localhost:4010
-}
-
-route /http-protocol/removed {
-	reverse_proxy localhost:4010
-}
-
-route /http-protocol {
-	reverse_proxy localhost:4010
-}
-
-route /js-playwright/users-list {
-	reverse_proxy localhost:4010
-}
-
-route /js-dom-testing-library/users-list {
-	reverse_proxy localhost:4010
-}
-
-route /http-api/* {
-	uri strip_prefix /http-api
+handle_path /http-api/* {
 	reverse_proxy localhost:4011
 }
 
-route /http-protocol/* {
-	uri strip_prefix /http-protocol
+# http-protocol course
+handle /http-protocol/example {
+	reverse_proxy localhost:4010
+}
+
+handle /http-protocol/login {
+	reverse_proxy localhost:4010
+}
+
+handle /http-protocol/stream {
+	reverse_proxy localhost:4010
+}
+
+handle /http-protocol/removed {
+	reverse_proxy localhost:4010
+}
+
+handle /http-protocol {
+	reverse_proxy localhost:4010
+}
+
+handle /http-protocol-openapi* {
+	reverse_proxy localhost:4010
+}
+
+handle_path /http-protocol/* {
 	reverse_proxy localhost:4012
 }
 
-route /js-playwright/* {
-	uri strip_prefix /playwright
+# js-playwright course
+handle /js-playwright/users-list {
+	reverse_proxy localhost:4010
+}
+
+handle /js-playwright-openapi* {
+	reverse_proxy localhost:4010
+}
+
+handle_path /js-playwright/* {
 	reverse_proxy localhost:4013
 }
 
-route /postman/* {
-	uri strip_prefix /postman
+# postman course
+handle /postman/cookie {
+	reverse_proxy localhost:4010
+}
+
+handle /postman-openapi* {
+	reverse_proxy localhost:4010
+}
+
+handle_path /postman/* {
 	reverse_proxy localhost:4014
+}
+
+# js-dom-testing-library course
+handle /js-dom-testing-library/users-list {
+	reverse_proxy localhost:4010
+}
+
+# shared/static
+handle /assets* {
+	reverse_proxy localhost:4010
+}
+
+# default
+handle {
+	reverse_proxy localhost:4010
 }

@@ -35,7 +35,7 @@ const setupDocs = async (app) => {
       await instance.register(swaggerUI, {
         routePrefix: `${name}-${appConfig.docRoute}`,
         title: appConfig.title,
-        staticCSP: true,
+        staticCSP: false,
         transformSpecificationClone: true,
         theme: {
           title: appConfig.title,
