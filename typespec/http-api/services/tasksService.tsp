@@ -25,7 +25,7 @@ interface TaskService {
   ): Task;
 
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewTaskDto): Task;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewTaskDto): CreatedResponse & Task;
 
   @patch
   op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditTaskDto): Task;

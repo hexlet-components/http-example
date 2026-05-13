@@ -28,7 +28,7 @@ interface UserService {
   ): User;
 
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewUserDto): User;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewUserDto): CreatedResponse & User;
 
   @useAuth(BearerAuth)
   @patch

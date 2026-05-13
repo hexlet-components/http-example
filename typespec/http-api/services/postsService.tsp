@@ -26,7 +26,7 @@ interface PostService {
 
   @useAuth(BearerAuth)
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewPostDto): Post;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewPostDto): CreatedResponse & Post;
 
   @useAuth(BearerAuth)
   @patch
