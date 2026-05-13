@@ -26,7 +26,7 @@ interface CourseService {
   ): Course;
 
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCourseDto): Course;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCourseDto): CreatedResponse & Course;
 
   @patch
   op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditCourseDto): Course;

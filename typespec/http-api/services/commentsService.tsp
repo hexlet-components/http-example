@@ -27,7 +27,7 @@ interface CommentService {
 
   @useAuth(BearerAuth)
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): Comment;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): CreatedResponse & Comment;
 
   @useAuth(BearerAuth)
   @patch
