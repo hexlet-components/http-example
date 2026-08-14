@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-// Дымовой прогон http-api: поднимает мок prism и приложение, после чего
-// проверяет ответы запросами.
+// Дымовой прогон http-api: поднимает приложение и проверяет ответы запросами.
+// Мока prism у этой спецификации больше нет, все её маршруты обслуживает
+// приложение, см. custom-server/src/http-api.ts.
 //
 // Проверяется то, что уже ломалось незаметно.
 //
@@ -11,8 +12,10 @@
 // спецификации, откуда их берёт документация курса.
 //
 // Второе: коды ответов. На 404, 405, 422, 401, 201 и 204 построены
-// самостоятельные работы. Часть кодов даёт prism из спецификации, а коды
-// /tasks — наш код в custom-server/src/tasks-rest.js, и там их легко потерять.
+// самостоятельные работы, причём урок kinds просит записать три *разных* кода на
+// три неудачных запроса. Коды теперь дают спецификация (валидация и @useAuth),
+// плагин fastify-allow (405) и обработчик ошибок (422 вместо 400), поэтому
+// потерять их можно правкой любого из трёх мест.
 //
 // Третье: соответствие спецификации. Модели объявляют uint16, а динамический
 // мок про это ограничение не знает и отдавал отрицательные id.
@@ -20,26 +23,29 @@
 // Четвёртое: skip, limit и отбор по пути. Ровно то, чего не умел статичный мок
 // и из-за чего уроки приходилось подгонять под сервер (FEEDBACK-371, #16).
 //
-// Caddy здесь не участвует: он есть только в образе, а в CI его нет. Поэтому
-// prism и приложение опрашиваются напрямую по своим портам. Пути учитывают, что
-// Caddy срезает префикс перед prism и оставляет его перед приложением.
+// Caddy здесь не участвует: он есть только в образе, а в CI его нет. Приложение
+// опрашивается напрямую по своему порту, с полными путями: Caddy префикс не
+// срезает.
 
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { readFileSync } from 'node:fs';
 
 import expectedComments from '../custom-server/src/data/comments.js';
+import expectedCourses from '../custom-server/src/data/courses.js';
 import expectedPosts from '../custom-server/src/data/posts.js';
 import expectedTasks from '../custom-server/src/data/tasks.js';
 import expectedUsers from '../custom-server/src/data/users.js';
 
 const SPEC = './tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml';
-const PRISM = 'http://127.0.0.1:4011';
 const APP = 'http://127.0.0.1:4010';
 const TASKS = `${APP}/http-api/tasks`;
 const USERS = `${APP}/http-api/users`;
 const POSTS = `${APP}/http-api/posts`;
 const COMMENTS = `${APP}/http-api/comments`;
+const COURSES = `${APP}/http-api/courses`;
+const LOGIN = `${APP}/http-api/login`;
+const KEY = { 'X-API-KEY': 'any-value' };
 const UINT16_MAX = 65535;
 
 const failures = [];
@@ -142,16 +148,13 @@ const outOfRange = (value, path = '$') => {
 };
 
 const run = async () => {
-  start('prism', 'npx', [
-    'prism', 'mock', '--multiprocess=false',
-    '--json-schema-faker-fillProperties=false',
-    '-p', '4011', '--host', '127.0.0.1', SPEC,
-  ]);
+  // Флаг --options обязателен: без него fastify-cli не читает экспорт options
+  // из приложения, ajv не узнаёт про format uint16 из спецификации и сборка
+  // схемы падает на старте. Падает молча, кодом 1 и без единой строки вывода.
   start('app', 'npx', [
-    'fastify', 'start', '-p', '4010', '-a', '127.0.0.1', 'custom-server/src/index.js',
+    'fastify', 'start', '--options', '-p', '4010', '-a', '127.0.0.1', 'custom-server/src/index.js',
   ]);
 
-  await waitFor(`${PRISM}/posts`, 'prism');
   await waitFor(`${APP}/`, 'приложение');
 
   console.log('\nREST и RPC отдают одни и те же задачи');
@@ -333,7 +336,7 @@ const run = async () => {
 
   console.log('\nКоды ответов, на них построены самостоятельные');
   const codes = [
-    ['GET /nosuch → 404', `${PRISM}/nosuch`, { method: 'GET' }, 404],
+    ['GET /nosuch → 404', `${APP}/http-api/nosuch`, { method: 'GET' }, 404],
     ['DELETE /tasks → 405', TASKS, { method: 'DELETE' }, 405],
     ['POST /tasks с пустым телом → 422', TASKS, {
       method: 'POST',
@@ -346,7 +349,7 @@ const run = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: 'title', body: 'body' }),
     }, 401],
-    ['GET /courses без ключа → 401', `${PRISM}/courses`, { method: 'GET' }, 401],
+    ['GET /courses без ключа → 401', COURSES, { method: 'GET' }, 401],
   ];
   for (const [name, url, options, expected] of codes) {
     const { status } = await getJson(url, options);
@@ -385,13 +388,10 @@ const run = async () => {
     JSON.stringify(createdPost.body),
   );
 
-  const withKey = await getJson(`${PRISM}/courses`, {
-    method: 'GET',
-    headers: { 'X-API-KEY': 'any-value' },
-  });
+  const withKey = await getJson(COURSES, { method: 'GET', headers: KEY });
   check('GET /courses с ключом → 200', withKey.status === 200, `получено ${withKey.status}`);
 
-  const login = await getJson(`${PRISM}/login`, {
+  const login = await getJson(LOGIN, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'max@hotmail.com', password: 'password' }),
@@ -402,6 +402,69 @@ const run = async () => {
     JSON.stringify(login.body),
   );
 
+
+  // Ровно тот запрос, на который жалуются в тикете FEEDBACK-166: параметры
+  // должны возвращаться из запроса, а список начинаться с шестой задачи.
+  const asked = await getJson(`${TASKS}?skip=5&limit=10`);
+  check(
+    'GET /tasks?skip=5&limit=10 возвращает skip и limit из запроса',
+    asked.body?.skip === 5 && asked.body?.limit === 10,
+    JSON.stringify({ skip: asked.body?.skip, limit: asked.body?.limit }),
+  );
+  check(
+    'GET /tasks?skip=5&limit=10 отдаёт десять задач начиная с шестой',
+    JSON.stringify(asked.body?.tasks) === JSON.stringify(expectedTasks.slice(5, 15)),
+    `получено ${asked.body?.tasks?.length} записей, первая ${asked.body?.tasks?.[0]?.id}`,
+  );
+
+  // Курсы тоже обслуживает приложение, а не мок: на моке параметры не работали.
+  const coursesPage = await getJson(`${COURSES}?skip=1&limit=2`, { headers: KEY });
+  check(
+    '/courses?skip=1&limit=2 применяет параметры',
+    JSON.stringify(coursesPage.body) === JSON.stringify({
+      courses: expectedCourses.slice(1, 3), total: expectedCourses.length, skip: 1, limit: 2,
+    }),
+    JSON.stringify(coursesPage.body),
+  );
+
+  // Урок httpie показывает отправку формы (`http -f`), и спецификация объявляет
+  // x-www-form-urlencoded у каждой операции создания. Тело разбирает
+  // @fastify/formbody, а проверяет схема, поэтому проверка нужна отдельная.
+  const form = await getJson(USERS, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'email=john@mail.com&firstName=John&lastName=Doe&password=secret',
+  });
+  check(
+    'POST /users формой → 201',
+    form.status === 201 && form.body?.firstName === 'John',
+    `${form.status} ${JSON.stringify(form.body)}`,
+  );
+
+  // Урок kinds просит записать три разных кода. Совпадение любых двух делает
+  // задание бессмысленным, поэтому проверяется именно различие.
+  const lessonCodes = [];
+  for (const [url, options] of [
+    [`${APP}/http-api/nosuch`, { method: 'GET' }],
+    [TASKS, { method: 'DELETE' }],
+    [TASKS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }],
+  ]) {
+    const { status } = await getJson(url, options);
+    lessonCodes.push(status);
+  }
+  check(
+    'три неудачных запроса из урока kinds дают три разных кода',
+    new Set(lessonCodes).size === 3,
+    JSON.stringify(lessonCodes),
+  );
+
+  const allowHeader = await fetch(TASKS, { method: 'DELETE' });
+  check(
+    '405 несёт заголовок Allow',
+    (allowHeader.headers.get('allow') ?? '').includes('GET'),
+    `Allow: ${allowHeader.headers.get('allow')}`,
+  );
+
   console.log('\nЧисла в ответах не выходят за uint16');
   for (const url of [TASKS, `${TASKS}/1`, USERS, `${USERS}/1`, POSTS, `${POSTS}/1`, COMMENTS]) {
     const path = url.replace(APP, '');
@@ -409,10 +472,7 @@ const run = async () => {
     const bad = outOfRange(body, path);
     check(`${path} в границах uint16`, bad.length === 0, bad.join(', '));
   }
-  const { body: coursesBody } = await getJson(`${PRISM}/courses`, {
-    method: 'GET',
-    headers: { 'X-API-KEY': 'any-value' },
-  });
+  const { body: coursesBody } = await getJson(COURSES, { method: 'GET', headers: KEY });
   check('/courses в границах uint16', outOfRange(coursesBody, '/courses').length === 0);
 
   console.log('\nПримеры спецификации не расходятся с набором задач');
@@ -420,13 +480,20 @@ const run = async () => {
   // есть примеры и набор это две копии. Сверка идёт поиском подстроки: разбирать
   // YAML нечем, отдельная зависимость ради одной проверки того не стоит.
   const spec = readFileSync(SPEC, 'utf8');
-  for (const task of expectedTasks) {
+  // В примере приведены первые три задачи, а не весь набор: пример это
+  // иллюстрация ответа, а не его копия. Сверяется то, что показано, плюс total.
+  for (const task of expectedTasks.slice(0, 3)) {
     check(
       `пример задачи ${task.id} есть в спецификации`,
       spec.includes(task.title) && spec.includes(task.description),
       `нет «${task.title}»`,
     );
   }
+  check(
+    'пример Tasks объявляет реальный total',
+    spec.includes(`total: ${expectedTasks.length}`),
+    `ожидался total: ${expectedTasks.length}`,
+  );
   for (const user of expectedUsers.slice(0, 3)) {
     check(
       `пример пользователя ${user.id} есть в спецификации`,
