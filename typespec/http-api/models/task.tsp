@@ -23,8 +23,8 @@ model EditTaskDto {
 // поэтому расхождение здесь ломает урок. Совпадение проверяет bin/smoke-test.js.
 @example(#{
   id: 1,
-  title: "Опубликовать курс по основам JavaScript",
-  description: "Автор подготовил курс по JavaScript. Нужно его опубликовать",
+  title: "Publish the JavaScript basics course",
+  description: "The author has prepared the course, it is ready to be published",
   status: Status.Backlog,
 })
 model Task {
@@ -44,20 +44,20 @@ model Task {
   tasks: #[
     #{
       id: 1,
-      title: "Опубликовать курс по основам JavaScript",
-      description: "Автор подготовил курс по JavaScript. Нужно его опубликовать",
+      title: "Publish the JavaScript basics course",
+      description: "The author has prepared the course, it is ready to be published",
       status: Status.Backlog,
     },
     #{
       id: 2,
-      title: "Записать скринкаст про HTTP API",
-      description: "Показать, чем REST отличается от RPC",
+      title: "Record a screencast about HTTP API",
+      description: "Show how REST differs from RPC",
       status: Status.InProgress,
     },
     #{
       id: 3,
-      title: "Обновить документацию",
-      description: "Описать эндпоинт /rpc в спецификации",
+      title: "Update the documentation",
+      description: "Describe the /rpc endpoint in the specification",
       status: Status.Done,
     }
   ],

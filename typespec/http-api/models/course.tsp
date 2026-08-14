@@ -18,7 +18,7 @@ model EditCourseDto {
 @example(#{
   id: 1,
   title: "HTTP API",
-  description: "Учимся проектировать и вызывать API по HTTP",
+  description: "Designing and calling APIs over HTTP",
 })
 model Course {
   @key
@@ -34,9 +34,9 @@ model Course {
 
 @example(#{
   courses: #[
-    #{ id: 1, title: "HTTP API", description: "Учимся проектировать и вызывать API по HTTP" },
-    #{ id: 2, title: "Протокол HTTP", description: "Разбираем запрос, ответ, коды и заголовки" },
-    #{ id: 3, title: "Основы JavaScript", description: "Первый язык программирования с нуля" }
+    #{ id: 1, title: "HTTP API", description: "Designing and calling APIs over HTTP" },
+    #{ id: 2, title: "The HTTP protocol", description: "Requests, responses, status codes and headers" },
+    #{ id: 3, title: "JavaScript basics", description: "A first programming language from scratch" }
   ],
   total: 3,
   skip: 0,

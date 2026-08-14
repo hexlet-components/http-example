@@ -21,8 +21,8 @@ model EditPostDto {
 @example(#{
   id: 1,
   authorId: 1,
-  title: "Как устроен HTTP",
-  body: "Разбираем запрос и ответ по частям: строка запроса, заголовки, тело",
+  title: "How HTTP works",
+  body: "Taking a request and a response apart: request line, headers, body",
 })
 model Post {
   @key
@@ -42,20 +42,20 @@ model Post {
     #{
       id: 1,
       authorId: 1,
-      title: "Как устроен HTTP",
-      body: "Разбираем запрос и ответ по частям: строка запроса, заголовки, тело",
+      title: "How HTTP works",
+      body: "Taking a request and a response apart: request line, headers, body",
     },
     #{
       id: 2,
       authorId: 1,
-      title: "Коды ответов на практике",
-      body: "Чем 401 отличается от 403 и почему 404 приходит чаще остальных",
+      title: "Status codes in practice",
+      body: "How 401 differs from 403 and why 404 shows up more often than the rest",
     },
     #{
       id: 3,
       authorId: 1,
-      title: "REST и RPC",
-      body: "Один и тот же список задач двумя разными способами",
+      title: "REST and RPC",
+      body: "The same list of tasks served in two different ways",
     }
   ],
   total: 40,

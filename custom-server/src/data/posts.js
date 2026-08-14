@@ -1,51 +1,54 @@
 // Посты демонстрационного сервера.
 //
-// Их сорок, и число выбрано под урок example: он учит пагинации на запросе
-// `?skip=30`, а значит записей должно быть заметно больше тридцати, иначе
-// параметр нечем показать. Сорок дают последнюю страницу из десяти записей.
+// Данные на английском намеренно: сервер один на все локали курсов, см. шапку
+// data/tasks.js.
 //
-// Авторы распределены неравномерно, и у автора 1 их шесть: урок показывает
+// Их сорок, и число выбрано под урок example: он учит пагинации на запросе
+// `?skip=30`, а значит записей должно быть заметно больше тридцати. Сорок дают
+// последнюю страницу из десяти записей.
+//
+// Авторы распределены неравномерно, и у автора 1 их восемь: урок показывает
 // вложенный ресурс `/users/1/posts`, и на пустом или однозаписочном списке он
 // ничего не объясняет.
 export default [
-  { id: 1, authorId: 1, title: 'Как устроен HTTP', body: 'Разбираем запрос и ответ по частям: строка запроса, заголовки, тело' },
-  { id: 2, authorId: 1, title: 'Коды ответов на практике', body: 'Чем 401 отличается от 403 и почему 404 приходит чаще остальных' },
-  { id: 3, authorId: 1, title: 'REST и RPC', body: 'Один и тот же список задач двумя разными способами' },
-  { id: 4, authorId: 2, title: 'Заголовки, о которых забывают', body: 'Content-Type, Accept и почему сервер отвечает не тем, чего ждали' },
-  { id: 5, authorId: 3, title: 'Идемпотентность простыми словами', body: 'Почему повторный PUT безопасен, а повторный POST нет' },
-  { id: 6, authorId: 1, title: 'Пагинация: skip и limit', body: 'Как отдавать большие списки по частям и зачем в ответе total' },
-  { id: 7, authorId: 4, title: 'Кеширование ответов', body: 'ETag, Last-Modified и условные запросы на живом примере' },
-  { id: 8, authorId: 2, title: 'Аутентификация против авторизации', body: 'Кто вы и что вам можно: две разные задачи и два разных механизма' },
-  { id: 9, authorId: 5, title: 'Bearer-токен изнутри', body: 'Откуда берётся токен, где он живёт и что делать, когда истёк' },
-  { id: 10, authorId: 1, title: 'JWT: подпись, а не шифрование', body: 'Полезная нагрузка читается любым, подделать её мешает подпись' },
-  { id: 11, authorId: 6, title: 'OAuth без магии', body: 'Обмен кода на токен по шагам, глазами клиента и сервера' },
-  { id: 12, authorId: 3, title: 'Версии API: путь или заголовок', body: 'Где размещать версию и чем это обходится клиентам' },
-  { id: 13, authorId: 7, title: 'OpenAPI как договор', body: 'Спецификация вперёд кода и что это даёт обеим сторонам' },
-  { id: 14, authorId: 2, title: 'Валидация на границе', body: 'Почему 422 полезнее, чем упавший обработчик' },
-  { id: 15, authorId: 8, title: 'Ошибки в теле ответа', body: 'Формат проблемы вместо голого кода: RFC 7807 на практике' },
-  { id: 16, authorId: 1, title: 'CORS: чей это запрос', body: 'Предварительный запрос, заголовки и типичные грабли фронтенда' },
-  { id: 17, authorId: 4, title: 'Загрузка файлов через API', body: 'multipart против прямой отдачи в хранилище' },
-  { id: 18, authorId: 9, title: 'Ограничение частоты запросов', body: 'Rate limit, окна и заголовки, по которым клиент понимает лимит' },
-  { id: 19, authorId: 5, title: 'Вебхуки вместо опроса', body: 'Как сервер сам сообщает о событии и что делать с повторами' },
-  { id: 20, authorId: 2, title: 'Мягкое удаление', body: 'Когда запись нужно спрятать, а не потерять' },
-  { id: 21, authorId: 10, title: 'Фильтры и сортировка в списках', body: 'Договорённости о параметрах, которые не превращаются в кашу' },
-  { id: 22, authorId: 3, title: 'Частичное обновление', body: 'PATCH и почему он не то же самое, что PUT с половиной полей' },
-  { id: 23, authorId: 6, title: 'Вложенные ресурсы', body: 'Когда /users/1/posts уместнее, чем фильтр по автору' },
-  { id: 24, authorId: 1, title: 'Выбор полей ответа', body: 'Параметр select и экономия на лишних данных' },
-  { id: 25, authorId: 7, title: 'HTTP/2 и множество запросов', body: 'Что изменилось для клиента и почему склейка ресурсов устарела' },
-  { id: 26, authorId: 4, title: 'Таймауты и повторы', body: 'Клиент, который не ждёт вечно, и сервер, который это учитывает' },
-  { id: 27, authorId: 8, title: 'Логи запросов без лишнего', body: 'Что писать, чтобы разобраться, и чего не писать никогда' },
-  { id: 28, authorId: 5, title: 'Тестирование API', body: 'Контрактные проверки, моки и почему одних юнитов мало' },
-  { id: 29, authorId: 9, title: 'Документация, которой пользуются', body: 'Примеры запросов важнее описания полей' },
-  { id: 30, authorId: 2, title: 'Курсорная пагинация', body: 'Когда skip перестаёт работать и на что его меняют' },
-  { id: 31, authorId: 10, title: 'Массовые операции', body: 'Один запрос на пачку записей и что отвечать при частичном успехе' },
-  { id: 32, authorId: 3, title: 'Долгие операции в API', body: 'Ответ 202, ссылка на статус и опрос результата' },
-  { id: 33, authorId: 6, title: 'Формат даты в ответе', body: 'ISO 8601, часовые пояса и споры, которых можно избежать' },
-  { id: 34, authorId: 7, title: 'Числа и деньги', body: 'Почему сумму не стоит передавать числом с плавающей точкой' },
-  { id: 35, authorId: 1, title: 'Совместимость при изменениях', body: 'Что можно добавить безопасно, а что ломает клиентов' },
-  { id: 36, authorId: 4, title: 'GraphQL рядом с REST', body: 'Где выигрывает запрос по схеме, а где привычные эндпоинты' },
-  { id: 37, authorId: 8, title: 'Пределы размера запроса', body: 'Код 413, разумные ограничения и понятные сообщения' },
-  { id: 38, authorId: 5, title: 'Здоровье сервиса', body: 'Проверки готовности и живости, и чем они отличаются' },
-  { id: 39, authorId: 9, title: 'Трассировка запроса', body: 'Идентификатор запроса, который проходит через все сервисы' },
-  { id: 40, authorId: 10, title: 'Отключение старого эндпоинта', body: 'Предупреждение, срок и заголовок Deprecation' },
+  { id: 1, authorId: 1, title: 'How HTTP works', body: 'Taking a request and a response apart: request line, headers, body' },
+  { id: 2, authorId: 1, title: 'Status codes in practice', body: 'How 401 differs from 403 and why 404 shows up more often than the rest' },
+  { id: 3, authorId: 1, title: 'REST and RPC', body: 'The same list of tasks served in two different ways' },
+  { id: 4, authorId: 2, title: 'Headers people forget', body: 'Content-Type, Accept and why the server answers with something else' },
+  { id: 5, authorId: 3, title: 'Idempotency in plain words', body: 'Why a repeated PUT is safe and a repeated POST is not' },
+  { id: 6, authorId: 1, title: 'Pagination with skip and limit', body: 'Serving long lists in parts and why the response carries total' },
+  { id: 7, authorId: 4, title: 'Caching responses', body: 'ETag, Last-Modified and conditional requests on a live example' },
+  { id: 8, authorId: 2, title: 'Authentication versus authorization', body: 'Who you are and what you may do: two problems, two mechanisms' },
+  { id: 9, authorId: 5, title: 'A bearer token from the inside', body: 'Where the token comes from, where it lives and what to do when it expires' },
+  { id: 10, authorId: 1, title: 'JWT is signed, not encrypted', body: 'Anyone can read the payload, the signature is what stops forgery' },
+  { id: 11, authorId: 6, title: 'OAuth without magic', body: 'Trading the code for a token step by step, from both sides' },
+  { id: 12, authorId: 3, title: 'API versions: path or header', body: 'Where to put the version and what it costs the clients' },
+  { id: 13, authorId: 7, title: 'OpenAPI as a contract', body: 'Specification before code and what both sides get out of it' },
+  { id: 14, authorId: 2, title: 'Validation at the boundary', body: 'Why 422 is more useful than a handler that crashed' },
+  { id: 15, authorId: 8, title: 'Errors in the response body', body: 'A problem document instead of a bare status code: RFC 7807 in practice' },
+  { id: 16, authorId: 1, title: 'CORS: whose request is this', body: 'The preflight request, the headers and the usual frontend traps' },
+  { id: 17, authorId: 4, title: 'Uploading files through an API', body: 'Multipart against handing the client a direct upload URL' },
+  { id: 18, authorId: 9, title: 'Rate limiting', body: 'Windows, quotas and the headers that tell the client where the limit is' },
+  { id: 19, authorId: 5, title: 'Webhooks instead of polling', body: 'How the server reports an event and what to do about duplicates' },
+  { id: 20, authorId: 2, title: 'Soft deletes', body: 'When a record has to be hidden rather than lost' },
+  { id: 21, authorId: 10, title: 'Filtering and sorting lists', body: 'Conventions for query parameters that do not turn into a mess' },
+  { id: 22, authorId: 3, title: 'Partial updates', body: 'PATCH and why it is not a PUT with half of the fields' },
+  { id: 23, authorId: 6, title: 'Nested resources', body: 'When /users/1/posts reads better than a filter by author' },
+  { id: 24, authorId: 1, title: 'Choosing response fields', body: 'The select parameter and saving on data nobody asked for' },
+  { id: 25, authorId: 7, title: 'HTTP/2 and many requests', body: 'What changed for the client and why bundling assets is history' },
+  { id: 26, authorId: 4, title: 'Timeouts and retries', body: 'A client that does not wait forever and a server that expects retries' },
+  { id: 27, authorId: 8, title: 'Request logs without the noise', body: 'What to write to be able to debug and what never to write at all' },
+  { id: 28, authorId: 5, title: 'Testing an API', body: 'Contract checks, mocks and why unit tests alone are not enough' },
+  { id: 29, authorId: 9, title: 'Documentation people actually use', body: 'Example requests matter more than field descriptions' },
+  { id: 30, authorId: 2, title: 'Cursor pagination', body: 'When skip stops working and what replaces it' },
+  { id: 31, authorId: 10, title: 'Bulk operations', body: 'One request for many records and what to answer on partial success' },
+  { id: 32, authorId: 3, title: 'Long running operations', body: 'Answering 202, handing out a status URL and polling for the result' },
+  { id: 33, authorId: 6, title: 'Date format in responses', body: 'ISO 8601, time zones and arguments that can be avoided' },
+  { id: 34, authorId: 7, title: 'Numbers and money', body: 'Why an amount should not travel as a floating point number' },
+  { id: 35, authorId: 1, title: 'Staying compatible while changing', body: 'What can be added safely and what breaks existing clients' },
+  { id: 36, authorId: 4, title: 'GraphQL next to REST', body: 'Where a schema query wins and where plain endpoints do' },
+  { id: 37, authorId: 8, title: 'Request size limits', body: 'Status 413, sensible limits and messages that explain them' },
+  { id: 38, authorId: 5, title: 'Service health', body: 'Readiness and liveness checks and how they differ' },
+  { id: 39, authorId: 9, title: 'Tracing a request', body: 'A request id that travels through every service on the way' },
+  { id: 40, authorId: 10, title: 'Retiring an old endpoint', body: 'A warning, a deadline and the Deprecation header' },
 ];
