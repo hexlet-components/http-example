@@ -18,7 +18,7 @@ model EditCommentDto {
   id: 1,
   authorId: 2,
   postId: 1,
-  body: "Спасибо, наконец понял, зачем нужны заголовки",
+  body: "Thanks, headers finally make sense to me",
 })
 model Comment {
   @key
@@ -33,13 +33,13 @@ model Comment {
 
 @example(#{
   comments: #[
-    #{ id: 1, authorId: 2, postId: 1, body: "Спасибо, наконец понял, зачем нужны заголовки" },
-    #{ id: 2, authorId: 3, postId: 1, body: "А где почитать про кеширование подробнее?" },
-    #{ id: 3, authorId: 4, postId: 1, body: "Схема запроса очень наглядная" }
+    #{ id: 1, authorId: 2, postId: 1, body: "Thanks, headers finally make sense to me" },
+    #{ id: 2, authorId: 3, postId: 1, body: "Where can I read more about this?" },
+    #{ id: 3, authorId: 4, postId: 1, body: "The diagram is very clear, bookmarked it" }
   ],
-  total: 3,
+  total: 30,
   skip: 0,
-  limit: 30,
+  limit: 3,
 })
 model Comments {
   comments: Comment[];

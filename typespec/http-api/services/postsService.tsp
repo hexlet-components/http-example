@@ -22,7 +22,7 @@ interface PostService {
   op get(
     @path id: string,
     @query select?: string
-  ): Post;
+  ): Post | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @post
@@ -30,11 +30,11 @@ interface PostService {
 
   @useAuth(BearerAuth)
   @patch
-  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditPostDto): Post;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditPostDto): Post | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @delete
-  op delete(@path id: string): void;
+  op delete(@path id: string): NoContentResponse | NotFoundResponse;
 
   @route("/{postId}/comments")
   op getComments(
