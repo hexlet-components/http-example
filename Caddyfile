@@ -3,6 +3,16 @@
 # Апстримы указаны адресом, а не именем localhost: и prism, и приложение слушают
 # только IPv4 (0.0.0.0), а localhost резолвится ещё и в ::1, где не слушает никто.
 
+# Документация со слешем на конце отвечает 405, а не страницей: swagger-ui
+# регистрирует и GET, и добавленный фастифаем HEAD на один путь, а fastify-allow
+# запоминает по маршруту последний метод, и в Allow остаётся только HEAD. Ссылка
+# со слешем живая, урок crud курса http-api ведёт на /http-api-openapi/#/Tasks,
+# поэтому адрес нормализуется здесь.
+redir /http-api-openapi/ /http-api-openapi 301
+redir /http-protocol-openapi/ /http-protocol-openapi 301
+redir /js-playwright-openapi/ /js-playwright-openapi 301
+redir /postman-openapi/ /postman-openapi 301
+
 # http-api course
 # Весь курс обслуживает приложение, мока у этой спецификации больше нет. Мок
 # отдавал пример дословно, поэтому не применял skip, limit и select и не отбирал
@@ -19,19 +29,10 @@ handle /http-api/* {
 }
 
 # http-protocol course
-handle /http-protocol/example {
-	reverse_proxy 127.0.0.1:4010
-}
-
-handle /http-protocol/login {
-	reverse_proxy 127.0.0.1:4010
-}
-
-handle /http-protocol/stream {
-	reverse_proxy 127.0.0.1:4010
-}
-
-handle /http-protocol/removed {
+# Мока у этой спецификации больше нет, весь префикс обслуживает приложение.
+# Отдельный блок на /http-protocol нужен потому, что путь без слеша под
+# /http-protocol/* не попадает: по нему отдаётся страница урока.
+handle /http-protocol-openapi* {
 	reverse_proxy 127.0.0.1:4010
 }
 
@@ -39,38 +40,26 @@ handle /http-protocol {
 	reverse_proxy 127.0.0.1:4010
 }
 
-handle /http-protocol-openapi* {
+handle /http-protocol/* {
 	reverse_proxy 127.0.0.1:4010
-}
-
-handle_path /http-protocol/* {
-	reverse_proxy 127.0.0.1:4012
 }
 
 # js-playwright course
-handle /js-playwright/users-list {
-	reverse_proxy 127.0.0.1:4010
-}
-
 handle /js-playwright-openapi* {
 	reverse_proxy 127.0.0.1:4010
 }
 
-handle_path /js-playwright/* {
-	reverse_proxy 127.0.0.1:4013
-}
-
-# postman course
-handle /postman/cookie {
+handle /js-playwright/* {
 	reverse_proxy 127.0.0.1:4010
 }
 
+# postman course
 handle /postman-openapi* {
 	reverse_proxy 127.0.0.1:4010
 }
 
-handle_path /postman/* {
-	reverse_proxy 127.0.0.1:4014
+handle /postman/* {
+	reverse_proxy 127.0.0.1:4010
 }
 
 # js-dom-testing-library course

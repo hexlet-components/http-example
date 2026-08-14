@@ -23,14 +23,10 @@ stop_all() {
 
 trap 'stop_all' INT TERM
 
-# У спецификации http-api мока нет: все её маршруты обслуживает приложение, см.
-# custom-server/src/resources.js. Мок отдаёт ответ, не разбирая запрос, а уроки
-# курса построены на skip, limit, select и на идентификаторе в пути.
-# Остальные три спецификации остаются на -d осознанно: примеров в них нет, и
-# статичный режим отдал бы вместо данных заглушки вида "string".
-start_service prism-http-protocol "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml"
-start_service prism-js-playwright "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml"
-start_service prism-postman "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml"
+# Моков prism больше нет ни у одной спецификации: все четыре обслуживает
+# приложение, маршруты строятся по самой спецификации. Мок отдавал ответ, не
+# разбирая запрос, а уроки построены на skip, limit, select и на идентификаторе
+# в пути.
 start_service app "npm start"
 start_service caddy "caddy run"
 

@@ -9,7 +9,7 @@ import fastifyCookie from '@fastify/cookie';
 
 import appConfig from '../../app.config.json'  with {type: 'json'}
 import setUpRpc from './rpc.js';
-import setUpHttpApi from './http-api.ts';
+import setUpSpec from './openapi-spec.ts';
 
 const { dirname } = import.meta;
 
@@ -48,6 +48,7 @@ const setupDocs = async (app) => {
   })
 
   await app.register(fp((instance) => Promise.all(getPromises(instance))));
+
 };
 // Опции самого экземпляра fastify: fastify-cli подхватывает этот экспорт, но
 // только с флагом --options. Без флага ajv не узнает про формат ниже, сборка
@@ -159,10 +160,12 @@ export default async (app, _options) => {
 
   // REST-маршруты коллекций обслуживаются приложением, а не моком prism: см.
   // шапку custom-server/src/routes.js.
-  // Маршруты курса HTTP API. Отдельным плагином, потому что внутри свой
-  // обработчик ошибок: валидация по спецификации отвечает 400, а уроки учат
-  // на 422.
-  await app.register(setUpHttpApi);
+  // Маршруты всех четырёх спецификаций. Каждая своим плагином, потому что внутри
+  // свой обработчик ошибок: валидация по спецификации отвечает 400, а уроки учат
+  // на 422. Список тот же, что задаёт маршруты документации.
+  for (const name of appConfig.apps) {
+    await app.register(setUpSpec, { name });
+  }
 
   app.get('/postman/cookie', (req, res) => {
     res.setCookie('myCookie', 'cookieValue', {
