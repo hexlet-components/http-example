@@ -8,6 +8,7 @@ import fastifyCookie from '@fastify/cookie';
 
 import appConfig from '../../app.config.json'  with {type: 'json'}
 import setUpRpc from './rpc.js';
+import setUpTasks from './tasks-rest.js';
 
 const { dirname } = import.meta;
 
@@ -116,6 +117,10 @@ export default async (app, _options) => {
   app.post('/http-api/echo', (req, res) => res.send(req.body));
 
   setUpRpc(app);
+
+  // REST-маршруты /http-api/tasks обслуживаются здесь, а не моком prism: см.
+  // шапку tasks-rest.js.
+  setUpTasks(app);
 
   app.get('/postman/cookie', (req, res) => {
     res.setCookie('myCookie', 'cookieValue', {
