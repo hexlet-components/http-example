@@ -34,6 +34,13 @@ import expectedTasks from '../custom-server/src/data/tasks.js';
 import expectedUsers from '../custom-server/src/data/users.js';
 
 const SPEC = './tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml';
+// Порт на приложение задан в package.json, порты моков в bin/start.sh.
+const MOCKS = [
+  ['http-api', 4011],
+  ['http-protocol', 4012],
+  ['js-playwright', 4013],
+  ['postman', 4014],
+];
 const PRISM = 'http://127.0.0.1:4011';
 const APP = 'http://127.0.0.1:4010';
 const TASKS = `${APP}/http-api/tasks`;
@@ -94,8 +101,11 @@ const stopAll = async () => {
   }));
 };
 
+// Прогон поднимает пять сервисов: четыре мока и приложение. На загруженной машине
+// это заметно дольше одного, поэтому ожидание щедрое. Если сервис не поднялся,
+// печатается его вывод, и причина видна сразу.
 const waitFor = async (url, name) => {
-  for (let i = 0; i < 60; i += 1) {
+  for (let i = 0; i < 240; i += 1) {
     try {
       await fetch(url);
       return;
@@ -104,7 +114,7 @@ const waitFor = async (url, name) => {
     }
   }
   dumpOutput();
-  throw new Error(`${name} не поднялся за 30 секунд: ${url}`);
+  throw new Error(`${name} не поднялся за 120 секунд: ${url}`);
 };
 
 const getJson = async (url, options) => {
@@ -142,16 +152,21 @@ const outOfRange = (value, path = '$') => {
 };
 
 const run = async () => {
-  start('prism', 'npx', [
-    'prism', 'mock', '--multiprocess=false',
-    '--json-schema-faker-fillProperties=false',
-    '-p', '4011', '--host', '127.0.0.1', SPEC,
-  ]);
+  for (const [app, port] of MOCKS) {
+    start(`prism-${app}`, 'npx', [
+      'prism', 'mock', '--multiprocess=false',
+      '--json-schema-faker-fillProperties=false',
+      '-p', String(port), '--host', '127.0.0.1',
+      `./tsp-output/${app}/@typespec/openapi3/openapi.1.0.yaml`,
+    ]);
+  }
   start('app', 'npx', [
     'fastify', 'start', '-p', '4010', '-a', '127.0.0.1', 'custom-server/src/index.js',
   ]);
 
-  await waitFor(`${PRISM}/posts`, 'prism');
+  for (const [app, port] of MOCKS) {
+    await waitFor(`http://127.0.0.1:${port}/courses`, `мок ${app}`);
+  }
   await waitFor(`${APP}/`, 'приложение');
 
   console.log('\nREST и RPC отдают одни и те же задачи');
@@ -401,6 +416,153 @@ const run = async () => {
     typeof login.body?.token === 'string' && login.body.token.length > 0,
     JSON.stringify(login.body),
   );
+
+  console.log('\nОстальные три спецификации: те же коллекции тем же кодом');
+  // Ожидания выписаны здесь заново, а не взяты из resources.js: прогон должен
+  // утверждать поведение спецификаций, а не повторять реализацию. Матрица снята
+  // с typespec/<app>/services/.
+  const OTHER_SPECS = [
+    {
+      prefix: '/http-protocol', collections: ['tasks', 'users', 'posts', 'comments'], nested: true,
+      guarded: [['DELETE', '/users/1', 'bearer'], ['POST', '/posts', 'bearer']],
+      open: [['GET', '/tasks/1'], ['POST', '/tasks']],
+    },
+    {
+      prefix: '/js-playwright', collections: ['tasks', 'users'], nested: false,
+      guarded: [],
+      open: [['GET', '/tasks/1'], ['POST', '/users'], ['DELETE', '/users/1']],
+    },
+    {
+      prefix: '/postman', collections: ['tasks', 'users', 'posts', 'comments'], nested: true,
+      // Задачи здесь закрыты Basic, и чтение одной задачи тоже.
+      guarded: [['GET', '/tasks/1', 'basic'], ['POST', '/tasks', 'basic'], ['DELETE', '/users/1', 'bearer']],
+      open: [['GET', '/tasks'], ['POST', '/users']],
+    },
+  ];
+
+  const bodyFor = (path) => {
+    if (path.startsWith('/tasks')) return { title: 'title', description: 'description' };
+    if (path.startsWith('/users')) return {
+      email: 'john@mail.com', firstName: 'John', lastName: 'Doe', password: 'secret',
+    };
+    if (path.startsWith('/posts')) return { title: 'title', body: 'body' };
+    return { postId: 1, body: 'body' };
+  };
+
+  const credentials = { bearer: 'Bearer any-value', basic: `Basic ${Buffer.from('user:pass').toString('base64')}` };
+
+  for (const spec of OTHER_SPECS) {
+    const at = (path) => `${APP}${spec.prefix}${path}`;
+    const send = (method, path, scheme) => {
+      const headers = {};
+      if (scheme) headers.Authorization = credentials[scheme];
+      if (method === 'POST' || method === 'PATCH') headers['Content-Type'] = 'application/json';
+      return getJson(at(path), {
+        method,
+        headers,
+        body: method === 'POST' || method === 'PATCH' ? JSON.stringify(bodyFor(path)) : undefined,
+      });
+    };
+
+    // Пагинация и отбор по пути — то, чего не умел мок.
+    const page = await send('GET', '/users?skip=3&limit=2');
+    check(
+      `${spec.prefix}: skip=3&limit=2 применяются`,
+      JSON.stringify(page.body?.users) === JSON.stringify(expectedUsers.slice(3, 5))
+        && page.body?.total === expectedUsers.length,
+      JSON.stringify(page.body),
+    );
+    const selected = await send('GET', '/users?select=firstName');
+    check(
+      `${spec.prefix}: select оставляет id и запрошенное поле`,
+      JSON.stringify(Object.keys(selected.body?.users?.[0] ?? {})) === JSON.stringify(['id', 'firstName']),
+      JSON.stringify(selected.body?.users?.[0]),
+    );
+    const third = await send('GET', '/users/3');
+    check(
+      `${spec.prefix}: /users/3 отдаёт третьего пользователя`,
+      JSON.stringify(third.body) === JSON.stringify(expectedUsers[2]),
+      JSON.stringify(third.body),
+    );
+    const missing = await send('GET', '/users/999');
+    check(`${spec.prefix}: /users/999 → 404`, missing.status === 404, `получено ${missing.status}`);
+    const wrongMethod = await send('DELETE', '/users');
+    check(`${spec.prefix}: DELETE по коллекции → 405`, wrongMethod.status === 405, `получено ${wrongMethod.status}`);
+
+    // Код создания: у этих трёх спецификаций нет CreatedResponse, значит 200.
+    const createScheme = spec.guarded.find(([m, p]) => m === 'POST' && p === '/users')?.[2];
+    const createdUser = await send('POST', '/users', createScheme);
+    check(
+      `${spec.prefix}: POST /users → 201`,
+      createdUser.status === 201,
+      `получено ${createdUser.status}`,
+    );
+
+    // Состав коллекций: чего в спецификации нет, того быть не должно.
+    for (const name of ['tasks', 'users', 'posts', 'comments']) {
+      const { status } = await send('GET', `/${name}`);
+      const declared = spec.collections.includes(name);
+      check(
+        `${spec.prefix}/${name} ${declared ? 'отвечает 200' : 'не объявлена'}`,
+        declared ? status === 200 : status !== 200,
+        `получено ${status}`,
+      );
+    }
+
+    if (spec.nested) {
+      const own = await send('GET', '/users/1/posts');
+      check(
+        `${spec.prefix}: /users/1/posts отбирает по автору`,
+        JSON.stringify(own.body?.posts) === JSON.stringify(expectedPosts.filter((post) => post.authorId === 1)),
+        `постов ${own.body?.posts?.length}`,
+      );
+    }
+
+    for (const [method, path, scheme] of spec.guarded) {
+      const without = await send(method, path);
+      check(`${spec.prefix}: ${method} ${path} без ${scheme} → 401`, without.status === 401, `получено ${without.status}`);
+      const withCreds = await send(method, path, scheme);
+      check(
+        `${spec.prefix}: ${method} ${path} с ${scheme} проходит`,
+        withCreds.status < 400,
+        `получено ${withCreds.status}`,
+      );
+    }
+
+    for (const [method, path] of spec.open) {
+      const { status } = await send(method, path);
+      check(`${spec.prefix}: ${method} ${path} открыт`, status < 400, `получено ${status}`);
+    }
+  }
+
+  console.log('\nМок отдаёт /courses и /login без латыни по всем префиксам');
+  for (const prefix of ['/http-api', '/http-protocol', '/js-playwright', '/postman']) {
+    // Каддй направляет эти два адреса моку, всё остальное приложению. Мок теперь
+    // статичный у всех четырёх спецификаций, значит отдаёт примеры, а не faker.
+    const port = { '/http-api': 4011, '/http-protocol': 4012, '/js-playwright': 4013, '/postman': 4014 }[prefix];
+    const mock = `http://127.0.0.1:${port}`;
+    const courses = await getJson(`${mock}/courses`, { headers: { 'X-API-KEY': 'any-value' } });
+    check(
+      `${prefix}: /courses отдаёт осмысленные курсы`,
+      courses.body?.courses?.[0]?.title === 'HTTP API' && courses.body?.total === 3,
+      JSON.stringify(courses.body).slice(0, 120),
+    );
+    check(
+      `${prefix}: /courses в границах uint16`,
+      outOfRange(courses.body, `${prefix}/courses`).length === 0,
+      outOfRange(courses.body, `${prefix}/courses`).join(', '),
+    );
+    const login = await getJson(`${mock}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'max@hotmail.com', password: 'password' }),
+    });
+    check(
+      `${prefix}: /login отдаёт длинный токен, а не латынь`,
+      typeof login.body?.token === 'string' && login.body.token.length > 40,
+      JSON.stringify(login.body),
+    );
+  }
 
   console.log('\nЧисла в ответах не выходят за uint16');
   for (const url of [TASKS, `${TASKS}/1`, USERS, `${USERS}/1`, POSTS, `${POSTS}/1`, COMMENTS]) {

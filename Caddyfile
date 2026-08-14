@@ -60,6 +60,39 @@ handle_path /http-api/* {
 }
 
 # http-protocol course
+# Коллекции обслуживает приложение, а не мок: см. комментарий у /http-api.
+# За моком остаются только /login и /courses.
+handle /http-protocol/tasks {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/tasks/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/users {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/users/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/posts {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/posts/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/comments {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-protocol/comments/* {
+	reverse_proxy 127.0.0.1:4010
+}
 handle /http-protocol/example {
 	reverse_proxy 127.0.0.1:4010
 }
@@ -89,6 +122,23 @@ handle_path /http-protocol/* {
 }
 
 # js-playwright course
+# Коллекции обслуживает приложение, а не мок: см. комментарий у /http-api.
+# За моком остаются только /login и /courses.
+handle /js-playwright/tasks {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /js-playwright/tasks/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /js-playwright/users {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /js-playwright/users/* {
+	reverse_proxy 127.0.0.1:4010
+}
 handle /js-playwright/users-list {
 	reverse_proxy 127.0.0.1:4010
 }
@@ -102,6 +152,39 @@ handle_path /js-playwright/* {
 }
 
 # postman course
+# Коллекции обслуживает приложение, а не мок: см. комментарий у /http-api.
+# За моком остаются только /login и /courses.
+handle /postman/tasks {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/tasks/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/users {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/users/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/posts {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/posts/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/comments {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /postman/comments/* {
+	reverse_proxy 127.0.0.1:4010
+}
 handle /postman/cookie {
 	reverse_proxy 127.0.0.1:4010
 }

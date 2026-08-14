@@ -1,3 +1,6 @@
+// Эти маршруты обслуживает приложение, а не мок prism, см. custom-server/src/resources.js.
+// Спецификация описывает настоящее поведение: skip, limit и select применяются,
+// а запрос несуществующей записи отвечает 404.
 import "@typespec/http";
 import "@typespec/rest";
 import "../models/comment.tsp";
@@ -23,17 +26,17 @@ interface CommentService {
     @path
     id: string,
     @query select?: string
-  ): Comment;
+  ): Comment | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): Comment;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): CreatedResponse & Comment;
 
   @useAuth(BearerAuth)
   @patch
-  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @delete
-  op delete(@path id: string): void;
+  op delete(@path id: string): NoContentResponse | NotFoundResponse;
 }

@@ -28,24 +28,29 @@ const methodNotAllowed = (res, allow) => res
   });
 
 // Сервер демонстрационный и значение токена не проверяет, важно только наличие
-// заголовка. Настоящий сервис здесь сверил бы подпись и срок. Урок
+// заголовка нужной схемы. Настоящий сервис сверил бы подпись, срок и пароль. Урок
 // authentication построен на том, что без заголовка приходит 401.
-const hasBearer = (req) => {
-  const header = req.headers.authorization;
-  return typeof header === 'string' && /^Bearer\s+\S/i.test(header);
+//
+// Схем две, потому что спецификации разных курсов закрывают маршруты по-разному:
+// Bearer почти везде, Basic у задач курса Postman. Схема отражается в заголовке
+// WWW-Authenticate, по нему клиент и понимает, что предъявлять.
+const SCHEMES = {
+  bearer: { header: 'Bearer', detail: 'Нужен заголовок Authorization с Bearer-токеном' },
+  basic: { header: 'Basic', detail: 'Нужен заголовок Authorization со схемой Basic' },
 };
 
-const unauthorized = (res) => res
-  .code(401)
-  .header('WWW-Authenticate', 'Bearer')
-  .send({
-    title: 'Unauthorized',
-    status: 401,
-    detail: 'Нужен заголовок Authorization с Bearer-токеном',
-  });
+const hasScheme = (req, scheme) => {
+  const header = req.headers.authorization;
+  return typeof header === 'string' && new RegExp(`^${scheme}\\s+\\S`, 'i').test(header);
+};
 
-const withAuth = (needsAuth, handler) => (req, res) => {
-  if (needsAuth && !hasBearer(req)) return unauthorized(res);
+const unauthorized = (res, scheme) => res
+  .code(401)
+  .header('WWW-Authenticate', SCHEMES[scheme].header)
+  .send({ title: 'Unauthorized', status: 401, detail: SCHEMES[scheme].detail });
+
+const withAuth = (scheme, handler) => (req, res) => {
+  if (scheme && !hasScheme(req, SCHEMES[scheme].header)) return unauthorized(res, scheme);
   return handler(req, res);
 };
 
@@ -70,11 +75,11 @@ export const registerCollection = (app, {
     return res.send(page({ items: items(), envelope, ...range, fields }));
   });
 
-  app.get(item, (req, res) => {
+  app.get(item, withAuth(auth.get, (req, res) => {
     const found = findById(items(), req.params.id);
     if (!found) return notFound(res, req.params.id);
     return res.send(project(found, parseSelect(req.query.select)));
-  });
+  }));
 
   app.post(base, withAuth(auth.create, (req, res) => {
     const problems = validate(req.body ?? {});

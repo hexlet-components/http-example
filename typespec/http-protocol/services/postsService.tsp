@@ -1,3 +1,6 @@
+// Эти маршруты обслуживает приложение, а не мок prism, см. custom-server/src/resources.js.
+// Спецификация описывает настоящее поведение: skip, limit и select применяются,
+// а запрос несуществующей записи отвечает 404.
 import "@typespec/http";
 import "@typespec/rest";
 import "../models/post.tsp";
@@ -22,19 +25,19 @@ interface PostService {
   op get(
     @path id: string,
     @query select?: string
-  ): Post;
+  ): Post | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewPostDto): Post;
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewPostDto): CreatedResponse & Post;
 
   @useAuth(BearerAuth)
   @patch
-  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditPostDto): Post;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path id: string, ...EditPostDto): Post | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @delete
-  op delete(@path id: string): void;
+  op delete(@path id: string): NoContentResponse | NotFoundResponse;
 
   @route("/{postId}/comments")
   op getComments(
