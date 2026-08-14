@@ -61,7 +61,7 @@ model Task {
       status: Status.Done,
     }
   ],
-  total: 3,
+  total: 20,
   skip: 0,
   limit: 30,
 })

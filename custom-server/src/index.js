@@ -4,11 +4,12 @@ import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
+import allow from 'fastify-allow';
 import fastifyCookie from '@fastify/cookie';
 
 import appConfig from '../../app.config.json'  with {type: 'json'}
 import setUpRpc from './rpc.js';
-import setUpResources from './resources.js';
+import setUpHttpApi from './http-api.ts';
 
 const { dirname } = import.meta;
 
@@ -48,7 +49,45 @@ const setupDocs = async (app) => {
 
   await app.register(fp((instance) => Promise.all(getPromises(instance))));
 };
+// Опции самого экземпляра fastify: fastify-cli подхватывает этот экспорт, но
+// только с флагом --options. Без флага ajv не узнает про формат ниже, сборка
+// схемы падает на старте, и падает молча: код 1 и ни строки вывода.
+//
+// TypeSpec пишет в спецификацию `format: uint16` и больше ничем диапазон не
+// выражает: ни minimum, ни maximum в схеме нет. Поэтому формат объявляется не
+// заглушкой, а проверкой: иначе `?skip=-1` проходит валидацию, а срез массива
+// от отрицательного числа отдаёт хвост списка вместо ошибки.
+const UINT16_MAX = 65535;
+
+export const options = {
+  ajv: {
+    customOptions: {
+      formats: {
+        uint16: {
+          type: 'number',
+          validate: (value) => Number.isInteger(value) && value >= 0 && value <= UINT16_MAX,
+        },
+      },
+    },
+  },
+};
+
 export default async (app, _options) => {
+  // Метод, которого у адреса нет, отвечает 405 и заголовком Allow, а не 404.
+  // Самостоятельная урока kinds просит выполнить три заведомо неудачных
+  // запроса и записать три *разных* кода, и DELETE /tasks один из них.
+  // Регистрируется в корне: onRequest-хуки вложенного плагина на
+  // несопоставленном маршруте не отрабатывают.
+  await app.register(allow);
+
+  // Свой обработчик ненайденного маршрута нужен не ради текста ответа: без него
+  // 404 обрабатывается корневым контекстом fastify, куда хуки этого плагина не
+  // достают, и fastify-allow не успевает превратить неверный метод в 405.
+  app.setNotFoundHandler((req, res) => res.code(404).send({
+    code: 404,
+    message: `Адреса ${req.url} нет`,
+  }));
+
   await app.register(formbody);
   await app.register(fastifyCookie, {
     secret: 'my-secret',
@@ -120,7 +159,10 @@ export default async (app, _options) => {
 
   // REST-маршруты коллекций обслуживаются приложением, а не моком prism: см.
   // шапку custom-server/src/routes.js.
-  setUpResources(app);
+  // Маршруты курса HTTP API. Отдельным плагином, потому что внутри свой
+  // обработчик ошибок: валидация по спецификации отвечает 400, а уроки учат
+  // на 422.
+  await app.register(setUpHttpApi);
 
   app.get('/postman/cookie', (req, res) => {
     res.setCookie('myCookie', 'cookieValue', {

@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "fastify start -p 4010 -a 0.0.0.0 custom-server/src/index.js",
+    "start": "fastify start --options -p 4010 -a 0.0.0.0 custom-server/src/index.js",
     "build": "tsp compile ./typescpec/main.tsp"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.99.0",
     "npm-check-updates": "^23.0.2",
     "ts-node": "^10.9.2",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3"
   },
   "private": true,
   "dependencies": {
@@ -27,7 +28,9 @@
     "@typespec/rest": "^0.85.0",
     "@typespec/versioning": "^0.85.0",
     "fastify": "^5.12.0",
+    "fastify-allow": "^2.1.1",
     "fastify-cli": "^8.0.0",
+    "fastify-openapi-glue": "^4.11.4",
     "fastify-plugin": "^6.0.0",
     "lodash": "^4.18.1"
   }

@@ -5,6 +5,16 @@ setup:
 	npm ci
 	make compile
 
+# Типы обработчиков из спецификации. Сгенерированное лежит в репозитории, а не
+# собирается на старте: образ не должен тянуть генератор, а свежесть проверяет
+# `make check-generated` в прогоне.
+generate:
+	npx @hey-api/openapi-ts
+
+check-generated:
+	npx @hey-api/openapi-ts
+	git diff --exit-code custom-server/src/generated
+
 compile:
 	npx tsp compile ./typespec/http-api/main.tsp --output-dir "./tsp-output/http-api"
 	npx tsp compile ./typespec/postman/main.tsp --output-dir "./tsp-output/postman"
@@ -15,6 +25,7 @@ start:
 	./bin/start.sh
 
 test:
+	make check-generated
 	node ./bin/smoke-test.js
 
 update-deps:

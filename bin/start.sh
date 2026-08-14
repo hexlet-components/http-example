@@ -23,14 +23,11 @@ stop_all() {
 
 trap 'stop_all' INT TERM
 
-# http-api идёт без -d, то есть статичным моком: ответы берутся из примеров
-# спецификации, а не генерируются faker'ом. Динамический режим не смотрит на
-# uint16 и отдавал отрицательные id, а данные при каждом запросе были новые,
-# из-за чего уроки курса http-api не могли на них опираться. Коды 404, 405, 422
-# и 401 статичный режим сохраняет, на них построен урок kinds.
+# У спецификации http-api мока нет: все её маршруты обслуживает приложение, см.
+# custom-server/src/resources.js. Мок отдаёт ответ, не разбирая запрос, а уроки
+# курса построены на skip, limit, select и на идентификаторе в пути.
 # Остальные три спецификации остаются на -d осознанно: примеров в них нет, и
 # статичный режим отдал бы вместо данных заглушки вида "string".
-start_service prism-http-api "npx prism mock --multiprocess=false --json-schema-faker-fillProperties=false -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml"
 start_service prism-http-protocol "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml"
 start_service prism-js-playwright "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml"
 start_service prism-postman "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml"
