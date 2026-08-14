@@ -5,6 +5,10 @@ handle /http-api/echo {
 	reverse_proxy localhost:4010
 }
 
+handle /http-api/rpc {
+	reverse_proxy localhost:4010
+}
+
 handle /http-api-openapi* {
 	reverse_proxy localhost:4010
 }

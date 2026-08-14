@@ -7,6 +7,7 @@ import formbody from '@fastify/formbody';
 import fastifyCookie from '@fastify/cookie';
 
 import appConfig from '../../app.config.json'  with {type: 'json'}
+import setUpRpc from './rpc.js';
 
 const { dirname } = import.meta;
 
@@ -113,6 +114,8 @@ export default async (app, _options) => {
   app.get('/', (req, res) => res.sendFile('main/index.html'));
 
   app.post('/http-api/echo', (req, res) => res.send(req.body));
+
+  setUpRpc(app);
 
   app.get('/postman/cookie', (req, res) => {
     res.setCookie('myCookie', 'cookieValue', {
