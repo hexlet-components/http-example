@@ -1,9 +1,15 @@
+// Эти маршруты обслуживает приложение, а не мок prism, см. custom-server/src/openapi-spec.ts.
+// Спецификация описывает настоящее поведение: skip, limit и select применяются,
+// вложенные ресурсы отбирают записи по родителю, а запрос несуществующей записи
+// отвечает 404.
 import "@typespec/http";
+import "@typespec/openapi";
 import "@typespec/rest";
 import "../models/comment.tsp";
 import "../models/error.tsp";
 
 using TypeSpec.Http;
+using TypeSpec.OpenAPI;
 using TypeSpec.Rest;
 
 namespace AppService;
@@ -12,6 +18,7 @@ namespace AppService;
 @route("/comments")
 interface CommentService {
   @get
+  @operationId("commentServiceList")
   op list(
     @query skip?: uint16 = 0,
     @query limit?: uint16 = 30,
@@ -19,21 +26,25 @@ interface CommentService {
   ): Comments;
 
   @get
+  @operationId("commentServiceGet")
   op get(
     @path
     id: string,
     @query select?: string
-  ): Comment;
+  ): Comment | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @post
-  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): Comment;
+  @operationId("commentServiceCreate")
+  op create(@header contentType: "application/json" | "application/x-www-form-urlencoded", ...NewCommentDto): CreatedResponse & Comment;
 
   @useAuth(BearerAuth)
   @patch
-  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment;
+  @operationId("commentServiceUpdate")
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @delete
-  op delete(@path id: string): void;
+  @operationId("commentServiceDelete")
+  op delete(@path id: string): NoContentResponse | NotFoundResponse;
 }

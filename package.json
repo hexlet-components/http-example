@@ -20,7 +20,6 @@
     "@fastify/swagger": "^9.8.1",
     "@fastify/swagger-ui": "^6.1.1",
     "@openapitools/openapi-generator-cli": "^2.40.1",
-    "@stoplight/prism-cli": "5.14.2",
     "@typespec/compiler": "^1.15.0",
     "@typespec/http": "^1.15.0",
     "@typespec/openapi": "^1.15.0",

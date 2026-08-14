@@ -465,6 +465,125 @@ const run = async () => {
     `Allow: ${allowHeader.headers.get('allow')}`,
   );
 
+  console.log('\nОстальные три спецификации ведут себя так же');
+  // Ожидания выписаны здесь заново, а не взяты из кода: прогон утверждает
+  // поведение спецификаций. Матрица снята с typespec/<app>/services/, и различия
+  // в ней настоящие: задачи курса Postman закрыты Basic, включая чтение одной
+  // задачи, а у js-playwright есть только задачи с пользователями и всё открыто.
+  const OTHER_SPECS = [
+    {
+      prefix: 'http-protocol',
+      collections: ['tasks', 'users', 'posts', 'comments'],
+      nested: true,
+      guarded: [['DELETE', '/users/1', 'bearer'], ['POST', '/posts', 'bearer']],
+      open: [['GET', '/tasks/1'], ['POST', '/tasks']],
+    },
+    {
+      prefix: 'js-playwright',
+      collections: ['tasks', 'users'],
+      nested: false,
+      guarded: [],
+      open: [['GET', '/tasks/1'], ['POST', '/users'], ['DELETE', '/users/1']],
+    },
+    {
+      prefix: 'postman',
+      collections: ['tasks', 'users', 'posts', 'comments'],
+      nested: true,
+      guarded: [['GET', '/tasks/1', 'basic'], ['POST', '/tasks', 'basic'], ['DELETE', '/users/1', 'bearer']],
+      open: [['GET', '/tasks'], ['POST', '/users']],
+    },
+  ];
+
+  const bodyFor = (path) => {
+    if (path.startsWith('/tasks')) return { title: 'title', description: 'description' };
+    if (path.startsWith('/users')) {
+      return { email: 'john@mail.com', firstName: 'John', lastName: 'Doe', password: 'secret' };
+    }
+    if (path.startsWith('/posts')) return { title: 'title', body: 'body' };
+    return { postId: 1, body: 'body' };
+  };
+
+  const credentials = {
+    bearer: 'Bearer any-value',
+    basic: `Basic ${Buffer.from('user:pass').toString('base64')}`,
+  };
+
+  for (const spec of OTHER_SPECS) {
+    const send = (method, path, scheme) => {
+      const headers = {};
+      if (scheme) headers.Authorization = credentials[scheme];
+      const hasBody = method === 'POST' || method === 'PATCH';
+      if (hasBody) headers['Content-Type'] = 'application/json';
+      return getJson(`${APP}/${spec.prefix}${path}`, {
+        method,
+        headers,
+        body: hasBody ? JSON.stringify(bodyFor(path)) : undefined,
+      });
+    };
+
+    const page = await send('GET', '/users?skip=3&limit=2');
+    check(
+      `${spec.prefix}: skip=3&limit=2 применяются`,
+      JSON.stringify(page.body?.users) === JSON.stringify(expectedUsers.slice(3, 5))
+        && page.body?.total === expectedUsers.length,
+      JSON.stringify(page.body),
+    );
+    const selected = await send('GET', '/users?select=firstName');
+    check(
+      `${spec.prefix}: select оставляет id и запрошенное поле`,
+      JSON.stringify(Object.keys(selected.body?.users?.[0] ?? {})) === JSON.stringify(['id', 'firstName']),
+      JSON.stringify(selected.body?.users?.[0]),
+    );
+    const third = await send('GET', '/users/3');
+    check(
+      `${spec.prefix}: /users/3 отдаёт третьего пользователя`,
+      JSON.stringify(third.body) === JSON.stringify(expectedUsers[2]),
+      JSON.stringify(third.body),
+    );
+    const missing = await send('GET', '/users/999');
+    check(`${spec.prefix}: /users/999 → 404`, missing.status === 404, `получено ${missing.status}`);
+    const wrongMethod = await send('DELETE', '/users');
+    check(`${spec.prefix}: DELETE по коллекции → 405`, wrongMethod.status === 405, `получено ${wrongMethod.status}`);
+    const badRange = await send('GET', '/users?skip=-1');
+    check(`${spec.prefix}: отрицательный skip → 422`, badRange.status === 422, `получено ${badRange.status}`);
+
+    for (const name of ['tasks', 'users', 'posts', 'comments']) {
+      const declared = spec.collections.includes(name);
+      const { status } = await send('GET', `/${name}`);
+      check(
+        `${spec.prefix}/${name} ${declared ? 'отвечает 200' : 'не объявлена'}`,
+        declared ? status === 200 : status === 404,
+        `получено ${status}`,
+      );
+    }
+
+    if (spec.nested) {
+      const own = await send('GET', '/users/1/posts');
+      check(
+        `${spec.prefix}: /users/1/posts отбирает по автору`,
+        JSON.stringify(own.body?.posts) === JSON.stringify(expectedPosts.filter((post) => post.authorId === 1)),
+        `постов ${own.body?.posts?.length}`,
+      );
+    }
+
+    for (const [method, path, scheme] of spec.guarded) {
+      const without = await send(method, path);
+      check(`${spec.prefix}: ${method} ${path} без ${scheme} → 401`, without.status === 401, `получено ${without.status}`);
+      const withCreds = await send(method, path, scheme);
+      check(`${spec.prefix}: ${method} ${path} с ${scheme} проходит`, withCreds.status < 400, `получено ${withCreds.status}`);
+    }
+
+    for (const [method, path] of spec.open) {
+      const { status } = await send(method, path);
+      check(`${spec.prefix}: ${method} ${path} открыт`, status < 400, `получено ${status}`);
+    }
+
+    // Создание везде 201: три спецификации объявляли обычный ответ, и урок
+    // api-testing курса Playwright из-за этого не проходил.
+    const created = await send('POST', '/users');
+    check(`${spec.prefix}: POST /users → 201`, created.status === 201, `получено ${created.status}`);
+  }
+
   console.log('\nЧисла в ответах не выходят за uint16');
   for (const url of [TASKS, `${TASKS}/1`, USERS, `${USERS}/1`, POSTS, `${POSTS}/1`, COMMENTS]) {
     const path = url.replace(APP, '');
