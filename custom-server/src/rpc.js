@@ -2,26 +2,7 @@
 // Shows the RPC style next to the REST routes served by the prism mock:
 // one endpoint, always POST, errors live in the body and the status is always 200.
 
-const tasks = [
-  {
-    id: 1,
-    title: 'Опубликовать курс по основам JavaScript',
-    description: 'Автор подготовил курс по JavaScript. Нужно его опубликовать',
-    status: 'Backlog',
-  },
-  {
-    id: 2,
-    title: 'Записать скринкаст про HTTP API',
-    description: 'Показать, чем REST отличается от RPC',
-    status: 'In Progress',
-  },
-  {
-    id: 3,
-    title: 'Обновить документацию',
-    description: 'Описать эндпоинт /rpc в спецификации',
-    status: 'Done',
-  },
-];
+import tasks from './data/tasks.js';
 
 // Negative codes are the protocol level ones defined by the JSON-RPC spec.
 // Application errors like "task not found" get positive codes chosen by the API itself.
