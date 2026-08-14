@@ -15,7 +15,7 @@ start:
 	./bin/start.sh
 
 test:
-	echo no tests
+	node ./bin/smoke-test.js
 
 update-deps:
 	npx ncu -u
