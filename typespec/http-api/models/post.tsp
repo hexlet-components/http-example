@@ -58,9 +58,9 @@ model Post {
       body: "Один и тот же список задач двумя разными способами",
     }
   ],
-  total: 3,
+  total: 40,
   skip: 0,
-  limit: 30,
+  limit: 3,
 })
 model Posts {
   posts: Post[];

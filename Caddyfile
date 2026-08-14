@@ -1,100 +1,130 @@
 :{$PORT}
 
+# Апстримы указаны адресом, а не именем localhost: и prism, и приложение слушают
+# только IPv4 (0.0.0.0), а localhost резолвится ещё и в ::1, где не слушает никто.
+
 # http-api course
 handle /http-api/echo {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-api/rpc {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
-# /tasks обслуживает приложение, а не мок prism: мок отдавал пример дословно и
-# поэтому не применял skip и limit и не отбирал записи по пути. Блоки заданы
-# точно, без tasks*, чтобы не перехватывать посторонние адреса. Префикс здесь не
-# срезается, поэтому приложение регистрирует полные пути.
+# Коллекции обслуживает приложение, а не мок prism: мок отдавал пример дословно и
+# поэтому не применял skip, limit и select и не отбирал записи по пути. Блоки
+# заданы точно, без tasks* и users*, чтобы не перехватывать посторонние адреса.
+# Префикс здесь не срезается, поэтому приложение регистрирует полные пути.
+#
+# /courses и /login остаются за моком: параметров выборки уроки на них не учат,
+# а /courses закрыт API-ключом, который мок и проверяет.
 handle /http-api/tasks {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-api/tasks/* {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-api/users {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-api/users/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-api/posts {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-api/posts/* {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-api/comments {
+	reverse_proxy 127.0.0.1:4010
+}
+
+handle /http-api/comments/* {
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-api-openapi* {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle_path /http-api/* {
-	reverse_proxy localhost:4011
+	reverse_proxy 127.0.0.1:4011
 }
 
 # http-protocol course
 handle /http-protocol/example {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-protocol/login {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-protocol/stream {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-protocol/removed {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-protocol {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /http-protocol-openapi* {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle_path /http-protocol/* {
-	reverse_proxy localhost:4012
+	reverse_proxy 127.0.0.1:4012
 }
 
 # js-playwright course
 handle /js-playwright/users-list {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /js-playwright-openapi* {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle_path /js-playwright/* {
-	reverse_proxy localhost:4013
+	reverse_proxy 127.0.0.1:4013
 }
 
 # postman course
 handle /postman/cookie {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle /postman-openapi* {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 handle_path /postman/* {
-	reverse_proxy localhost:4014
+	reverse_proxy 127.0.0.1:4014
 }
 
 # js-dom-testing-library course
 handle /js-dom-testing-library/users-list {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 # shared/static
 handle /assets* {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }
 
 # default
 handle {
-	reverse_proxy localhost:4010
+	reverse_proxy 127.0.0.1:4010
 }

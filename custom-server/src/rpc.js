@@ -2,9 +2,9 @@
 // Shows the RPC style next to the REST routes in tasks-rest.js: one endpoint,
 // always POST, errors live in the body and the status is always 200.
 //
-// Данные и операции берутся из tasks-store.js, того же модуля, что обслуживает
-// REST. Урок kinds сравнивает два стиля и опирается на то, что задача с одним
-// номером в обоих стилях одна и та же.
+// Данные и операции берутся из tasks-store.js, того же модуля, из которого
+// собираются REST-маршруты. Урок kinds сравнивает два стиля и опирается на то,
+// что задача с одним номером в обоих одна и та же.
 
 import {
   build, find, list, parseRange, validate,

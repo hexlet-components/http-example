@@ -28,12 +28,18 @@ import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { readFileSync } from 'node:fs';
 
+import expectedComments from '../custom-server/src/data/comments.js';
+import expectedPosts from '../custom-server/src/data/posts.js';
 import expectedTasks from '../custom-server/src/data/tasks.js';
+import expectedUsers from '../custom-server/src/data/users.js';
 
 const SPEC = './tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml';
 const PRISM = 'http://127.0.0.1:4011';
 const APP = 'http://127.0.0.1:4010';
 const TASKS = `${APP}/http-api/tasks`;
+const USERS = `${APP}/http-api/users`;
+const POSTS = `${APP}/http-api/posts`;
+const COMMENTS = `${APP}/http-api/comments`;
 const UINT16_MAX = 65535;
 
 const failures = [];
@@ -212,6 +218,107 @@ const run = async () => {
   const badRange = await getJson(`${TASKS}?skip=-1`);
   check('отрицательный skip отвечает 422', badRange.status === 422, `получено ${badRange.status}`);
 
+  console.log('\nКоллекции: пагинация, select и вложенные ресурсы');
+  // Урок example печатает ровно этот ответ: пользователей десять, поэтому
+  // страница за тридцатым пустая, а total остаётся десяткой.
+  const usersSkipped = await getJson(`${USERS}?skip=30`);
+  check(
+    '/users?skip=30 отдаёт пустую страницу с total 10',
+    JSON.stringify(usersSkipped.body) === JSON.stringify({
+      users: [], total: expectedUsers.length, skip: 30, limit: 30,
+    }),
+    JSON.stringify(usersSkipped.body),
+  );
+
+  const postsSkipped = await getJson(`${POSTS}?skip=30`);
+  check(
+    '/posts?skip=30 отдаёт последнюю страницу',
+    JSON.stringify(postsSkipped.body?.posts) === JSON.stringify(expectedPosts.slice(30)),
+    `постов ${postsSkipped.body?.posts?.length}`,
+  );
+  check(
+    '/posts?skip=30: total равен всему набору',
+    postsSkipped.body?.total === expectedPosts.length,
+    `total = ${postsSkipped.body?.total}`,
+  );
+
+  // select оставляет запрошенные поля и всегда идентификатор: без него запись
+  // бесполезна, и именно так параметр показан в уроке example.
+  const selected = await getJson(`${USERS}?select=firstName,email`);
+  check(
+    'select оставляет только запрошенные поля и id',
+    JSON.stringify(Object.keys(selected.body?.users?.[0] ?? {}).sort()) === JSON.stringify(['email', 'firstName', 'id']),
+    JSON.stringify(selected.body?.users?.[0]),
+  );
+  const selectedOne = await getJson(`${USERS}/1?select=lastName`);
+  check(
+    'select работает и на одиночном ресурсе',
+    JSON.stringify(Object.keys(selectedOne.body ?? {}).sort()) === JSON.stringify(['id', 'lastName']),
+    JSON.stringify(selectedOne.body),
+  );
+
+  // Вложенный ресурс отбирает по родителю: мок отдавал здесь весь список.
+  const ownPosts = await getJson(`${USERS}/1/posts`);
+  const expectedOwn = expectedPosts.filter((post) => post.authorId === 1);
+  check(
+    '/users/1/posts отдаёт только посты автора 1',
+    JSON.stringify(ownPosts.body?.posts) === JSON.stringify(expectedOwn),
+    `постов ${ownPosts.body?.posts?.length}, ожидалось ${expectedOwn.length}`,
+  );
+  const allPosts = await getJson(POSTS);
+  check(
+    '/users/1/posts не совпадает с /posts',
+    JSON.stringify(ownPosts.body) !== JSON.stringify(allPosts.body),
+  );
+  const postComments = await getJson(`${POSTS}/1/comments`);
+  check(
+    '/posts/1/comments отдаёт только комментарии этого поста',
+    JSON.stringify(postComments.body?.comments) === JSON.stringify(expectedComments.filter((c) => c.postId === 1)),
+    JSON.stringify(postComments.body?.comments),
+  );
+  const nestedMissing = await getJson(`${USERS}/999/posts`);
+  check('/users/999/posts → 404', nestedMissing.status === 404, `получено ${nestedMissing.status}`);
+
+  console.log('\nОтсутствующая запись и авторизация по коллекциям');
+  for (const [name, url] of [['users', USERS], ['posts', POSTS], ['comments', COMMENTS]]) {
+    const { status } = await getJson(`${url}/999`);
+    check(`GET /${name}/999 → 404`, status === 404, `получено ${status}`);
+  }
+  // Спецификация закрывает Bearer'ом изменение постов, комментариев и
+  // пользователей, а создание пользователя оставляет открытым.
+  const guarded = [
+    ['PATCH /users/1 без токена → 401', `${USERS}/1`, 'PATCH', 401],
+    ['DELETE /users/1 без токена → 401', `${USERS}/1`, 'DELETE', 401],
+    ['PATCH /posts/1 без токена → 401', `${POSTS}/1`, 'PATCH', 401],
+    ['DELETE /comments/1 без токена → 401', `${COMMENTS}/1`, 'DELETE', 401],
+  ];
+  for (const [name, url, method, expected] of guarded) {
+    // Content-Type проставляется только вместе с телом: fastify отвечает 400 на
+    // пустое тело при заявленном application/json, и проверка мерила бы не то.
+    const options = method === 'PATCH'
+      ? {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: 'x', body: 'y', firstName: 'z' }),
+      }
+      : { method };
+    const { status } = await getJson(url, options);
+    check(name, status === expected, `получено ${status}`);
+  }
+  const createdUser = await getJson(USERS, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'john@mail.com', firstName: 'John', lastName: 'Doe', password: 'secret',
+    }),
+  });
+  check('POST /users без токена → 201', createdUser.status === 201, `получено ${createdUser.status}`);
+  check(
+    'созданный пользователь без пароля в ответе',
+    createdUser.body !== null && !('password' in createdUser.body),
+    JSON.stringify(createdUser.body),
+  );
+
   console.log('\nRPC держит ошибки в теле, а код оставляет успешным');
   const rpcMissing = await rpc('tasks.get', { id: 999 });
   const rpcUnknown = await rpc('tasks.destroy', { id: 1 });
@@ -234,7 +341,7 @@ const run = async () => {
       body: '{}',
     }, 422],
     ['DELETE /tasks/1 → 204', `${TASKS}/1`, { method: 'DELETE' }, 204],
-    ['POST /posts без токена → 401', `${PRISM}/posts`, {
+    ['POST /posts без токена → 401', POSTS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: 'title', body: 'body' }),
@@ -266,7 +373,7 @@ const run = async () => {
     JSON.stringify(afterCreate.body?.tasks),
   );
 
-  const createdPost = await getJson(`${PRISM}/posts`, {
+  const createdPost = await getJson(POSTS, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer any-value' },
     body: JSON.stringify({ title: 'title', body: 'body' }),
@@ -296,8 +403,9 @@ const run = async () => {
   );
 
   console.log('\nЧисла в ответах не выходят за uint16');
-  for (const path of ['/posts', '/posts/1', '/users', '/users/1', '/comments']) {
-    const { body } = await getJson(`${PRISM}${path}`, { method: 'GET' });
+  for (const url of [TASKS, `${TASKS}/1`, USERS, `${USERS}/1`, POSTS, `${POSTS}/1`, COMMENTS]) {
+    const path = url.replace(APP, '');
+    const { body } = await getJson(url, { method: 'GET' });
     const bad = outOfRange(body, path);
     check(`${path} в границах uint16`, bad.length === 0, bad.join(', '));
   }
@@ -306,7 +414,6 @@ const run = async () => {
     headers: { 'X-API-KEY': 'any-value' },
   });
   check('/courses в границах uint16', outOfRange(coursesBody, '/courses').length === 0);
-  check('/tasks в границах uint16', outOfRange(restList.body, '/tasks').length === 0);
 
   console.log('\nПримеры спецификации не расходятся с набором задач');
   // Документацию курса читают по спецификации, а данные отдаёт приложение, то
@@ -320,6 +427,26 @@ const run = async () => {
       `нет «${task.title}»`,
     );
   }
+  for (const user of expectedUsers.slice(0, 3)) {
+    check(
+      `пример пользователя ${user.id} есть в спецификации`,
+      spec.includes(user.email) && spec.includes(user.firstName),
+      `нет «${user.email}»`,
+    );
+  }
+  for (const post of expectedPosts.slice(0, 3)) {
+    check(`пример поста ${post.id} есть в спецификации`, spec.includes(post.title), `нет «${post.title}»`);
+  }
+  check(
+    'пример Posts объявляет реальный total',
+    spec.includes(`total: ${expectedPosts.length}`),
+    `ожидался total: ${expectedPosts.length}`,
+  );
+  check(
+    'пример Comments объявляет реальный total',
+    spec.includes(`total: ${expectedComments.length}`),
+    `ожидался total: ${expectedComments.length}`,
+  );
 };
 
 try {

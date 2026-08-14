@@ -23,7 +23,7 @@ interface CommentService {
     @path
     id: string,
     @query select?: string
-  ): Comment;
+  ): Comment | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @post
@@ -31,9 +31,9 @@ interface CommentService {
 
   @useAuth(BearerAuth)
   @patch
-  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment;
+  op update(@header contentType: "application/json" | "application/x-www-form-urlencoded", @path  id: string, ...EditCommentDto): Comment | NotFoundResponse;
 
   @useAuth(BearerAuth)
   @delete
-  op delete(@path id: string): void;
+  op delete(@path id: string): NoContentResponse | NotFoundResponse;
 }

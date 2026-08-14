@@ -50,7 +50,7 @@ model User {
   users: #[
     #{ id: 1, email: "max@hotmail.com", firstName: "Allison", lastName: "Bernier" },
     #{ id: 2, email: "Colt97@yahoo.com", firstName: "Hudson", lastName: "Schowalter" },
-    #{ id: 3, email: "Reyna_Bahringer@gmail.com", firstName: "Reyna", lastName: "Bahringer" },
+    #{ id: 3, email: "Landen50@gmail.com", firstName: "Reinhold", lastName: "Langosh" },
     #{ id: 4, email: "Marcus.Kunde@hotmail.com", firstName: "Marcus", lastName: "Kunde" },
     #{ id: 5, email: "Elena_Padberg@yahoo.com", firstName: "Elena", lastName: "Padberg" },
     #{ id: 6, email: "Oscar.Runolfsson@gmail.com", firstName: "Oscar", lastName: "Runolfsson" },

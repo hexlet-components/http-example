@@ -37,9 +37,9 @@ model Comment {
     #{ id: 2, authorId: 3, postId: 1, body: "А где почитать про кеширование подробнее?" },
     #{ id: 3, authorId: 4, postId: 1, body: "Схема запроса очень наглядная" }
   ],
-  total: 3,
+  total: 30,
   skip: 0,
-  limit: 30,
+  limit: 3,
 })
 model Comments {
   comments: Comment[];
