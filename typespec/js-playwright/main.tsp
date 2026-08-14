@@ -10,7 +10,7 @@ import "./services/tasksService.tsp";
 using TypeSpec.Versioning;
 using TypeSpec.Http;
 
-@service({
+@service(#{
   title: "HTTP Api Example",
 })
 @versioned(Versions)

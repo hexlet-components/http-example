@@ -23,10 +23,10 @@ stop_all() {
 
 trap 'stop_all' INT TERM
 
-start_service prism-http-api "npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml"
-start_service prism-http-protocol "npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml"
-start_service prism-js-playwright "npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml"
-start_service prism-postman "npx prism mock -m -d --json-schema-faker-fillProperties=false -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml"
+start_service prism-http-api "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4011 --host 0.0.0.0 ./tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml"
+start_service prism-http-protocol "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4012 --host 0.0.0.0 ./tsp-output/http-protocol/@typespec/openapi3/openapi.1.0.yaml"
+start_service prism-js-playwright "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4013 --host 0.0.0.0 ./tsp-output/js-playwright/@typespec/openapi3/openapi.1.0.yaml"
+start_service prism-postman "npx prism mock --multiprocess=false -d --json-schema-faker-fillProperties=false -p 4014 --host 0.0.0.0 ./tsp-output/postman/@typespec/openapi3/openapi.1.0.yaml"
 start_service app "npm start"
 start_service caddy "caddy run"
 
