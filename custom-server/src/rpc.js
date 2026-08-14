@@ -1,8 +1,14 @@
 // JSON-RPC 2.0 endpoint for the http-api course.
-// Shows the RPC style next to the REST routes served by the prism mock:
-// one endpoint, always POST, errors live in the body and the status is always 200.
+// Shows the RPC style next to the REST routes in tasks-rest.js: one endpoint,
+// always POST, errors live in the body and the status is always 200.
+//
+// Данные и операции берутся из tasks-store.js, того же модуля, что обслуживает
+// REST. Урок kinds сравнивает два стиля и опирается на то, что задача с одним
+// номером в обоих стилях одна и та же.
 
-import tasks from './data/tasks.js';
+import {
+  build, find, list, parseRange, validate,
+} from './tasks-store.js';
 
 // Negative codes are the protocol level ones defined by the JSON-RPC spec.
 // Application errors like "task not found" get positive codes chosen by the API itself.
@@ -12,47 +18,35 @@ const errors = {
   invalidParams: { code: -32602, message: 'Invalid params' },
 };
 
+const notFound = (id) => ({ error: { code: 1, message: `Task with id ${id} not found` } });
+
 const methods = {
   'tasks.list': (params = {}) => {
-    const skip = Number(params.skip ?? 0);
-    const limit = Number(params.limit ?? tasks.length);
-    if (Number.isNaN(skip) || Number.isNaN(limit)) {
+    const range = parseRange(params);
+    if (range === null) {
       return { error: errors.invalidParams };
     }
-    return { result: { tasks: tasks.slice(skip, skip + limit), total: tasks.length } };
+    return { result: list(range) };
   },
 
   'tasks.get': (params = {}) => {
-    const task = tasks.find((item) => item.id === Number(params.id));
-    if (!task) {
-      return { error: { code: 1, message: `Task with id ${params.id} not found` } };
-    }
-    return { result: task };
+    const task = find(params.id);
+    return task ? { result: task } : notFound(params.id);
   },
 
   'tasks.create': (params = {}) => {
-    if (!params.title || !params.description) {
+    if (validate(params).length > 0) {
       return { error: errors.invalidParams };
     }
-    const task = {
-      id: tasks.length + 1,
-      title: params.title,
-      description: params.description,
-      status: params.status ?? 'Backlog',
-    };
-    return { result: task };
+    return { result: build(params) };
   },
 
   'tasks.delete': (params = {}) => {
-    const task = tasks.find((item) => item.id === Number(params.id));
-    if (!task) {
-      return { error: { code: 1, message: `Task with id ${params.id} not found` } };
-    }
-    return { result: true };
+    const task = find(params.id);
+    return task ? { result: true } : notFound(params.id);
   },
 };
 
-// The dataset never changes, create and delete only report what would happen.
 const handleCall = (call) => {
   const id = call?.id ?? null;
 
