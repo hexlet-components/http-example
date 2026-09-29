@@ -27,7 +27,7 @@ trap 'stop_all' INT TERM
 # приложение, маршруты строятся по самой спецификации. Мок отдавал ответ, не
 # разбирая запрос, а уроки построены на skip, limit, select и на идентификаторе
 # в пути.
-start_service app "npm start"
+start_service app "pnpm run start"
 start_service caddy "caddy run"
 
 while :; do
