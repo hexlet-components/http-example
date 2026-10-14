@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 120,
+  "ignorePatterns": [
+    "custom-server/src/generated",
+    "custom-server/assets",
+    "tsp-output",
+    "pnpm-lock.yaml",
+    "**/*.tsp",
+    "**/*.md"
+  ]
+}

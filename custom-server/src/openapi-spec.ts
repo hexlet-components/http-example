@@ -17,6 +17,7 @@
 //
 // Остаётся здесь только то, чего в спецификации выразить нельзя:
 // 405, отображение 400 в 422 и снятие схемы ответа у операций с select.
+import type { FastifyError, FastifyInstance, FastifyRequest } from 'fastify';
 import glue from 'fastify-openapi-glue';
 
 import serviceHandlers from './handlers.ts';
@@ -33,38 +34,39 @@ import serviceHandlers from './handlers.ts';
 // у задач курса Postman. Basic встречается только там, и снимать его нельзя:
 // урок про авторизацию в Postman разбирает именно этот способ.
 const securityHandlers = {
-  BearerAuth: async (req) => {
+  BearerAuth: async (req: FastifyRequest) => {
     if (!/^Bearer\s+\S/i.test(req.headers.authorization ?? '')) {
       throw new Error('нужен заголовок Authorization с Bearer-токеном');
     }
   },
-  ApiKeyAuth: async (req) => {
+  ApiKeyAuth: async (req: FastifyRequest) => {
     if (!req.headers['x-api-key']) {
       throw new Error('нужен заголовок X-API-KEY');
     }
   },
-  BasicAuth: async (req) => {
+  BasicAuth: async (req: FastifyRequest) => {
     if (!/^Basic\s+\S/i.test(req.headers.authorization ?? '')) {
       throw new Error('нужен заголовок Authorization со схемой Basic');
     }
   },
 };
 
-export default async (app, { name }) => {
+export default async (app: FastifyInstance, { name }: { name: string }) => {
   // Схема ответа снимается там, где у операции есть select. OpenAPI не умеет
   // сказать «набор полей ответа зависит от параметра запроса», поэтому
   // сериализатор падает на записи без lastName, хотя ответ верный. Валидация
   // запроса при этом остаётся, снимается только схема ответа.
   app.addHook('onRoute', (route) => {
-    const query = route.schema?.querystring?.properties ?? {};
-    if ('select' in query && route.schema?.response) {
-      delete route.schema.response;
+    const schema = route.schema as { querystring?: { properties?: object }; response?: unknown } | undefined;
+    const query = schema?.querystring?.properties ?? {};
+    if ('select' in query && schema?.response) {
+      delete schema.response;
     }
   });
 
   // Валидация по схеме отвечает 400, а уроки курса учат на 422: урок crud
   // прямо называет 422 кодом ошибки валидации.
-  app.setErrorHandler((error, req, res) => {
+  app.setErrorHandler((error: FastifyError, req, res) => {
     if (error.code === 'FST_ERR_VALIDATION') {
       return res.code(422).send({
         statusCode: 422,

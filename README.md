@@ -21,19 +21,21 @@
 
 ## Prerequisites
 
-- Make
-- Docker
+- [mise](https://mise.jdx.dev) (ставит Node, pnpm, Caddy и jactionlint по `mise.toml`)
+- Docker (только для `compose:*`)
 
 ## Commands
 
 ```bash
-make setup           # зависимости и компиляция спецификаций
-make test            # прогон против всех четырёх префиксов
-make compose-build
-make compose         # http://localhost:8080
+mise run setup           # зависимости и компиляция спецификаций
+mise run check           # типы, линтеры, сгенерированное, тесты
+mise run test            # только тесты, против всех четырёх префиксов
+mise daemons start       # приложение и Caddy на http://localhost:8080
+mise run compose:build
+mise run compose:up      # http://localhost:8080
 ```
 
-Остальные цели — в [Makefile](./Makefile).
+Остальные задачи: `mise tasks`.
 
 ---
 

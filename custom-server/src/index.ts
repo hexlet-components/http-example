@@ -1,20 +1,29 @@
 import path from 'node:path';
+import type { FastifyInstance, FastifyPluginAsync, FastifyServerOptions } from 'fastify';
 import fp from 'fastify-plugin';
 import fastifySwagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
-import allow from 'fastify-allow';
+import allowPlugin from 'fastify-allow';
 import fastifyCookie from '@fastify/cookie';
 
-import appConfig from '../../app.config.json'  with {type: 'json'}
-import setUpRpc from './rpc.js';
-import setUpBodyExamples from './body-examples.js';
+import rawConfig from '../../app.config.json' with { type: 'json' };
+import setUpRpc from './rpc.ts';
+import setUpBodyExamples from './body-examples.ts';
 import setUpSpec from './openapi-spec.ts';
+
+// title в app.config.json нет, и документация всегда отдавалась без заголовка.
+// Тип это допускает, чтобы не менять ответ.
+const appConfig: { docRoute: string; apps: string[]; title?: string } = rawConfig;
+
+// fastify-allow отдаёт CommonJS-экспорт, и под nodenext его типы не сходятся с
+// сигнатурой register, хотя по сути это обычный плагин.
+const allow = allowPlugin as unknown as FastifyPluginAsync;
 
 const { dirname } = import.meta;
 
-const setUpStaticAssets = (app) => {
+const setUpStaticAssets = (app: FastifyInstance) => {
   const pathPublic = path.join(dirname, '../assets');
   app.register(fastifyStatic, {
     root: pathPublic,
@@ -22,23 +31,21 @@ const setUpStaticAssets = (app) => {
   });
 };
 
-const setupDocs = async (app) => {
-  const getPromises = (instance) => appConfig.apps.map(async (name) => {
+const getPromises = (instance: FastifyInstance) =>
+  appConfig.apps.map(async (name) => {
     const openapiFilePath = path.join(dirname, '../../tsp-output/', name, '/@typespec/openapi3/openapi.1.0.yaml');
-    return await instance.register(async (innerInstance) => {
+    return await instance.register(async () => {
       await instance.register(fastifySwagger, {
         mode: 'static',
-        title: appConfig.title,
-        exposeRoute: true,
         specification: {
           path: openapiFilePath,
+          baseDir: path.dirname(openapiFilePath),
         },
         // routePrefix: `${name}-${appConfig.docRoute}`,
       });
 
       await instance.register(swaggerUI, {
         routePrefix: `${name}-${appConfig.docRoute}`,
-        title: appConfig.title,
         staticCSP: false,
         transformSpecificationClone: true,
         theme: {
@@ -46,11 +53,16 @@ const setupDocs = async (app) => {
         },
       });
     });
-  })
+  });
 
-  await app.register(fp((instance) => Promise.all(getPromises(instance))));
-
+const setupDocs = async (app: FastifyInstance) => {
+  await app.register(
+    fp(async (instance) => {
+      await Promise.all(getPromises(instance));
+    }),
+  );
 };
+
 // Опции самого экземпляра fastify: fastify-cli подхватывает этот экспорт, но
 // только с флагом --options. Без флага ajv не узнает про формат ниже, сборка
 // схемы падает на старте, и падает молча: код 1 и ни строки вывода.
@@ -61,20 +73,22 @@ const setupDocs = async (app) => {
 // от отрицательного числа отдаёт хвост списка вместо ошибки.
 const UINT16_MAX = 65535;
 
-export const options = {
+export const options: FastifyServerOptions = {
   ajv: {
     customOptions: {
       formats: {
         uint16: {
           type: 'number',
-          validate: (value) => Number.isInteger(value) && value >= 0 && value <= UINT16_MAX,
+          validate: (value: number) => Number.isInteger(value) && value >= 0 && value <= UINT16_MAX,
         },
       },
     },
   },
 };
 
-export default async (app, _options) => {
+// Второй параметр нужен не ради значения: fastify-cli проверяет длину функции и
+// отвергает async-плагин с одним аргументом, приложение тогда не стартует.
+export default async (app: FastifyInstance, _options: unknown) => {
   // Метод, которого у адреса нет, отвечает 405 и заголовком Allow, а не 404.
   // Самостоятельная урока kinds просит выполнить три заведомо неудачных
   // запроса и записать три *разных* кода, и DELETE /tasks один из них.
@@ -85,10 +99,12 @@ export default async (app, _options) => {
   // Свой обработчик ненайденного маршрута нужен не ради текста ответа: без него
   // 404 обрабатывается корневым контекстом fastify, куда хуки этого плагина не
   // достают, и fastify-allow не успевает превратить неверный метод в 405.
-  app.setNotFoundHandler((req, res) => res.code(404).send({
-    code: 404,
-    message: `Адреса ${req.url} нет`,
-  }));
+  app.setNotFoundHandler((req, res) =>
+    res.code(404).send({
+      code: 404,
+      message: `Адреса ${req.url} нет`,
+    }),
+  );
 
   await app.register(formbody);
   await app.register(fastifyCookie, {
@@ -106,7 +122,7 @@ export default async (app, _options) => {
         Expires: -1,
         'Cache-Control': 'private, max-age=0',
         'Content-Type': 'text/html; charset=ISO-8859-1',
-        'P3P': 'CP="This is not a P3P policy! See g.co/p3phelp for more info."',
+        P3P: 'CP="This is not a P3P policy! See g.co/p3phelp for more info."',
         Server: 'gws',
         'X-XSS-Protection': 0,
         'X-Frame-Options': 'SAMEORIGIN',
@@ -141,7 +157,7 @@ export default async (app, _options) => {
     };
 
     // Запускаем отправку чанков
-    sendChunks().catch(err => {
+    sendChunks().catch((err) => {
       req.log.error(err);
       res.send(err);
     });
@@ -162,7 +178,7 @@ export default async (app, _options) => {
   setUpRpc(app);
 
   // REST-маршруты коллекций обслуживаются приложением, а не моком prism: см.
-  // шапку custom-server/src/routes.js.
+  // шапку custom-server/src/openapi-spec.ts.
   // Маршруты всех четырёх спецификаций. Каждая своим плагином, потому что внутри
   // свой обработчик ошибок: валидация по спецификации отвечает 400, а уроки учат
   // на 422. Список тот же, что задаёт маршруты документации.
@@ -171,13 +187,14 @@ export default async (app, _options) => {
   }
 
   app.get('/postman/cookie', (req, res) => {
-    res.setCookie('myCookie', 'cookieValue', {
-      path: '/',
-      httpOnly: true,
-      secure: true, // Используйте true, если вы работаете с HTTPS
-      maxAge: 3600 // Время жизни куки в секундах
-    })
-    .send('Done!');
+    res
+      .setCookie('myCookie', 'cookieValue', {
+        path: '/',
+        httpOnly: true,
+        secure: true, // Используйте true, если вы работаете с HTTPS
+        maxAge: 3600, // Время жизни куки в секундах
+      })
+      .send('Done!');
   });
 
   return app;

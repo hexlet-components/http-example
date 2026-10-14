@@ -12,6 +12,6 @@ import { defineConfig } from '@hey-api/openapi-ts';
 // обработчик не нашёлся бы.
 export default defineConfig({
   input: './tsp-output/http-api/@typespec/openapi3/openapi.1.0.yaml',
-  output: { path: './custom-server/src/generated' },
+  output: { path: './custom-server/src/generated', importFileExtension: '.ts' },
   plugins: ['fastify'],
 });
