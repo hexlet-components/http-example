@@ -9,6 +9,7 @@ import fastifyCookie from '@fastify/cookie';
 
 import appConfig from '../../app.config.json'  with {type: 'json'}
 import setUpRpc from './rpc.js';
+import setUpBodyExamples from './body-examples.js';
 import setUpSpec from './openapi-spec.ts';
 
 const { dirname } = import.meta;
@@ -94,6 +95,8 @@ export default async (app, _options) => {
     secret: 'my-secret',
   });
   setUpStaticAssets(app);
+
+  await app.register(setUpBodyExamples);
 
   await setupDocs(app);
 

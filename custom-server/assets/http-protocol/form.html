@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTTP Form</title>
+    <style>
+      body { font: 18px/1.5 system-ui, sans-serif; margin: 40px auto; padding: 0 24px; max-width: 620px; color: #18212d; }
+      h1 { font-size: 30px; }
+      label { display: block; margin: 24px 0; }
+      input, textarea { display: block; box-sizing: border-box; width: 100%; margin-top: 8px; padding: 12px; font: inherit; border: 1px solid #9ca6b4; border-radius: 6px; }
+      textarea { min-height: 100px; resize: vertical; }
+      button { padding: 10px 24px; font: inherit; color: white; background: #315acc; border: 0; border-radius: 6px; cursor: pointer; }
+      a { color: #315acc; }
+    </style>
+  </head>
+  <body>
+    <a href="/http-protocol">HTTP examples</a>
+    <h1>Send task details</h1>
+    <form action="/http-protocol/form" method="post">
+      <label>
+        Title
+        <input name="title" value="Check the automation task" />
+      </label>
+      <label>
+        Description
+        <textarea name="description">Review the test request</textarea>
+      </label>
+      <button type="submit">Send</button>
+    </form>
+  </body>
+</html>
