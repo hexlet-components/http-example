@@ -26,7 +26,7 @@ start:
 
 test:
 	make check-generated
-	node ./bin/smoke-test.js
+	pnpm exec vitest run
 
 update-deps:
 	pnpm exec ncu -u
