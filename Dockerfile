@@ -8,7 +8,7 @@ RUN apk add --no-cache make caddy
 
 # corepack из образов Node 26 убран, поэтому pnpm ставится напрямую. Версия
 # совпадает с полем packageManager, чтобы образ и разработка не расходились.
-RUN npm install -g pnpm@12.6.0
+RUN npm install -g pnpm@12.11.2
 
 # .pnpmfile.cjs участвует в разрешении зависимостей, и без него
 # --frozen-lockfile отвергает лок как несовпадающий.
