@@ -1,9 +1,4 @@
 {
   "docRoute": "openapi",
-  "apps": [
-    "http-api",
-    "http-protocol",
-    "js-playwright",
-    "postman"
-  ]
+  "apps": ["http-api", "http-protocol", "js-playwright", "postman"]
 }

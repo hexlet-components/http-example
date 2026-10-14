@@ -1,5 +1,5 @@
 // JSON-RPC 2.0 endpoint for the http-api course.
-// Shows the RPC style next to the REST routes in tasks-rest.js: one endpoint,
+// Shows the RPC style next to the REST routes in handlers.ts: one endpoint,
 // always POST, errors live in the body and the status is always 200.
 //
 // Данные и операции берутся из tasks-store.js, того же модуля, из которого
@@ -8,9 +8,7 @@
 
 import type { FastifyInstance } from 'fastify';
 
-import {
-  build, find, list, parseRange, validate,
-} from './tasks-store.ts';
+import { build, find, list, parseRange, validate } from './tasks-store.ts';
 import type { TaskDto } from './tasks-store.ts';
 
 // Negative codes are the protocol level ones defined by the JSON-RPC spec.

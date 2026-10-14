@@ -23,22 +23,39 @@ const SPECS: {
     prefix: 'http-protocol',
     collections: ['tasks', 'users', 'posts', 'comments'],
     nested: true,
-    guarded: [['DELETE', '/users/1', 'bearer'], ['POST', '/posts', 'bearer']],
-    open: [['GET', '/tasks/1'], ['POST', '/tasks']],
+    guarded: [
+      ['DELETE', '/users/1', 'bearer'],
+      ['POST', '/posts', 'bearer'],
+    ],
+    open: [
+      ['GET', '/tasks/1'],
+      ['POST', '/tasks'],
+    ],
   },
   {
     prefix: 'js-playwright',
     collections: ['tasks', 'users'],
     nested: false,
     guarded: [],
-    open: [['GET', '/tasks/1'], ['POST', '/users'], ['DELETE', '/users/1']],
+    open: [
+      ['GET', '/tasks/1'],
+      ['POST', '/users'],
+      ['DELETE', '/users/1'],
+    ],
   },
   {
     prefix: 'postman',
     collections: ['tasks', 'users', 'posts', 'comments'],
     nested: true,
-    guarded: [['GET', '/tasks/1', 'basic'], ['POST', '/tasks', 'basic'], ['DELETE', '/users/1', 'bearer']],
-    open: [['GET', '/tasks'], ['POST', '/users']],
+    guarded: [
+      ['GET', '/tasks/1', 'basic'],
+      ['POST', '/tasks', 'basic'],
+      ['DELETE', '/users/1', 'bearer'],
+    ],
+    open: [
+      ['GET', '/tasks'],
+      ['POST', '/users'],
+    ],
   },
 ];
 

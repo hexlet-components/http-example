@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  page, parseRange, parseSelect, project,
-} from '../custom-server/src/collections.ts';
+import { page, parseRange, parseSelect, project } from '../custom-server/src/collections.ts';
 
 describe('parseSelect', () => {
   it('пустое значение означает «все поля»', () => {
@@ -45,7 +43,10 @@ describe('page', () => {
   it('total это размер всего набора, а не страницы', () => {
     const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
     expect(page({ items, envelope: 'items', skip: 1, limit: 1 })).toEqual({
-      items: [{ id: 2 }], total: 3, skip: 1, limit: 1,
+      items: [{ id: 2 }],
+      total: 3,
+      skip: 1,
+      limit: 1,
     });
   });
 });

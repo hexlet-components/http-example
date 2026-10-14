@@ -91,7 +91,10 @@ describe('Коллекции: пагинация, select и вложенные �
   it('/users?skip=30 отдаёт пустую страницу с total 10', async () => {
     const reply = await client.send(`${USERS}?skip=30`);
     expect(reply.body).toEqual({
-      users: [], total: expectedUsers.length, skip: 30, limit: 30,
+      users: [],
+      total: expectedUsers.length,
+      skip: 30,
+      limit: 30,
     });
   });
 
@@ -103,12 +106,12 @@ describe('Коллекции: пагинация, select и вложенные �
 
   it('select оставляет только запрошенные поля и id', async () => {
     const reply = await client.send(`${USERS}?select=firstName,email`);
-    expect(Object.keys(reply.body.users[0]).sort()).toEqual(['email', 'firstName', 'id']);
+    expect(Object.keys(reply.body.users[0]).toSorted()).toEqual(['email', 'firstName', 'id']);
   });
 
   it('select работает и на одиночном ресурсе', async () => {
     const reply = await client.send(`${USERS}/1?select=lastName`);
-    expect(Object.keys(reply.body).sort()).toEqual(['id', 'lastName']);
+    expect(Object.keys(reply.body).toSorted()).toEqual(['id', 'lastName']);
   });
 
   it('/users/1/posts отдаёт только посты автора 1 и не совпадает с /posts', async () => {
@@ -129,18 +132,22 @@ describe('Коллекции: пагинация, select и вложенные �
   it('/courses?skip=1&limit=2 применяет параметры', async () => {
     const reply = await client.send(`${COURSES}?skip=1&limit=2`, { headers: KEY });
     expect(reply.body).toEqual({
-      courses: expectedCourses.slice(1, 3), total: expectedCourses.length, skip: 1, limit: 2,
+      courses: expectedCourses.slice(1, 3),
+      total: expectedCourses.length,
+      skip: 1,
+      limit: 2,
     });
   });
 });
 
 describe('Отсутствующая запись и авторизация по коллекциям', () => {
-  it.each([['users', USERS], ['posts', POSTS], ['comments', COMMENTS]])(
-    'GET /%s/999 → 404',
-    async (_name, url) => {
-      expect((await client.send(`${url}/999`)).status).toBe(404);
-    },
-  );
+  it.each([
+    ['users', USERS],
+    ['posts', POSTS],
+    ['comments', COMMENTS],
+  ])('GET /%s/999 → 404', async (_name, url) => {
+    expect((await client.send(`${url}/999`)).status).toBe(404);
+  });
 
   // Спецификация закрывает Bearer'ом изменение постов, комментариев и
   // пользователей, а создание пользователя оставляет открытым.
@@ -152,15 +159,19 @@ describe('Отсутствующая запись и авторизация по
   ] as const)('%s без токена → 401', async (_name, url, method) => {
     // Content-Type только вместе с телом: fastify отвечает 400 на пустое тело
     // при заявленном application/json, и проверка мерила бы не то.
-    const reply = method === 'PATCH'
-      ? await client.json(url, method, { title: 'x', body: 'y', firstName: 'z' })
-      : await client.json(url, method);
+    const reply =
+      method === 'PATCH'
+        ? await client.json(url, method, { title: 'x', body: 'y', firstName: 'z' })
+        : await client.json(url, method);
     expect(reply.status).toBe(401);
   });
 
   it('POST /users без токена → 201, пароля в ответе нет', async () => {
     const created = await client.json(USERS, 'POST', {
-      email: 'john@mail.com', firstName: 'John', lastName: 'Doe', password: 'secret',
+      email: 'john@mail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      password: 'secret',
     });
     expect(created.status).toBe(201);
     expect(created.body).not.toHaveProperty('password');
@@ -231,7 +242,10 @@ describe('Коды ответов, на них построены самосто
 
   it('POST /posts с токеном → 201 и authorId от сервера', async () => {
     const created = await client.json(
-      POSTS, 'POST', { title: 'title', body: 'body' }, { Authorization: 'Bearer any-value' },
+      POSTS,
+      'POST',
+      { title: 'title', body: 'body' },
+      { Authorization: 'Bearer any-value' },
     );
     expect(created.status).toBe(201);
     expect(Number.isInteger(created.body.authorId)).toBe(true);
@@ -256,13 +270,14 @@ describe('Коды ответов, на них построены самосто
 });
 
 describe('Числа в ответах не выходят за uint16', () => {
-  it.each([
-    [TASKS], [`${TASKS}/1`], [USERS], [`${USERS}/1`], [POSTS], [`${POSTS}/1`], [COMMENTS],
-  ])('%s', async (url) => {
-    expect(outOfRange((await client.send(url)).body, url)).toEqual([]);
-  });
+  it.each([[TASKS], [`${TASKS}/1`], [USERS], [`${USERS}/1`], [POSTS], [`${POSTS}/1`], [COMMENTS]])(
+    '%s',
+    async (url) => {
+      expect(outOfRange((await client.send(url)).body, url)).toEqual([]);
+    },
+  );
 
-  it(COURSES, async () => {
+  it('/http-api/courses', async () => {
     expect(outOfRange((await client.send(COURSES, { headers: KEY })).body, COURSES)).toEqual([]);
   });
 });

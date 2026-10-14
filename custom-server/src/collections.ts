@@ -7,7 +7,7 @@
 // (FEEDBACK-166, FEEDBACK-371).
 //
 // Здесь только разбор параметров и выборка. Маршруты и коды ответов лежат в
-// routes.js, данные в data/, а один и тот же список задач берёт отсюда же и
+// handlers.ts, данные в data/, а один и тот же список задач берёт отсюда же и
 // JSON-RPC, чтобы REST и RPC не расходились.
 
 export const DEFAULT_LIMIT = 30;
@@ -56,15 +56,17 @@ export const parseSelect = (select?: string | string[] | null): string[] | null 
 export const project = <T extends Identified>(item: T, fields: string[] | null): Partial<T> => {
   if (fields === null) return item;
   const wanted = new Set(fields);
-  return Object.fromEntries(
-    Object.entries(item).filter(([key]) => key === 'id' || wanted.has(key)),
-  ) as Partial<T>;
+  return Object.fromEntries(Object.entries(item).filter(([key]) => key === 'id' || wanted.has(key))) as Partial<T>;
 };
 
 // total это размер всего набора, а не выданной страницы: по нему клиент понимает,
 // есть ли записи за пределами limit.
 export const page = <T extends Identified>({
-  items, envelope, skip, limit, fields = null,
+  items,
+  envelope,
+  skip,
+  limit,
+  fields = null,
 }: {
   items: T[];
   envelope: string;
@@ -78,7 +80,8 @@ export const page = <T extends Identified>({
   limit,
 });
 
-export const findById = <T extends Identified>(items: T[], id: Param): T | undefined => items.find((item) => item.id === Number(id));
+export const findById = <T extends Identified>(items: T[], id: Param): T | undefined =>
+  items.find((item) => item.id === Number(id));
 
 export const nextId = (items: Identified[]): number => items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
 
@@ -87,7 +90,11 @@ export const isFilled = (value: unknown): boolean => typeof value === 'string' &
 // Пустая строка не проходит: в спецификации у текстовых полей стоит @minLength(1).
 export const validateFields = (
   dto: Record<string, unknown> = {},
-  { required = [], optional = [], partial = false }: { required?: string[]; optional?: string[]; partial?: boolean } = {},
+  {
+    required = [],
+    optional = [],
+    partial = false,
+  }: { required?: string[]; optional?: string[]; partial?: boolean } = {},
 ): string[] => {
   const problems: string[] = [];
 

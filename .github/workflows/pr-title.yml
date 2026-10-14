@@ -5,7 +5,9 @@ name: PR Title
 # поднять. Проверка отдельных коммитов ветки намеренно не делается, чтобы не
 # мешать работе внутри PR.
 on:
-  pull_request_target:
+  # pull_request_target нужен намеренно: экшену надо читать заголовок и у PR из
+  # форков. Код PR здесь не чекаутится и не выполняется, токен только на чтение.
+  pull_request_target: # jactionlint ignore=dangerous-triggers
     types:
       - opened
       - edited
@@ -15,10 +17,15 @@ on:
 permissions:
   pull-requests: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: amannn/action-semantic-pull-request@v6
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

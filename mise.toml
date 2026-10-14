@@ -1,6 +1,118 @@
-# Тулинг репозитория для хоста и CI (jdx/mise-action). Точную версию pnpm
-# задаёт packageManager в package.json: pnpm сам переключается на неё и
-# записывает её в лок, поэтому здесь только мажор.
+# Тулинг, задачи и демоны репозитория. Хост и CI (jdx/mise-action) читают этот
+# файл. Точную версию pnpm задаёт packageManager в package.json: pnpm сам
+# переключается на неё и записывает её в лок, поэтому здесь только мажор.
+#
+# Задачи заменили Makefile, а демоны запускают приложение с Caddy на хосте.
+# В образ mise не ставится: там остаётся bin/start.sh.
+
+[settings]
+# [daemons] пока экспериментальные. Флаг лежит в репозитории, а не только в
+# глобальном конфиге, иначе `mise daemons` не заведётся на чужой машине и в CI.
+experimental = true
+
 [tools]
 node = "26"
 pnpm = "12"
+caddy = "2"
+jactionlint = "latest"
+
+[env]
+# Порт Caddy, как в образе: $PORT в Caddyfile.
+PORT = "{{ get_env(name='PORT', default='8080') }}"
+
+# --- Демоны: локальный стенд ---------------------------------------------
+# `mise daemons start` поднимает приложение и Caddy перед ним, `mise daemons
+# stop` снимает. В образе то же делает bin/start.sh.
+
+[daemons.app]
+# --options обязателен, и вместе с ним сборка без `pnpm run start` не нужна:
+# команда в package.json единственное место, где он прописан.
+run = "exec pnpm run start"
+ready_port = 4010
+
+[daemons.caddy]
+run = "exec caddy run"
+depends = ["app"]
+ready_port = 8080
+
+# --- Задачи --------------------------------------------------------------
+
+[tasks.compile]
+description = "Скомпилировать спецификации TypeSpec в OpenAPI (tsp-output/)"
+run = "node bin/compile.ts"
+sources = ["typespec/**/*.tsp", "tspconfig.yaml", "app.config.json", "pnpm-lock.yaml"]
+outputs = ["tsp-output/**/openapi.1.0.yaml"]
+
+[tasks.setup]
+description = "Зависимости и компиляция спецификаций"
+run = "pnpm install --frozen-lockfile"
+depends_post = ["compile"]
+
+# Сгенерированное лежит в репозитории, а не собирается на старте: образ не
+# должен тянуть генератор, а свежесть проверяет `check-generated`.
+# `generate` очищает custom-server/src/generated/ перед записью, так что
+# неудачная проба сносит закоммиченное: восстанавливать из git.
+[tasks.generate]
+description = "Типы обработчиков из спецификации (custom-server/src/generated/)"
+depends = ["compile"]
+run = "pnpm exec openapi-ts"
+
+[tasks."check-generated"]
+description = "Падает, если сгенерированное в репозитории отстало от спецификации"
+depends = ["generate"]
+run = "git diff --exit-code custom-server/src/generated"
+
+[tasks.typecheck]
+description = "Проверка типов (tsc --noEmit)"
+run = "pnpm exec tsc"
+
+[tasks.lint]
+description = "oxlint"
+run = "pnpm exec oxlint"
+
+[tasks.fmt]
+description = "Отформатировать код (oxfmt)"
+run = "pnpm exec oxfmt"
+
+[tasks."fmt:check"]
+description = "Проверить форматирование (oxfmt)"
+run = "pnpm exec oxfmt --check"
+
+[tasks."lint:actions"]
+description = "Проверить workflow GitHub Actions (jactionlint)"
+run = "jactionlint"
+
+[tasks.test]
+description = "Тесты vitest против всех четырёх спецификаций"
+depends = ["compile"]
+run = "pnpm exec vitest run"
+
+[tasks.check]
+description = "Всё, что гоняет CI"
+depends = ["typecheck", "lint", "fmt:check", "lint:actions", "check-generated", "test"]
+
+[tasks.start]
+description = "Приложение и Caddy в одном процессе, как в образе"
+run = "./bin/start.sh"
+
+[tasks."update-deps"]
+description = "Поднять зависимости до последних версий"
+run = ["pnpm exec ncu -u", "pnpm install"]
+
+[tasks."compose:build"]
+run = "docker compose build"
+
+[tasks."compose:bash"]
+run = "docker compose run --rm app sh"
+
+[tasks."compose:up"]
+run = "docker compose up"
+
+[tasks."compose:down"]
+run = "docker compose down"
+
+[tasks."compose:logs"]
+run = "docker compose logs -f --tail=200"
+
+[tasks."compose:ps"]
+run = "docker compose ps"

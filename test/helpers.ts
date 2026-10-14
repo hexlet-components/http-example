@@ -34,15 +34,20 @@ export const createClient = (instance: FastifyInstance) => {
     return { status: response.statusCode, body, headers: response.headers };
   };
 
-  const json = (url: string, method: InjectOptions['method'], payload?: unknown, headers = {}) => send(url, {
-    method,
-    headers: payload === undefined ? headers : { 'content-type': 'application/json', ...headers },
-    payload: payload === undefined ? undefined : JSON.stringify(payload),
-  });
+  const json = (url: string, method: InjectOptions['method'], payload?: unknown, headers = {}) =>
+    send(url, {
+      method,
+      headers: payload === undefined ? headers : { 'content-type': 'application/json', ...headers },
+      payload: payload === undefined ? undefined : JSON.stringify(payload),
+    });
 
-  const rpc = (method: string, params?: unknown) => json('/http-api/rpc', 'POST', {
-    jsonrpc: '2.0', method, params, id: 1,
-  });
+  const rpc = (method: string, params?: unknown) =>
+    json('/http-api/rpc', 'POST', {
+      jsonrpc: '2.0',
+      method,
+      params,
+      id: 1,
+    });
 
   return { send, json, rpc };
 };
