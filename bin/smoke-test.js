@@ -30,6 +30,7 @@
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { readFileSync } from 'node:fs';
+import checkBodyExamples from './body-smoke-test.js';
 
 import expectedComments from '../custom-server/src/data/comments.js';
 import expectedCourses from '../custom-server/src/data/courses.js';
@@ -156,6 +157,8 @@ const run = async () => {
   ]);
 
   await waitFor(`${APP}/`, 'приложение');
+
+  await checkBodyExamples({ APP, check, getJson });
 
   console.log('\nREST и RPC отдают одни и те же задачи');
   const restList = await getJson(TASKS);
