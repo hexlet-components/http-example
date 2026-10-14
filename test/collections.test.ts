@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   page, parseRange, parseSelect, project,
-} from '../custom-server/src/collections.js';
+} from '../custom-server/src/collections.ts';
 
 describe('parseSelect', () => {
   it('пустое значение означает «все поля»', () => {

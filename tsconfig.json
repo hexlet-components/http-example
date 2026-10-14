@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
-    "allowJs": true,
     "target": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "types": ["node"]
   },
-  "include": ["./server/src/**/*"]
+  "include": ["custom-server/src", "test", "vitest.config.ts", "openapi-ts.config.ts"]
 }

@@ -6,9 +6,12 @@
 // собираются REST-маршруты. Урок kinds сравнивает два стиля и опирается на то,
 // что задача с одним номером в обоих одна и та же.
 
+import type { FastifyInstance } from 'fastify';
+
 import {
   build, find, list, parseRange, validate,
-} from './tasks-store.js';
+} from './tasks-store.ts';
+import type { TaskDto } from './tasks-store.ts';
 
 // Negative codes are the protocol level ones defined by the JSON-RPC spec.
 // Application errors like "task not found" get positive codes chosen by the API itself.
@@ -18,9 +21,19 @@ const errors = {
   invalidParams: { code: -32602, message: 'Invalid params' },
 };
 
-const notFound = (id) => ({ error: { code: 1, message: `Task with id ${id} not found` } });
+// Параметры приходят из тела запроса как есть, проверяет их только код ниже.
+type Params = TaskDto & { id?: number; skip?: number; limit?: number };
 
-const methods = {
+interface RpcCall {
+  jsonrpc?: string;
+  method?: unknown;
+  params?: Params;
+  id?: unknown;
+}
+
+const notFound = (id: unknown) => ({ error: { code: 1, message: `Task with id ${id} not found` } });
+
+const methods: Record<string, (params?: Params) => object> = {
   'tasks.list': (params = {}) => {
     const range = parseRange(params);
     if (range === null) {
@@ -47,7 +60,7 @@ const methods = {
   },
 };
 
-const handleCall = (call) => {
+const handleCall = (call: RpcCall | null) => {
   const id = call?.id ?? null;
 
   if (call?.jsonrpc !== '2.0' || typeof call.method !== 'string') {
@@ -62,9 +75,9 @@ const handleCall = (call) => {
   return { jsonrpc: '2.0', ...method(call.params), id };
 };
 
-export default (app) => {
+export default (app: FastifyInstance) => {
   app.post('/http-api/rpc', (req, res) => {
-    const body = Array.isArray(req.body) ? req.body.map(handleCall) : handleCall(req.body);
+    const body = Array.isArray(req.body) ? req.body.map(handleCall) : handleCall(req.body as RpcCall);
     res.send(body);
   });
 };

@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
-import expectedPosts from '../custom-server/src/data/posts.js';
-import expectedUsers from '../custom-server/src/data/users.js';
+import expectedPosts from '../custom-server/src/data/posts.ts';
+import expectedUsers from '../custom-server/src/data/users.ts';
 import { buildApp, createClient } from './helpers.ts';
 
 // Ожидания выписаны здесь заново, а не взяты из кода: тест утверждает поведение

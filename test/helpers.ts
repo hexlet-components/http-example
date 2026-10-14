@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import type { FastifyInstance, InjectOptions } from 'fastify';
 
-import app, { options } from '../custom-server/src/index.js';
+import app, { options } from '../custom-server/src/index.ts';
 
 export const UINT16_MAX = 65535;
 

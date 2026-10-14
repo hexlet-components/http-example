@@ -7,32 +7,43 @@
 
 import {
   findById, nextId, page, parseRange, parseSelect, validateFields,
-} from './collections.js';
-import tasks from './data/tasks.js';
+} from './collections.ts';
+import tasks from './data/tasks.ts';
 
 const STATUSES = ['Backlog', 'Ready', 'In Progress', 'Done', 'Archived'];
 
 export { parseRange };
 
+export interface TaskDto {
+  title?: string;
+  description?: string;
+  status?: string;
+}
+
 export const items = () => tasks;
 
-export const validate = (dto = {}, options = {}) => {
-  const problems = validateFields(dto, { required: ['title', 'description'], ...options });
+export const validate = (
+  dto: TaskDto = {},
+  options: { partial?: boolean } = {},
+): string[] => {
+  const problems = validateFields(dto as Record<string, unknown>, { required: ['title', 'description'], ...options });
   if (dto.status !== undefined && !STATUSES.includes(dto.status)) {
     problems.push(`status должен быть одним из: ${STATUSES.join(', ')}`);
   }
   return problems;
 };
 
-export const build = (dto) => ({
+export const build = (dto: TaskDto) => ({
   id: nextId(tasks),
   title: dto.title,
   description: dto.description,
   status: dto.status ?? 'Backlog',
 });
 
-export const list = ({ skip, limit, select } = {}) => page({
+export const list = (
+  { skip = 0, limit = 30, select }: { skip?: number; limit?: number; select?: string | string[] } = {},
+) => page({
   items: tasks, envelope: 'tasks', skip, limit, fields: parseSelect(select),
 });
 
-export const find = (id) => findById(tasks, id);
+export const find = (id: string | number | undefined) => findById(tasks, id);

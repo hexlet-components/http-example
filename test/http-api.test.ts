@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
-import expectedComments from '../custom-server/src/data/comments.js';
-import expectedCourses from '../custom-server/src/data/courses.js';
-import expectedPosts from '../custom-server/src/data/posts.js';
-import expectedTasks from '../custom-server/src/data/tasks.js';
-import expectedUsers from '../custom-server/src/data/users.js';
+import expectedComments from '../custom-server/src/data/comments.ts';
+import expectedCourses from '../custom-server/src/data/courses.ts';
+import expectedPosts from '../custom-server/src/data/posts.ts';
+import expectedTasks from '../custom-server/src/data/tasks.ts';
+import expectedUsers from '../custom-server/src/data/users.ts';
 import { buildApp, createClient, outOfRange } from './helpers.ts';
 
 const API = '/http-api';

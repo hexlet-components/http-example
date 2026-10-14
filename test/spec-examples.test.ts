@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import expectedComments from '../custom-server/src/data/comments.js';
-import expectedPosts from '../custom-server/src/data/posts.js';
-import expectedTasks from '../custom-server/src/data/tasks.js';
-import expectedUsers from '../custom-server/src/data/users.js';
+import expectedComments from '../custom-server/src/data/comments.ts';
+import expectedPosts from '../custom-server/src/data/posts.ts';
+import expectedTasks from '../custom-server/src/data/tasks.ts';
+import expectedUsers from '../custom-server/src/data/users.ts';
 
 // Документацию курса читают по спецификации, а данные отдаёт приложение, то
 // есть примеры и набор это две копии. Сверка идёт поиском подстроки: разбирать
