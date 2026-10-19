@@ -19,23 +19,38 @@
 
 Обработчик `body` принимает JSON, `application/x-www-form-urlencoded` и multipart. Для примера с файлом он возвращает его содержимое как строку UTF-8. Лимиты multipart допускают один файл до 64 КиБ и до десяти текстовых полей по 4 КиБ. Исходное тестовое изображение взято из [httpbin](https://httpbin.org/image/png), который распространяется под [лицензией MIT](https://github.com/postmanlabs/httpbin/blob/master/LICENSE).
 
-## Страницы для UI-тестов
+## Учебные приложения для UI-тестов
 
-Курсы Selenium и Playwright открывают учебные страницы под префиксом своего курса: `/java-selenium`, `/python-selenium`, `/python-playwright`. Страницы у всех одни, ссылки внутри и сессия у каждого курса свои. Уроки ищут на страницах элементы и проверяют тексты дословно, поэтому локаторы и надписи тоже контент курса. В таблице префикс курса обозначен `<курс>`.
+Курсы Selenium и Playwright тестируют маленькие приложения под префиксом своего курса. У каждого своя предметная область, и страницы в нём появились из её сценариев. Уроки ищут элементы и проверяют тексты дословно, поэтому локаторы и надписи этих страниц тоже контент курса.
 
-| Путь | Что на странице |
+**`/java-selenium`, библиотека City Library.** Курс разбирает действия пользователя, окна и фреймы, и у каждого действия в библиотеке есть смысл.
+
+| Путь | Сценарий |
 | --- | --- |
-| `/<курс>` | `h1` «Welcome to UI testing» и ссылки на примеры |
-| `/<курс>/login` | форма `#login` с полями `#username` и `#password`, учётка `student` / `secret123` |
-| `/<курс>/secure` | закрытый раздел, флеш `#flash`, меню `#menu-button` и ссылка на выход |
-| `/<курс>/hovers` | карточки `.figure`, подпись `.figcaption h5` видна при наведении |
-| `/<курс>/drag_and_drop` | колонки `#column-a` и `#column-b`, перетаскивание на событиях мыши |
-| `/<курс>/key_presses` | поле `#target`, результат в `#result` |
-| `/<курс>/javascript_alerts` | кнопки `jsAlert()`, `jsConfirm()` и `jsPrompt()` |
-| `/<курс>/windows` | ссылка «Click Here» открывает новое окно |
-| `/<курс>/iframe` | фрейм `editor-frame` с абзацем `#content` |
+| `/java-selenium` | каталог, `h1` «City Library» |
+| `/java-selenium/login` → `/my-shelf` | вход читателя `reader` / `books123`, полка с выданными книгами |
+| `/java-selenium/covers` | обложки `.figure`, название `.figcaption h5` видно при наведении, двойной клик добавляет книгу в избранное |
+| `/java-selenium/shelves` | книга `#book-moby-dick` перетаскивается на полку `#shelf-reading` |
+| `/java-selenium/search` | поиск `#search` фильтрует каталог, Enter печатает число найденного в `#result` |
+| `/java-selenium/return` | кнопка `#return-book` спрашивает `confirm` перед возвратом |
+| `/java-selenium/preview` | «Open preview» открывает отрывок в новом окне |
+| `/java-selenium/reader` | глава книги во фрейме `chapter`, абзац `#content` |
 
-Вход и закрытый раздел собирает `custom-server/src/ui-pages.ts`, остальные страницы лежат шаблонами в `custom-server/assets/ui-pages/`, префикс в них записан как `{{prefix}}`. Список курсов задаёт `courses` в том же модуле.
+**`/python-selenium`, трекер Task Board.** Курс разбирает сессию, куки, ожидания и мобильное меню.
+
+| Путь | Сценарий |
+| --- | --- |
+| `/python-selenium` | промо-страница, первая ссылка «Sign in» после названия |
+| `/python-selenium/login` → `/tasks` | вход `student` / `tasks123`, список задач, меню `#menu-button` с пунктами `.menu-item` |
+
+**`/python-playwright`, табло Departures.** Курс настраивает контекст браузера, и табло на эти настройки отвечает.
+
+| Путь | Сценарий |
+| --- | --- |
+| `/python-playwright` | табло `#departures`, время вылета печатается в часовом поясе браузера, на узком экране строки складываются в карточки |
+| `/python-playwright/login` → `/trips` | вход пассажира `passenger` / `flight123`, «My trips» |
+
+У всех трёх одинаковое устройство входа. Форма `#login` с полями `#username` и `#password` и кнопкой `button.primary[data-test=login-button]`, флеш-сообщение `#flash`, выход по `/<курс>/logout`. Приложения описаны конфигом `apps` в `custom-server/src/ui-pages.ts`, страницы лежат фрагментами в `custom-server/assets/ui-pages/<курс>/`, префикс в них записан как `{{prefix}}`.
 
 ## Prerequisites
 

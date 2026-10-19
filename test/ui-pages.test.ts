@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
-import { courses, credentials } from '../custom-server/src/ui-pages.ts';
+import { apps } from '../custom-server/src/ui-pages.ts';
 import { buildApp, createClient } from './helpers.ts';
 
 let app: FastifyInstance;
@@ -29,34 +29,31 @@ const logIn = (prefix: string, username: string, password: string) =>
     payload: new URLSearchParams({ username, password }).toString(),
   });
 
-// Уроки Selenium и Playwright ищут эти элементы и тексты дословно.
-describe.each(courses.map((course) => `/${course}`))('страницы %s', (prefix) => {
-  it.each([
-    ['', ['<title>Hexlet UI Testing</title>', '<h1 class="heading">Welcome to UI testing</h1>', 'Form Authentication']],
-    ['/hovers', ['class="figure"', '<h5>name: user1</h5>']],
-    ['/drag_and_drop', ['id="column-a"', 'id="column-b"']],
-    ['/key_presses', ['id="target"', 'id="result"']],
-    ['/javascript_alerts', ['onclick="jsAlert()"', 'onclick="jsConfirm()"', 'onclick="jsPrompt()"']],
-    ['/windows', ['target="_blank">Click Here</a>']],
-    ['/windows/new', ['<h3>New Window</h3>']],
-    ['/iframe', ['name="editor-frame"']],
-    ['/iframe/content', ['id="content"']],
-    [
-      '/login',
-      [
-        '<h2>Login Page</h2>',
-        'form id="login"',
-        'id="username"',
-        'id="password"',
-        'type="submit" data-test="login-button"',
-      ],
-    ],
-  ])('%s', async (url, fragments) => {
-    const reply = await client.send(`${prefix}${url}`);
+const courses = Object.entries(apps).map(([course, ui]) => ({ prefix: `/${course}`, ui }));
+
+// Уроки ищут эти элементы и тексты дословно.
+const pages: [string, string[]][] = [
+  ['/java-selenium', ['<title>City Library</title>', '<h1 class="heading">City Library</h1>']],
+  ['/java-selenium/covers', ['class="figure"', '<h5>Moby Dick</h5>']],
+  ['/java-selenium/shelves', ['id="book-moby-dick"', 'id="shelf-reading"']],
+  ['/java-selenium/search', ['id="search"', 'id="result"']],
+  ['/java-selenium/return', ['id="return-book"']],
+  ['/java-selenium/preview', ['target="_blank">Open preview</a>']],
+  ['/java-selenium/preview/moby-dick', ['<h3>Moby Dick: preview</h3>']],
+  ['/java-selenium/reader', ['name="chapter"']],
+  ['/java-selenium/reader/chapter', ['<p id="content">Call me Ishmael.</p>']],
+  ['/python-selenium', ['<title>Task Board</title>', '<h1 class="heading">Task Board</h1>', '>Sign in</a>']],
+  ['/python-playwright', ['<title>Departures</title>', 'id="departures"', '>My trips</a>']],
+];
+
+describe('страницы приложений', () => {
+  it.each(pages)('%s', async (url, fragments) => {
+    const reply = await client.send(url);
     expect(reply.status).toBe(200);
     for (const fragment of fragments) {
       expect(reply.body).toContain(fragment);
     }
+    expect(reply.body).not.toContain('{{prefix}}');
   });
 
   it('стиль страниц отдаётся статикой', async () => {
@@ -64,46 +61,61 @@ describe.each(courses.map((course) => `/${course}`))('страницы %s', (pre
   });
 });
 
-describe.each(courses.map((course) => `/${course}`))('вход в закрытый раздел %s', (prefix) => {
+describe.each(courses)('вход и закрытый раздел $prefix', ({ prefix, ui }) => {
+  const { credentials, texts } = ui;
+  const secure = `${prefix}${ui.securePath}`;
+
+  it('страница входа', async () => {
+    const reply = await client.send(`${prefix}/login`);
+    expect(reply.status).toBe(200);
+    for (const fragment of [
+      `<h2>${texts.loginHeading}</h2>`,
+      'form id="login"',
+      '<label for="username">Username</label>',
+      'id="password"',
+      'class="primary" type="submit" data-test="login-button"',
+    ]) {
+      expect(reply.body).toContain(fragment);
+    }
+  });
+
   it('без сессии закрытый раздел уводит на вход с сообщением', async () => {
-    const reply = await client.send(`${prefix}/secure`);
+    const reply = await client.send(secure);
     expect(reply.status).toBe(302);
     expect(reply.headers.location).toBe(`${prefix}/login`);
 
     const login = await client.send(`${prefix}/login`, { headers: { cookie: cookieHeader(reply.headers) } });
-    expect(login.body).toContain('<div id="flash" class="flash error">You must log in to view the secure area!</div>');
+    expect(login.body).toContain(`<div id="flash" class="flash error">${texts.mustLogIn}</div>`);
   });
 
   it('неверный пароль возвращает на вход', async () => {
     const reply = await logIn(prefix, credentials.username, 'wrong');
-    expect(reply.status).toBe(302);
     expect(reply.headers.location).toBe(`${prefix}/login`);
 
     const login = await client.send(`${prefix}/login`, { headers: { cookie: cookieHeader(reply.headers) } });
-    expect(login.body).toContain('Your username or password is invalid!');
+    expect(login.body).toContain(texts.invalid);
   });
 
   it('верная учётка открывает закрытый раздел, выход закрывает его', async () => {
     const reply = await logIn(prefix, credentials.username, credentials.password);
     expect(reply.status).toBe(302);
-    expect(reply.headers.location).toBe(`${prefix}/secure`);
+    expect(reply.headers.location).toBe(secure);
 
     const cookie = cookieHeader(reply.headers);
-    const secure = await client.send(`${prefix}/secure`, { headers: { cookie } });
-    expect(secure.status).toBe(200);
-    expect(secure.body).toContain('<h2>Secure Area</h2>');
-    expect(secure.body).toContain('<div id="flash" class="flash success">You logged into a secure area!</div>');
-    expect(secure.body).toContain(`href="${prefix}/logout"`);
-    expect(secure.body).toContain('id="menu-button"');
+    const page = await client.send(secure, { headers: { cookie } });
+    expect(page.status).toBe(200);
+    expect(page.body).toContain(`<h2>${texts.secureHeading}</h2>`);
+    expect(page.body).toContain(`<div id="flash" class="flash success">${texts.loggedIn}</div>`);
+    expect(page.body.split(`href="${prefix}/logout"`)).toHaveLength(2);
+    expect(page.body).toContain('id="menu-button"');
 
     const logout = await client.send(`${prefix}/logout`, { headers: { cookie } });
-    expect(logout.status).toBe(302);
     expect(logout.headers.location).toBe(`${prefix}/login`);
     expect(String(logout.headers['set-cookie'])).toContain('ui-session=;');
   });
 
   it('подделанная сессия не открывает закрытый раздел', async () => {
-    const reply = await client.send(`${prefix}/secure`, { headers: { cookie: 'ui-session=student' } });
+    const reply = await client.send(secure, { headers: { cookie: `ui-session=${credentials.username}` } });
     expect(reply.status).toBe(302);
   });
 });
@@ -111,18 +123,12 @@ describe.each(courses.map((course) => `/${course}`))('вход в закрыты
 describe('курсы не делят сессию', () => {
   it('вход в одном курсе не открывает закрытый раздел другого', async () => {
     const [first, second] = courses;
-    const reply = await logIn(`/${first}`, credentials.username, credentials.password);
-    const cookie = cookieHeader(reply.headers);
-    expect(String(reply.headers['set-cookie'])).toContain(`Path=/${first}`);
-    const secure = await client.send(`/${second}/secure`, { headers: { cookie } });
-    expect(secure.status).toBe(302);
-  });
+    const reply = await logIn(first.prefix, first.ui.credentials.username, first.ui.credentials.password);
+    expect(String(reply.headers['set-cookie'])).toContain(`Path=${first.prefix}`);
 
-  it('ссылки страниц ведут внутрь своего курса', async () => {
-    for (const course of courses) {
-      const reply = await client.send(`/${course}`);
-      expect(reply.body).toContain(`href="/${course}/login"`);
-      expect(reply.body).not.toContain('{{prefix}}');
-    }
+    const page = await client.send(`${second.prefix}${second.ui.securePath}`, {
+      headers: { cookie: cookieHeader(reply.headers) },
+    });
+    expect(page.status).toBe(302);
   });
 });

@@ -1,0 +1,36 @@
+    <main class="example">
+      <h3>Shelves</h3>
+      <p>Drag a book to the shelf you are reading from.</p>
+      <div id="shelves">
+        <section class="shelf" id="shelf-want">
+          <header>Want to read</header>
+          <div class="book" id="book-moby-dick">Moby Dick</div>
+          <div class="book" id="book-treasure-island">Treasure Island</div>
+        </section>
+        <section class="shelf" id="shelf-reading">
+          <header>Reading</header>
+        </section>
+      </div>
+    </main>
+    <script>
+      // Перетаскивание собрано на событиях мыши, а не на HTML5 drag and drop:
+      // Actions в Selenium эмулирует мышь, и событий dragstart браузер на неё не шлёт.
+      let dragged = null;
+      for (const book of document.querySelectorAll('.book')) {
+        book.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+          dragged = book;
+        });
+      }
+      for (const shelf of document.querySelectorAll('.shelf')) {
+        shelf.addEventListener('mouseup', () => {
+          if (dragged && dragged.parentElement !== shelf) {
+            shelf.append(dragged);
+          }
+          dragged = null;
+        });
+      }
+      document.addEventListener('mouseup', () => {
+        dragged = null;
+      });
+    </script>

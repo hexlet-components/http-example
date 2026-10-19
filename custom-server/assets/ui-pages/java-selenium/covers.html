@@ -1,0 +1,15 @@
+    <main class="example">
+      <h3>Book covers</h3>
+      <p>Hover over a cover to see the book. Double-click the title to add it to favorites.</p>
+      <div class="figure"><div class="cover">MD</div><div class="figcaption"><h5>Moby Dick</h5><p>Herman Melville</p></div></div>
+      <div class="figure"><div class="cover">TI</div><div class="figcaption"><h5>Treasure Island</h5><p>Robert Louis Stevenson</p></div></div>
+      <div class="figure"><div class="cover">PP</div><div class="figcaption"><h5>Pride and Prejudice</h5><p>Jane Austen</p></div></div>
+      <p id="result"></p>
+    </main>
+    <script>
+      for (const title of document.querySelectorAll('.figcaption h5')) {
+        title.addEventListener('dblclick', () => {
+          document.getElementById('result').textContent = `Added to favorites: ${title.textContent}`;
+        });
+      }
+    </script>

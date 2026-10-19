@@ -2,59 +2,147 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-// Учебные страницы для курсов Selenium и Playwright. Уроки цитируют локаторы и
-// тексты этих страниц дословно, так же как уроки HTTP цитируют ответы API.
-// Префикс это курс, как у остальных приложений сервера: страницы одни, а
-// ссылки и путь куки сессии у каждого курса свои. Вход и закрытый раздел
-// собираются здесь, потому что им нужны сессия и флеш-сообщение. Остальные
-// страницы лежат шаблонами в assets/ui-pages, префикс в них стоит как {{prefix}}.
+// Учебные приложения для курсов Selenium и Playwright. Префикс это курс, как у
+// остальных приложений сервера, и у каждого курса своя предметная область:
+// страницы появляются из её сценариев, а не из списка элементов для тренировки.
+// Уроки цитируют локаторы и тексты этих страниц дословно, так же как уроки HTTP
+// цитируют ответы API.
+//
+// Общее у приложений только устройство: вёрстка, вход, сессия и флеш-сообщение
+// собираются здесь. Страницы лежат фрагментами в assets/ui-pages/<курс>/,
+// префикс курса в них записан как {{prefix}}.
 
-export const credentials = { username: 'student', password: 'secret123' };
+interface Page {
+  file: string;
+  // Страница без общей вёрстки, например содержимое фрейма.
+  bare?: boolean;
+}
 
-export const courses = ['java-selenium', 'python-selenium', 'python-playwright'];
+interface UiApp {
+  title: string;
+  credentials: { username: string; password: string };
+  securePath: string;
+  texts: {
+    loginHeading: string;
+    secureHeading: string;
+    loggedIn: string;
+    invalid: string;
+    mustLogIn: string;
+    loggedOut: string;
+  };
+  secureBody: string;
+  // Выхода в меню нет: ссылка на /logout на странице одна, и find_element по
+  // href не находит скрытый пункт меню раньше видимой кнопки.
+  menu: { label: string; path: string }[];
+  pages: Record<string, Page>;
+}
+
+export const apps: Record<string, UiApp> = {
+  'java-selenium': {
+    title: 'City Library',
+    credentials: { username: 'reader', password: 'books123' },
+    securePath: '/my-shelf',
+    texts: {
+      loginHeading: 'Reader login',
+      secureHeading: 'My shelf',
+      loggedIn: 'Welcome back! Your shelf is ready.',
+      invalid: 'Wrong username or password.',
+      mustLogIn: 'Log in to see your shelf.',
+      loggedOut: 'You logged out of the library.',
+    },
+    secureBody: `<ul id="loans">
+        <li>Moby Dick, due in 7 days</li>
+        <li>Treasure Island, due in 12 days</li>
+      </ul>`,
+    menu: [
+      { label: 'Catalog', path: '' },
+      { label: 'Book covers', path: '/covers' },
+    ],
+    pages: {
+      '': { file: 'index.html' },
+      '/covers': { file: 'covers.html' },
+      '/shelves': { file: 'shelves.html' },
+      '/search': { file: 'search.html' },
+      '/return': { file: 'return.html' },
+      '/preview': { file: 'preview.html' },
+      '/preview/moby-dick': { file: 'preview_moby_dick.html' },
+      '/reader': { file: 'reader.html' },
+      '/reader/chapter': { file: 'reader_chapter.html', bare: true },
+    },
+  },
+  'python-selenium': {
+    title: 'Task Board',
+    credentials: { username: 'student', password: 'tasks123' },
+    securePath: '/tasks',
+    texts: {
+      loginHeading: 'Sign in',
+      secureHeading: 'My tasks',
+      loggedIn: 'You are signed in.',
+      invalid: 'Invalid username or password.',
+      mustLogIn: 'Sign in to see your tasks.',
+      loggedOut: 'You are signed out.',
+    },
+    secureBody: `<ul id="tasks">
+        <li class="task">Write the first test</li>
+        <li class="task">Add an explicit wait</li>
+        <li class="task">Move locators to a page object</li>
+      </ul>`,
+    menu: [
+      { label: 'Inbox', path: '/tasks' },
+      { label: 'Today', path: '/tasks' },
+    ],
+    pages: {
+      '': { file: 'index.html' },
+    },
+  },
+  'python-playwright': {
+    title: 'Departures',
+    credentials: { username: 'passenger', password: 'flight123' },
+    securePath: '/trips',
+    texts: {
+      loginHeading: 'Passenger login',
+      secureHeading: 'My trips',
+      loggedIn: 'Welcome aboard!',
+      invalid: 'Wrong username or password.',
+      mustLogIn: 'Log in to see your trips.',
+      loggedOut: 'You logged out.',
+    },
+    secureBody: `<ul id="trips">
+        <li class="trip">SK 204 to Lisbon, seat 14A</li>
+      </ul>`,
+    menu: [{ label: 'Departures', path: '' }],
+    pages: {
+      '': { file: 'index.html' },
+    },
+  },
+};
 
 const sessionCookie = 'ui-session';
 const flashCookie = 'ui-flash';
 const cookieOptionsFor = (prefix: string) => ({ path: prefix, httpOnly: true, sameSite: 'lax' }) as const;
 
-const staticPages = {
-  '': 'index.html',
-  '/hovers': 'hovers.html',
-  '/drag_and_drop': 'drag_and_drop.html',
-  '/key_presses': 'key_presses.html',
-  '/javascript_alerts': 'javascript_alerts.html',
-  '/windows': 'windows.html',
-  '/windows/new': 'windows_new.html',
-  '/iframe': 'iframe.html',
-  '/iframe/content': 'iframe_content.html',
-};
+const assetsDir = path.join(import.meta.dirname, '../assets/ui-pages');
 
 const escape = (text: string) =>
   text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
-const assetsDir = path.join(import.meta.dirname, '../assets/ui-pages');
-const templates = Object.fromEntries(
-  Object.values(staticPages).map((file) => [file, readFileSync(path.join(assetsDir, file), 'utf8')]),
-);
-
-const layout = (prefix: string, body: string) => `<!DOCTYPE html>
+const layout = (app: UiApp, prefix: string, body: string) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hexlet UI Testing</title>
+    <title>${app.title}</title>
     <link rel="stylesheet" href="/assets/ui-pages/style.css" />
   </head>
   <body>
-    <a href="${prefix}">UI testing examples</a>
+    <a class="brand" href="${prefix}">${app.title}</a>
 ${body}
-    <footer>Powered by <a href="https://hexlet.io">Hexlet</a></footer>
   </body>
 </html>
 `;
 
-const flashBlock = (flash: string | undefined, kind: 'success' | 'error') =>
-  flash ? `    <div id="flash" class="flash ${kind}">${escape(flash)}</div>\n` : '';
+const flashBlock = (flash: { kind: string; message: string } | undefined) =>
+  flash ? `    <div id="flash" class="flash ${flash.kind}">${escape(flash.message)}</div>\n` : '';
 
 const takeFlash = (req: FastifyRequest, res: FastifyReply, prefix: string) => {
   const raw = req.cookies[flashCookie];
@@ -74,71 +162,81 @@ const redirectWithFlash = (
 
 // В значении сессии стоит курс: урок про куки подкладывает их руками, и кука
 // одного курса не должна открывать закрытый раздел другого.
-const sessionValue = (prefix: string) => `${credentials.username}@${prefix}`;
+const sessionValue = (app: UiApp, prefix: string) => `${app.credentials.username}@${prefix}`;
 
-const isLoggedIn = (req: FastifyRequest, prefix: string) => {
+const isLoggedIn = (req: FastifyRequest, app: UiApp, prefix: string) => {
   const raw = req.cookies[sessionCookie];
   if (!raw) return false;
   const { valid, value } = req.unsignCookie(raw);
-  return valid && value === sessionValue(prefix);
+  return valid && value === sessionValue(app, prefix);
 };
 
-const setUpCourse = (app: FastifyInstance, course: string) => {
+const html = (res: FastifyReply, body: string) => res.type('text/html; charset=utf-8').send(body);
+
+const setUpApp = (server: FastifyInstance, course: string, app: UiApp) => {
   const prefix = `/${course}`;
   const cookieOptions = cookieOptionsFor(prefix);
+  const { credentials, texts } = app;
 
-  for (const [route, file] of Object.entries(staticPages)) {
-    const html = templates[file].replaceAll('{{prefix}}', prefix);
-    app.get(`${prefix}${route}`, (_req, res) => res.type('text/html; charset=utf-8').send(html));
+  for (const [route, page] of Object.entries(app.pages)) {
+    const fragment = readFileSync(path.join(assetsDir, course, page.file), 'utf8').replaceAll('{{prefix}}', prefix);
+    const body = page.bare ? fragment : layout(app, prefix, fragment);
+    server.get(`${prefix}${route}`, (_req, res) => html(res, body));
   }
 
-  app.get(`${prefix}/login`, (req, res) => {
+  server.get(`${prefix}/login`, (req, res) => {
     const flash = takeFlash(req, res, prefix);
-    return res.type('text/html; charset=utf-8').send(
+    return html(
+      res,
       layout(
+        app,
         prefix,
-        `${flashBlock(flash?.message, flash?.kind ?? 'error')}    <div class="example">
-      <h2>Login Page</h2>
+        `${flashBlock(flash)}    <main class="example">
+      <h2>${texts.loginHeading}</h2>
       <p>Use <code>${credentials.username}</code> and <code>${credentials.password}</code> to log in.</p>
       <form id="login" action="${prefix}/authenticate" method="post">
         <label for="username">Username</label>
         <input type="text" name="username" id="username" />
         <label for="password">Password</label>
         <input type="password" name="password" id="password" />
-        <button class="radius" type="submit" data-test="login-button">Login</button>
+        <button class="primary" type="submit" data-test="login-button">Log in</button>
       </form>
-    </div>`,
+    </main>`,
       ),
     );
   });
 
-  app.post(`${prefix}/authenticate`, (req, res) => {
+  server.post(`${prefix}/authenticate`, (req, res) => {
     const { username, password } = (req.body ?? {}) as Record<string, string>;
     if (username !== credentials.username || password !== credentials.password) {
-      return redirectWithFlash(res, prefix, '/login', 'error', 'Your username or password is invalid!');
+      return redirectWithFlash(res, prefix, '/login', 'error', texts.invalid);
     }
-    res.setCookie(sessionCookie, sessionValue(prefix), { ...cookieOptions, signed: true });
-    return redirectWithFlash(res, prefix, '/secure', 'success', 'You logged into a secure area!');
+    res.setCookie(sessionCookie, sessionValue(app, prefix), { ...cookieOptions, signed: true });
+    return redirectWithFlash(res, prefix, app.securePath, 'success', texts.loggedIn);
   });
 
-  app.get(`${prefix}/secure`, (req, res) => {
-    if (!isLoggedIn(req, prefix)) {
-      return redirectWithFlash(res, prefix, '/login', 'error', 'You must log in to view the secure area!');
+  server.get(`${prefix}${app.securePath}`, (req, res) => {
+    if (!isLoggedIn(req, app, prefix)) {
+      return redirectWithFlash(res, prefix, '/login', 'error', texts.mustLogIn);
     }
     const flash = takeFlash(req, res, prefix);
-    return res.type('text/html; charset=utf-8').send(
+    const menu = app.menu
+      .map((item) => `        <a class="menu-item" href="${prefix}${item.path}">${item.label}</a>`)
+      .join('\n');
+    return html(
+      res,
       layout(
+        app,
         prefix,
-        `${flashBlock(flash?.message, flash?.kind ?? 'success')}    <div class="example">
+        `${flashBlock(flash)}    <main class="example">
       <button id="menu-button" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
       <nav id="menu" hidden>
-        <a class="menu-item" href="${prefix}">Home</a>
-        <a class="menu-item" href="${prefix}/logout">Logout</a>
+${menu}
       </nav>
-      <h2>Secure Area</h2>
-      <p>Welcome to the secure area. Log out when you are done.</p>
+      <h2>${texts.secureHeading}</h2>
+      ${app.secureBody}
       <a class="button" href="${prefix}/logout">Logout</a>
-    </div>
+    </main>
     <script>
       const button = document.getElementById('menu-button');
       const menu = document.getElementById('menu');
@@ -151,14 +249,14 @@ const setUpCourse = (app: FastifyInstance, course: string) => {
     );
   });
 
-  app.get(`${prefix}/logout`, (_req, res) => {
+  server.get(`${prefix}/logout`, (_req, res) => {
     res.clearCookie(sessionCookie, cookieOptions);
-    return redirectWithFlash(res, prefix, '/login', 'success', 'You logged out of the secure area!');
+    return redirectWithFlash(res, prefix, '/login', 'success', texts.loggedOut);
   });
 };
 
-export default async function setUpUiPages(app: FastifyInstance) {
-  for (const course of courses) {
-    setUpCourse(app, course);
+export default async function setUpUiPages(server: FastifyInstance) {
+  for (const [course, app] of Object.entries(apps)) {
+    setUpApp(server, course, app);
   }
 }

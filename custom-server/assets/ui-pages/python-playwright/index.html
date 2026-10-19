@@ -1,0 +1,23 @@
+    <main>
+      <a href="{{prefix}}/login">My trips</a>
+      <h1 class="heading">Departures</h1>
+      <p id="timezone">Times are shown in your time zone.</p>
+      <table id="departures">
+        <thead>
+          <tr><th>Flight</th><th>Destination</th><th>Time</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr data-departure="2026-01-15T08:30:00Z"><td>SK 204</td><td>Lisbon</td><td class="time"></td><td>On time</td></tr>
+          <tr data-departure="2026-01-15T09:10:00Z"><td>SK 318</td><td>Oslo</td><td class="time"></td><td>Boarding</td></tr>
+          <tr data-departure="2026-01-15T11:45:00Z"><td>SK 527</td><td>Istanbul</td><td class="time"></td><td>Delayed</td></tr>
+        </tbody>
+      </table>
+    </main>
+    <script>
+      // Время вылета хранится в UTC и печатается в часовом поясе браузера, поэтому
+      // timezone_id контекста Playwright меняет то, что видно на табло.
+      const format = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+      for (const row of document.querySelectorAll('#departures tbody tr')) {
+        row.querySelector('.time').textContent = format.format(new Date(row.dataset.departure));
+      }
+    </script>
