@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexlet UI Testing</title>
+    <link rel="stylesheet" href="/assets/ui-testing/style.css" />
+  </head>
+  <body>
+    <a href="/ui-testing">UI testing examples</a>
+    <div class="example">
+      <h3>JavaScript Alerts</h3>
+      <ul>
+        <li><button type="button" onclick="jsAlert()">Click for JS Alert</button></li>
+        <li><button type="button" onclick="jsConfirm()">Click for JS Confirm</button></li>
+        <li><button type="button" onclick="jsPrompt()">Click for JS Prompt</button></li>
+      </ul>
+      <h4>Result:</h4>
+      <p id="result"></p>
+    </div>
+    <script>
+      const show = (text) => {
+        document.getElementById('result').textContent = text;
+      };
+      function jsAlert() {
+        alert('I am a JS Alert');
+        show('You successfully clicked an alert');
+      }
+      function jsConfirm() {
+        show(confirm('I am a JS Confirm') ? 'You clicked: Ok' : 'You clicked: Cancel');
+      }
+      function jsPrompt() {
+        show(`You entered: ${prompt('I am a JS prompt')}`);
+      }
+    </script>
+    <footer>Powered by <a href="https://hexlet.io">Hexlet</a></footer>
+  </body>
+</html>

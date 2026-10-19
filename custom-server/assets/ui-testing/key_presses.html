@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexlet UI Testing</title>
+    <link rel="stylesheet" href="/assets/ui-testing/style.css" />
+  </head>
+  <body>
+    <a href="/ui-testing">UI testing examples</a>
+    <div class="example">
+      <h3>Key Presses</h3>
+      <p>Focus the field and press a key.</p>
+      <label for="target">Field</label>
+      <input type="text" id="target" />
+      <p id="result"></p>
+    </div>
+    <script>
+      document.getElementById('target').addEventListener('keydown', (event) => {
+        document.getElementById('result').textContent = `You entered: ${event.key.toUpperCase()}`;
+      });
+    </script>
+    <footer>Powered by <a href="https://hexlet.io">Hexlet</a></footer>
+  </body>
+</html>

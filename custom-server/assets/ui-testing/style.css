@@ -1,0 +1,19 @@
+body { font: 18px/1.5 system-ui, sans-serif; margin: 40px auto; padding: 0 24px; max-width: 720px; color: #18212d; }
+a { color: #315acc; }
+footer { margin-top: 48px; font-size: 14px; color: #5c6675; }
+label { display: block; margin-top: 16px; }
+input { display: block; box-sizing: border-box; width: 100%; margin-top: 8px; padding: 12px; font: inherit; border: 1px solid #9ca6b4; border-radius: 6px; }
+button, .button { display: inline-block; margin-top: 16px; padding: 10px 24px; font: inherit; color: white; background: #315acc; border: 0; border-radius: 6px; cursor: pointer; text-decoration: none; }
+.flash { margin: 16px 0; padding: 12px 16px; border-radius: 6px; }
+.flash.success { background: #dff3e4; }
+.flash.error { background: #fbe1e1; }
+#menu { display: flex; gap: 16px; margin-top: 8px; }
+#menu[hidden] { display: none; }
+.figure { display: inline-block; position: relative; margin: 16px 16px 0 0; vertical-align: top; }
+.avatar { width: 120px; height: 120px; display: grid; place-items: center; font-size: 40px; color: white; background: #6b7a90; border-radius: 8px; }
+.figcaption { display: none; }
+.figure:hover .figcaption { display: block; }
+.figcaption h5 { margin: 8px 0 0; font-size: 16px; }
+#columns { display: flex; gap: 24px; }
+.column { width: 160px; height: 160px; display: grid; place-items: center; font-size: 40px; background: #e4e9f1; border: 2px solid #9ca6b4; border-radius: 8px; cursor: move; user-select: none; }
+iframe { width: 100%; height: 200px; border: 1px solid #9ca6b4; border-radius: 6px; }

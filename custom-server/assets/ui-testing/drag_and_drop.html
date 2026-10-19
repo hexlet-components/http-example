@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexlet UI Testing</title>
+    <link rel="stylesheet" href="/assets/ui-testing/style.css" />
+  </head>
+  <body>
+    <a href="/ui-testing">UI testing examples</a>
+    <div class="example">
+      <h3>Drag and Drop</h3>
+      <div id="columns">
+        <div class="column" id="column-a"><header>A</header></div>
+        <div class="column" id="column-b"><header>B</header></div>
+      </div>
+    </div>
+    <script>
+      // Перетаскивание собрано на событиях мыши, а не на HTML5 drag and drop:
+      // Actions в Selenium эмулирует мышь, и событий dragstart браузер на неё не шлёт.
+      let source = null;
+      for (const column of document.querySelectorAll('.column')) {
+        column.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+          source = column;
+        });
+        column.addEventListener('mouseup', () => {
+          if (source && source !== column) {
+            const from = source.querySelector('header');
+            const to = column.querySelector('header');
+            [from.textContent, to.textContent] = [to.textContent, from.textContent];
+          }
+          source = null;
+        });
+      }
+      document.addEventListener('mouseup', () => {
+        source = null;
+      });
+    </script>
+    <footer>Powered by <a href="https://hexlet.io">Hexlet</a></footer>
+  </body>
+</html>

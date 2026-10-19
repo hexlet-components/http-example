@@ -1,6 +1,6 @@
 # http-example
 
-Учебный HTTP-сервер Хекслета: [https://http.hexlet.app](https://http.hexlet.app). На него **живьём ходят студенты** из курсов HTTP API, протокол HTTP, Postman и js-playwright, а уроки и самостоятельные работы цитируют его ответы дословно, вплоть до значений полей.
+Учебный HTTP-сервер Хекслета: [https://http.hexlet.app](https://http.hexlet.app). На него **живьём ходят студенты** из курсов HTTP API, протокол HTTP, Postman, js-playwright и курсов Selenium и Playwright, а уроки и самостоятельные работы цитируют его ответы дословно, вплоть до значений полей.
 
 Отсюда главное свойство проекта: **ответы сервера это контент курса**, а не деталь реализации. Правка данных здесь делает неверным текст урока в другом репозитории, и по коду это не видно. Поэтому правила работы с проектом собраны в [AGENTS.md](./AGENTS.md), и читать их стоит до первой правки — там же разобрано, почему наборы данных такого размера, почему они не меняются и какие коды ответов несут уроки.
 
@@ -18,6 +18,24 @@
 | `GET /http-protocol/image.png` | Файл PNG размером 8090 байтов |
 
 Обработчик `body` принимает JSON, `application/x-www-form-urlencoded` и multipart. Для примера с файлом он возвращает его содержимое как строку UTF-8. Лимиты multipart допускают один файл до 64 КиБ и до десяти текстовых полей по 4 КиБ. Исходное тестовое изображение взято из [httpbin](https://httpbin.org/image/png), который распространяется под [лицензией MIT](https://github.com/postmanlabs/httpbin/blob/master/LICENSE).
+
+## Страницы для UI-тестов
+
+Курсы Selenium и Playwright открывают учебные страницы под префиксом `/ui-testing`. Уроки ищут на них элементы и проверяют тексты дословно, поэтому локаторы и надписи этих страниц тоже контент курса.
+
+| Путь | Что на странице |
+| --- | --- |
+| `/ui-testing` | `h1` «Welcome to UI testing» и ссылки на примеры |
+| `/ui-testing/login` | форма `#login` с полями `#username` и `#password`, учётка `student` / `secret123` |
+| `/ui-testing/secure` | закрытый раздел, флеш `#flash`, меню `#menu-button` и ссылка на выход |
+| `/ui-testing/hovers` | карточки `.figure`, подпись `.figcaption h5` видна при наведении |
+| `/ui-testing/drag_and_drop` | колонки `#column-a` и `#column-b`, перетаскивание на событиях мыши |
+| `/ui-testing/key_presses` | поле `#target`, результат в `#result` |
+| `/ui-testing/javascript_alerts` | кнопки `jsAlert()`, `jsConfirm()` и `jsPrompt()` |
+| `/ui-testing/windows` | ссылка «Click Here» открывает новое окно |
+| `/ui-testing/iframe` | фрейм `editor-frame` с абзацем `#content` |
+
+Вход и закрытый раздел собирает `custom-server/src/ui-testing.ts`, остальные страницы лежат статикой в `custom-server/assets/ui-testing/`.
 
 ## Prerequisites
 
