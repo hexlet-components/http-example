@@ -11,6 +11,7 @@ import fastifyCookie from '@fastify/cookie';
 import rawConfig from '../../app.config.json' with { type: 'json' };
 import setUpRpc from './rpc.ts';
 import setUpBodyExamples from './body-examples.ts';
+import setUpUiPages from './ui-pages.ts';
 import setUpSpec from './openapi-spec.ts';
 
 // title в app.config.json нет, и документация всегда отдавалась без заголовка.
@@ -113,6 +114,7 @@ export default async (app: FastifyInstance, _options: unknown) => {
   setUpStaticAssets(app);
 
   await app.register(setUpBodyExamples);
+  await app.register(setUpUiPages);
 
   await setupDocs(app);
 

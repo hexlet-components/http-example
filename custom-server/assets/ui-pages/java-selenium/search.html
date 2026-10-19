@@ -1,0 +1,30 @@
+    <main class="example">
+      <h3>Catalog search</h3>
+      <label for="search">Title or author</label>
+      <input type="search" id="search" autocomplete="off" />
+      <ul id="books">
+        <li>Moby Dick, Herman Melville</li>
+        <li>Treasure Island, Robert Louis Stevenson</li>
+        <li>Pride and Prejudice, Jane Austen</li>
+        <li>Frankenstein, Mary Shelley</li>
+      </ul>
+      <p id="result"></p>
+    </main>
+    <script>
+      const input = document.getElementById('search');
+      const books = [...document.querySelectorAll('#books li')];
+      const filter = () => {
+        const query = input.value.trim().toLowerCase();
+        const found = books.filter((book) => {
+          book.hidden = !book.textContent.toLowerCase().includes(query);
+          return !book.hidden;
+        });
+        return found.length;
+      };
+      input.addEventListener('input', filter);
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          document.getElementById('result').textContent = `Found: ${filter()}`;
+        }
+      });
+    </script>

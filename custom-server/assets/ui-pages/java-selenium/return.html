@@ -1,0 +1,12 @@
+    <main class="example">
+      <h3>Return a book</h3>
+      <p>Moby Dick, Herman Melville. Due in 7 days.</p>
+      <button type="button" id="return-book">Return the book</button>
+      <p id="result"></p>
+    </main>
+    <script>
+      document.getElementById('return-book').addEventListener('click', () => {
+        const returned = confirm('Return Moby Dick to the library?');
+        document.getElementById('result').textContent = returned ? 'The book is returned.' : 'The book stays on your shelf.';
+      });
+    </script>
