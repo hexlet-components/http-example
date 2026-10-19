@@ -21,21 +21,21 @@
 
 ## Страницы для UI-тестов
 
-Курсы Selenium и Playwright открывают учебные страницы под префиксом `/ui-testing`. Уроки ищут на них элементы и проверяют тексты дословно, поэтому локаторы и надписи этих страниц тоже контент курса.
+Курсы Selenium и Playwright открывают учебные страницы под префиксом своего курса: `/java-selenium`, `/python-selenium`, `/python-playwright`. Страницы у всех одни, ссылки внутри и сессия у каждого курса свои. Уроки ищут на страницах элементы и проверяют тексты дословно, поэтому локаторы и надписи тоже контент курса. В таблице префикс курса обозначен `<курс>`.
 
 | Путь | Что на странице |
 | --- | --- |
-| `/ui-testing` | `h1` «Welcome to UI testing» и ссылки на примеры |
-| `/ui-testing/login` | форма `#login` с полями `#username` и `#password`, учётка `student` / `secret123` |
-| `/ui-testing/secure` | закрытый раздел, флеш `#flash`, меню `#menu-button` и ссылка на выход |
-| `/ui-testing/hovers` | карточки `.figure`, подпись `.figcaption h5` видна при наведении |
-| `/ui-testing/drag_and_drop` | колонки `#column-a` и `#column-b`, перетаскивание на событиях мыши |
-| `/ui-testing/key_presses` | поле `#target`, результат в `#result` |
-| `/ui-testing/javascript_alerts` | кнопки `jsAlert()`, `jsConfirm()` и `jsPrompt()` |
-| `/ui-testing/windows` | ссылка «Click Here» открывает новое окно |
-| `/ui-testing/iframe` | фрейм `editor-frame` с абзацем `#content` |
+| `/<курс>` | `h1` «Welcome to UI testing» и ссылки на примеры |
+| `/<курс>/login` | форма `#login` с полями `#username` и `#password`, учётка `student` / `secret123` |
+| `/<курс>/secure` | закрытый раздел, флеш `#flash`, меню `#menu-button` и ссылка на выход |
+| `/<курс>/hovers` | карточки `.figure`, подпись `.figcaption h5` видна при наведении |
+| `/<курс>/drag_and_drop` | колонки `#column-a` и `#column-b`, перетаскивание на событиях мыши |
+| `/<курс>/key_presses` | поле `#target`, результат в `#result` |
+| `/<курс>/javascript_alerts` | кнопки `jsAlert()`, `jsConfirm()` и `jsPrompt()` |
+| `/<курс>/windows` | ссылка «Click Here» открывает новое окно |
+| `/<курс>/iframe` | фрейм `editor-frame` с абзацем `#content` |
 
-Вход и закрытый раздел собирает `custom-server/src/ui-testing.ts`, остальные страницы лежат статикой в `custom-server/assets/ui-testing/`.
+Вход и закрытый раздел собирает `custom-server/src/ui-pages.ts`, остальные страницы лежат шаблонами в `custom-server/assets/ui-pages/`, префикс в них записан как `{{prefix}}`. Список курсов задаёт `courses` в том же модуле.
 
 ## Prerequisites
 
