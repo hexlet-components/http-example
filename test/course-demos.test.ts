@@ -14,6 +14,12 @@ beforeAll(async () => {
 afterAll(() => app.close());
 
 describe('Куки и условные запросы', () => {
+  it('форма входа отправляет имя на страницу сессии', async () => {
+    const page = await client.send('/http-for-automation/login-form');
+    expect(page.status).toBe(200);
+    expect(page.body).toContain('action="/http-for-automation/session"');
+  });
+
   it('вход выдаёт куки, которая меняет ответ страницы сессии', async () => {
     expect((await client.send('/http-for-automation/session')).body).toBe('Guest');
     const login = await client.send('/http-for-automation/session', {
