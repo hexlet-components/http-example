@@ -16,7 +16,7 @@ interface Inbox {
 
 export default async function setUpWebhookExamples(app: FastifyInstance) {
   const inboxes = createDemoStore<Inbox>();
-  const prefix = '/http-protocol/webhooks/inboxes';
+  const prefix = '/http-for-automation/webhooks/inboxes';
   app.post(prefix, (_request, reply) => {
     const id = inboxes.create({ subscribed: false, delivering: false, nextEvent: 1, events: [] });
     if (!id) return reply.code(503).send({ error: 'demo_capacity_reached' });

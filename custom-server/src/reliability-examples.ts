@@ -17,7 +17,7 @@ interface Run {
 }
 export default async function setUpReliabilityExamples(app: FastifyInstance) {
   const runs = createDemoStore<Run>();
-  const prefix = '/http-protocol/reliability/runs';
+  const prefix = '/http-for-automation/reliability/runs';
   app.post(prefix, (_request, reply) => {
     const id = runs.create({
       temporaryAttempts: 0,

@@ -54,22 +54,22 @@
 
 ## Демонстрации HTTP для автоматизации
 
-Курс использует отдельные обработчики сессии, кеширования, событий и повторных запросов. Общие коллекции задач, пользователей и публикаций сохраняются.
+Обработчики сессии, кеширования, событий и повторных запросов живут под префиксом курса `/http-for-automation`. Общие коллекции задач, пользователей и публикаций сохраняются.
 
 | Метод и путь | Результат |
 | --- | --- |
-| `GET /http-protocol/login-form` | Форма с учебным именем `student` |
-| `POST /http-protocol/session` | Куки `session=hexlet-demo` на пять минут |
-| `GET /http-protocol/session` | `Guest` без куки, `Welcome, student!` с учебной куки |
-| `DELETE /http-protocol/session` | Удаление куки клиента |
-| `GET /http-protocol/cache` | Расписание, `ETag` и `private, max-age=60` |
-| `GET /http-protocol/cache/revalidate` | То же расписание с `no-cache` |
-| `GET /http-protocol/cache/no-store` | То же расписание с `no-store` |
-| `POST /http-protocol/webhooks/inboxes` | Новый приёмник, его `callback_url` и `events_url` |
-| `POST /http-protocol/webhooks/inboxes/{id}/subscription` | Подписка с полученным `callback_url` |
-| `POST /http-protocol/webhooks/inboxes/{id}/trigger` | Отправка учебного события настоящим HTTP-запросом в свой приёмник |
-| `GET /http-protocol/webhooks/inboxes/{id}/events` | Сохранённые входящие сообщения и ответы приёмника |
-| `POST /http-protocol/reliability/runs` | Новый отдельный опыт с `run_id` и `base_url` |
+| `GET /http-for-automation/login-form` | Форма с учебным именем `student` |
+| `POST /http-for-automation/session` | Куки `session=hexlet-demo` на пять минут |
+| `GET /http-for-automation/session` | `Guest` без куки, `Welcome, student!` с учебной куки |
+| `DELETE /http-for-automation/session` | Удаление куки клиента |
+| `GET /http-for-automation/cache` | Расписание, `ETag` и `private, max-age=60` |
+| `GET /http-for-automation/cache/revalidate` | То же расписание с `no-cache` |
+| `GET /http-for-automation/cache/no-store` | То же расписание с `no-store` |
+| `POST /http-for-automation/webhooks/inboxes` | Новый приёмник, его `callback_url` и `events_url` |
+| `POST /http-for-automation/webhooks/inboxes/{id}/subscription` | Подписка с полученным `callback_url` |
+| `POST /http-for-automation/webhooks/inboxes/{id}/trigger` | Отправка учебного события настоящим HTTP-запросом в свой приёмник |
+| `GET /http-for-automation/webhooks/inboxes/{id}/events` | Сохранённые входящие сообщения и ответы приёмника |
+| `POST /http-for-automation/reliability/runs` | Новый отдельный опыт с `run_id` и `base_url` |
 | `GET {base_url}/temporary` | Первый ответ 503 с `Retry-After: 1`, следующий 200 |
 | `GET {base_url}/limited` | 429 с `Retry-After: 1`, после ожидания 200 |
 | `GET {base_url}/slow` | Ответ через две секунды для проверки таймаута |
