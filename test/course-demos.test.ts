@@ -15,8 +15,8 @@ afterAll(() => app.close());
 
 describe('Куки и условные запросы', () => {
   it('вход выдаёт куки, которая меняет ответ страницы сессии', async () => {
-    expect((await client.send('/http-protocol/session')).body).toBe('Guest');
-    const login = await client.send('/http-protocol/session', {
+    expect((await client.send('/http-for-automation/session')).body).toBe('Guest');
+    const login = await client.send('/http-for-automation/session', {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       payload: 'username=student',
@@ -26,27 +26,27 @@ describe('Куки и условные запросы', () => {
     expect(login.headers['set-cookie']).toContain('session=hexlet-demo');
     expect(login.headers['set-cookie']).toContain('Max-Age=300');
     expect(login.headers['set-cookie']).toContain('HttpOnly; Secure; SameSite=Lax');
-    const member = await client.send('/http-protocol/session', { headers: { cookie: 'session=hexlet-demo' } });
+    const member = await client.send('/http-for-automation/session', { headers: { cookie: 'session=hexlet-demo' } });
     expect(member.body).toBe('Welcome, student!');
     expect(member.headers['cache-control']).toBe('no-store');
-    expect((await client.send('/http-protocol/session', { method: 'DELETE' })).headers['set-cookie']).toContain(
+    expect((await client.send('/http-for-automation/session', { method: 'DELETE' })).headers['set-cookie']).toContain(
       'Max-Age=0',
     );
   });
   it('подтверждает версию без тела и отличает no-cache от no-store', async () => {
-    const first = await client.send('/http-protocol/cache');
+    const first = await client.send('/http-for-automation/cache');
     expect(first.body).toBe('Office hours: 09:00-18:00');
     expect(first.headers['content-length']).toBe('25');
     expect(first.headers['cache-control']).toBe('private, max-age=60');
-    const match = await client.send('/http-protocol/cache', { headers: { 'if-none-match': first.headers.etag } });
+    const match = await client.send('/http-for-automation/cache', { headers: { 'if-none-match': first.headers.etag } });
     expect(match.status).toBe(304);
     expect(match.body).toBe('');
     expect(match.headers['content-length']).toBeUndefined();
-    expect((await client.send('/http-protocol/cache', { headers: { 'if-none-match': '"old-version"' } })).status).toBe(
-      200,
-    );
-    expect((await client.send('/http-protocol/cache/revalidate')).headers['cache-control']).toBe('no-cache');
-    const noStore = await client.send('/http-protocol/cache/no-store', {
+    expect(
+      (await client.send('/http-for-automation/cache', { headers: { 'if-none-match': '"old-version"' } })).status,
+    ).toBe(200);
+    expect((await client.send('/http-for-automation/cache/revalidate')).headers['cache-control']).toBe('no-cache');
+    const noStore = await client.send('/http-for-automation/cache/no-store', {
       headers: { 'if-none-match': first.headers.etag },
     });
     expect(noStore.status).toBe(200);
@@ -57,8 +57,8 @@ describe('Куки и условные запросы', () => {
 
 describe('Доставка вебхука', () => {
   it('требует подписку и делает настоящий HTTP-запрос в отдельный приёмник', async () => {
-    const created = await client.json('/http-protocol/webhooks/inboxes', 'POST');
-    const prefix = `/http-protocol/webhooks/inboxes/${created.body.inbox_id}`;
+    const created = await client.json('/http-for-automation/webhooks/inboxes', 'POST');
+    const prefix = `/http-for-automation/webhooks/inboxes/${created.body.inbox_id}`;
     expect(created.status).toBe(201);
     expect((await client.json(`${prefix}/trigger`, 'POST')).status).toBe(409);
     const unsafe = await client.json(`${prefix}/subscription`, 'POST', { callback_url: 'http://127.0.0.1/admin' });
@@ -75,14 +75,14 @@ describe('Доставка вебхука', () => {
       response_status: 204,
       body: { event_id: 'evt-1', type: 'task.created', data: { id: 101, title: 'Check the webhook' } },
     });
-    const other = await client.json('/http-protocol/webhooks/inboxes', 'POST');
-    expect((await client.send(`/http-protocol/webhooks/inboxes/${other.body.inbox_id}/events`)).body.events).toEqual(
-      [],
-    );
+    const other = await client.json('/http-for-automation/webhooks/inboxes', 'POST');
+    expect(
+      (await client.send(`/http-for-automation/webhooks/inboxes/${other.body.inbox_id}/events`)).body.events,
+    ).toEqual([]);
   });
   it('отклоняет сообщение без учебного подтверждения источника', async () => {
-    const inbox = await client.json('/http-protocol/webhooks/inboxes', 'POST');
-    const denied = await client.json(`/http-protocol/webhooks/inboxes/${inbox.body.inbox_id}`, 'POST', {
+    const inbox = await client.json('/http-for-automation/webhooks/inboxes', 'POST');
+    const denied = await client.json(`/http-for-automation/webhooks/inboxes/${inbox.body.inbox_id}`, 'POST', {
       event_id: 'evt-1',
       type: 'task.created',
       data: { id: 101, title: 'Check the webhook' },
@@ -92,9 +92,9 @@ describe('Доставка вебхука', () => {
 });
 
 const createRun = async () => {
-  const reply = await client.json('/http-protocol/reliability/runs', 'POST');
+  const reply = await client.json('/http-for-automation/reliability/runs', 'POST');
   expect(reply.status).toBe(201);
-  return `/http-protocol/reliability/runs/${reply.body.run_id}`;
+  return `/http-for-automation/reliability/runs/${reply.body.run_id}`;
 };
 
 describe('Управляемые сбои HTTP', () => {
