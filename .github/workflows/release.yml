@@ -13,8 +13,7 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
+permissions: {}
 
 # Прогон на пуллреквесте отменяется новым коммитом, а прогон на main нет:
 # отменённая публикация образа оставила бы main без свежего образа.
@@ -26,6 +25,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -33,6 +34,8 @@ jobs:
           persist-credentials: false
 
       - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5
+        with:
+          cache: false
 
       - name: Install
         run: mise run setup
