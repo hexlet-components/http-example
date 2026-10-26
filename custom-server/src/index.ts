@@ -173,6 +173,8 @@ export default async (app: FastifyInstance, _options: unknown) => {
 
   app.get('/http-protocol', (req, res) => res.sendFile('http-protocol/index.html'));
 
+  app.get('/http-for-automation', (req, res) => res.sendFile('http-for-automation/index.html'));
+
   app.get('/http-protocol/removed', (req, res) => res.code(301).redirect('/http-protocol/example'));
 
   app.get('/js-playwright/users-list', (req, res) => res.sendFile('users-list/index.html'));

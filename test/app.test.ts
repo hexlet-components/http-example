@@ -34,6 +34,15 @@ describe('документация и статика', () => {
     expect((await client.send('/')).status).toBe(200);
   });
 
+  it.each(['/', '/http-for-automation'])('ссылки со страницы %s живые', async (page) => {
+    const html = String((await client.send(page)).body);
+    const links = [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      expect({ link, status: (await client.send(link)).status }).not.toEqual({ link, status: 404 });
+    }
+  });
+
   it('несуществующий адрес → 404 с кодом в теле', async () => {
     const reply = await client.send('/nosuch');
     expect(reply.status).toBe(404);
