@@ -1,0 +1,37 @@
+    <main class="example">
+      <h1>Packing list</h1>
+      <input id="new-item" aria-label="New item" placeholder="What do you need to pack?" autofocus />
+      <ul id="items"></ul>
+      <p data-testid="items-left">Nothing to pack yet</p>
+    </main>
+    <script>
+      const input = document.getElementById('new-item');
+      const list = document.getElementById('items');
+      const counter = document.querySelector('[data-testid="items-left"]');
+
+      const update = () => {
+        const left = list.querySelectorAll('input:not(:checked)').length;
+        const total = list.children.length;
+        counter.textContent = total === 0 ? 'Nothing to pack yet' : `${left} of ${total} left to pack`;
+      };
+
+      input.addEventListener('keydown', (event) => {
+        const title = input.value.trim();
+        if (event.key !== 'Enter' || !title) return;
+        const item = document.createElement('li');
+        item.dataset.testid = 'item';
+        item.innerHTML = '<input type="checkbox" aria-label="Packed" /><label data-testid="item-title"></label><button type="button">Delete</button>';
+        item.querySelector('label').textContent = title;
+        item.querySelector('input').addEventListener('change', (change) => {
+          item.classList.toggle('packed', change.target.checked);
+          update();
+        });
+        item.querySelector('button').addEventListener('click', () => {
+          item.remove();
+          update();
+        });
+        list.append(item);
+        input.value = '';
+        update();
+      });
+    </script>

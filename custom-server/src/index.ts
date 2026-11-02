@@ -12,6 +12,7 @@ import rawConfig from '../../app.config.json' with { type: 'json' };
 import setUpRpc from './rpc.ts';
 import setUpBodyExamples from './body-examples.ts';
 import setUpUiPages from './ui-pages.ts';
+import setUpPythonPlaywright from './python-playwright.ts';
 import setUpSessionCacheExamples from './session-cache-examples.ts';
 import setUpWebhookExamples from './webhook-examples.ts';
 import setUpReliabilityExamples from './reliability-examples.ts';
@@ -118,6 +119,7 @@ export default async (app: FastifyInstance, _options: unknown) => {
 
   await app.register(setUpBodyExamples);
   await app.register(setUpUiPages);
+  await app.register(setUpPythonPlaywright);
   await app.register(setUpSessionCacheExamples);
   await app.register(setUpWebhookExamples);
   await app.register(setUpReliabilityExamples);

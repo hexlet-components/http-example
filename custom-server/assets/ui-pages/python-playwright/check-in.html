@@ -1,0 +1,95 @@
+    <main class="example">
+      <h1>Online check-in</h1>
+      <baggage-allowance></baggage-allowance>
+      <form id="check-in-form">
+        <label for="first-name">First name</label>
+        <input id="first-name" />
+        <label for="last-name">Last name</label>
+        <input id="last-name" />
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="name@example.com" />
+        <label for="birth-date">Date of birth</label>
+        <input id="birth-date" type="date" />
+        <label for="seat">Seat preference</label>
+        <select id="seat">
+          <option value="window">Window</option>
+          <option value="aisle">Aisle</option>
+          <option value="middle">Middle</option>
+        </select>
+        <label for="assistance">Special assistance</label>
+        <select id="assistance" multiple>
+          <option value="wheelchair">Wheelchair</option>
+          <option value="hearing">Hearing</option>
+          <option value="visual">Visual</option>
+        </select>
+        <span id="meal-label" class="label">Meal</span>
+        <div class="dropdown">
+          <button type="button" id="meal" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="meal-label meal">Standard</button>
+          <ul id="meal-options" role="listbox" aria-labelledby="meal-label" hidden>
+            <li role="option" aria-selected="true">Standard</li>
+            <li role="option" aria-selected="false">Vegetarian</li>
+            <li role="option" aria-selected="false">Vegan</li>
+          </ul>
+        </div>
+        <fieldset>
+          <legend>Cabin class</legend>
+          <label class="choice"><input type="radio" name="cabin" value="economy" checked /> Economy</label>
+          <label class="choice"><input type="radio" name="cabin" value="business" /> Business</label>
+        </fieldset>
+        <label class="choice"><input type="checkbox" id="terms" /> I accept the terms</label>
+        <label class="choice"><input type="checkbox" id="offers" checked /> Send me travel offers</label>
+        <label class="choice"><input type="checkbox" id="sms" /> Text me flight updates</label>
+        <label for="passport">Passport scan</label>
+        <input id="passport" type="file" />
+        <label for="documents">Travel documents</label>
+        <input id="documents" type="file" multiple />
+        <button type="submit" data-testid="check-in">Check in</button>
+      </form>
+      <p class="error" hidden>Accept the terms to check in.</p>
+      <p class="result" hidden></p>
+    </main>
+    <script>
+      // Содержимое в теневом DOM: локаторы Playwright проходят его границу сами.
+      customElements.define(
+        'baggage-allowance',
+        class extends HTMLElement {
+          constructor() {
+            super();
+            this.attachShadow({ mode: 'open' }).innerHTML = '<p>Baggage allowance: 23 kg</p>';
+          }
+        },
+      );
+
+      // Список питания собран не на <select>: select_option с ним не работает,
+      // выбирают двумя кликами, по кнопке и по варианту.
+      const meal = document.getElementById('meal');
+      const options = document.getElementById('meal-options');
+      meal.addEventListener('click', () => {
+        options.hidden = !options.hidden;
+        meal.setAttribute('aria-expanded', String(!options.hidden));
+      });
+      for (const option of options.querySelectorAll('[role="option"]')) {
+        option.addEventListener('click', () => {
+          for (const other of options.children) other.setAttribute('aria-selected', 'false');
+          option.setAttribute('aria-selected', 'true');
+          meal.textContent = option.textContent;
+          options.hidden = true;
+          meal.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      // Подтверждение приходит через секунду, как от настоящего сервера:
+      // assert сразу после клика его не застаёт, expect дожидается.
+      document.getElementById('check-in-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const error = document.querySelector('.error');
+        const result = document.querySelector('.result');
+        result.hidden = true;
+        error.hidden = document.getElementById('terms').checked;
+        if (!error.hidden) return;
+        setTimeout(() => {
+          result.textContent = 'Checked in';
+          result.hidden = false;
+        }, 1000);
+      });
+    </script>

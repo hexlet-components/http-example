@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payment</title>
+    <link rel="stylesheet" href="/assets/ui-pages/style.css" />
+  </head>
+  <body>
+    <form id="pay">
+      <label for="card">Card number</label>
+      <input id="card" inputmode="numeric" />
+      <label for="cvc">CVC</label>
+      <input id="cvc" inputmode="numeric" />
+      <button type="submit">Pay 25 EUR</button>
+    </form>
+    <p id="paid" hidden>Payment accepted</p>
+    <script>
+      document.getElementById('pay').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const filled = document.getElementById('card').value && document.getElementById('cvc').value;
+        document.getElementById('paid').hidden = !filled;
+      });
+    </script>
+  </body>
+</html>
