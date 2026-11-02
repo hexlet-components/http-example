@@ -115,8 +115,8 @@ export const apps: Record<string, UiApp> = {
     title: 'Departures',
     credentials: { username: 'passenger', password: 'flight123' },
     extraAccounts: [
-      { username: 'agent', password: 'staff123', home: '/staff' },
-      { username: 'blocked', password: 'flight123', home: '/trips', locked: true },
+      { username: 'agent', password: 'staff123', home: '/staff' }, // betterleaks:allow учебная учётка, напечатана в уроках
+      { username: 'blocked', password: 'flight123', home: '/trips', locked: true }, // betterleaks:allow учебная учётка, напечатана в уроках
     ],
     securePath: '/trips',
     texts: {

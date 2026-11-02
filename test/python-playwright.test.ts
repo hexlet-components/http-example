@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
 import { bookings, departures } from '../custom-server/src/python-playwright.ts';
+import { apps } from '../custom-server/src/ui-pages.ts';
 import { buildApp, createClient } from './helpers.ts';
 
 let app: FastifyInstance;
@@ -15,6 +16,11 @@ beforeAll(async () => {
 afterAll(() => app.close());
 
 const prefix = '/python-playwright';
+
+// Учётки берутся из конфига, как в ui-pages.test.ts: пароль литералом в тесте
+// сканер секретов принимает за утечку.
+const { credentials, extraAccounts = [] } = apps['python-playwright'];
+const [staff, blocked] = extraAccounts;
 
 const cookieHeader = (headers: Record<string, any>) =>
   [headers['set-cookie']]
@@ -122,7 +128,7 @@ describe('вход Departures', () => {
   });
 
   it('пассажир попадает в свои поездки, токен ложится в localStorage', async () => {
-    const reply = await logIn('passenger', 'flight123');
+    const reply = await logIn(credentials.username, credentials.password);
     expect(reply.headers.location).toBe(`${prefix}/trips`);
     const trips = await client.send(`${prefix}/trips`, { headers: { cookie: cookieHeader(reply.headers) } });
     expect(trips.body).toContain("localStorage.setItem('auth_token', 'passenger-token')");
@@ -131,14 +137,14 @@ describe('вход Departures', () => {
   });
 
   it('сотрудник попадает в список пассажиров, пассажиру он закрыт', async () => {
-    const agent = await logIn('agent', 'staff123');
-    expect(agent.headers.location).toBe(`${prefix}/staff`);
-    const staff = await client.send(`${prefix}/staff`, { headers: { cookie: cookieHeader(agent.headers) } });
-    expect(staff.status).toBe(200);
-    expect(staff.body).toContain('<h2>Passenger list</h2>');
-    expect(staff.body).toContain('<td>Lena Novak</td>');
+    const staffLogin = await logIn(staff.username, staff.password);
+    expect(staffLogin.headers.location).toBe(`${prefix}/staff`);
+    const staffPage = await client.send(`${prefix}/staff`, { headers: { cookie: cookieHeader(staffLogin.headers) } });
+    expect(staffPage.status).toBe(200);
+    expect(staffPage.body).toContain('<h2>Passenger list</h2>');
+    expect(staffPage.body).toContain('<td>Lena Novak</td>');
 
-    const passenger = await logIn('passenger', 'flight123');
+    const passenger = await logIn(credentials.username, credentials.password);
     const denied = await client.send(`${prefix}/staff`, { headers: { cookie: cookieHeader(passenger.headers) } });
     expect(denied.status).toBe(403);
     expect(denied.body).toContain('<h2>Access denied</h2>');
@@ -163,12 +169,15 @@ describe('API Departures', () => {
   });
 
   it('вход через API отдаёт токен и открывает сессию браузера', async () => {
-    const reply = await client.json(`${prefix}/api/login`, 'POST', { username: 'passenger', password: 'flight123' });
+    const reply = await client.json(`${prefix}/api/login`, 'POST', credentials);
     expect(reply.body).toEqual({ token: 'passenger-token' });
     const trips = await client.send(`${prefix}/trips`, { headers: { cookie: cookieHeader(reply.headers) } });
     expect(trips.status).toBe(200);
 
-    const wrong = await client.json(`${prefix}/api/login`, 'POST', { username: 'blocked', password: 'flight123' });
+    const wrong = await client.json(`${prefix}/api/login`, 'POST', {
+      username: blocked.username,
+      password: blocked.password,
+    });
     expect(wrong.status).toBe(401);
   });
 
