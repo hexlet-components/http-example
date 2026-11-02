@@ -47,8 +47,16 @@
 
 | Путь | Сценарий |
 | --- | --- |
-| `/python-playwright` | табло `#departures`, время вылета печатается в часовом поясе браузера, на узком экране строки складываются в карточки |
-| `/python-playwright/login` → `/trips` | вход пассажира `passenger` / `flight123`, «My trips» |
+| `/python-playwright` | табло `#departures` грузит рейсы запросом `api/departures`, время вылета печатается в часовом поясе браузера, часы `current-time`, на узком экране строки складываются в карточки, ссылки шапки уходят за кнопку «Navigation», блок «Travel alerts» прячется |
+| `/python-playwright/login` → `/trips` | вход пассажира `passenger` / `flight123`, «My trips», «Flight updates», токен `auth_token` в localStorage, выход по бездействию через пять минут на `/session-expired` |
+| `/python-playwright/login` → `/staff` | вход сотрудника `agent` / `staff123`, «Passenger list», пассажиру отвечает 403 «Access denied» |
+| `/python-playwright/login` | `blocked` / `flight123` заблокирован, пустые поля дают «Username is required.» и «Password is required.» |
+| `/python-playwright/packing` | список вещей вместо todomvc: поле «What do you need to pack?», `item`, `item-title`, счётчик `items-left` |
+| `/python-playwright/check-in` | форма регистрации: подписи, `select` и множественный `select`, кастомный список «Meal», radio, чекбоксы, загрузка файлов, теневой DOM; «Checked in» появляется через секунду |
+| `/python-playwright/boarding-pass` | `confirm` и `prompt`, «Airport map» в новой вкладке, оплата во фрейме `#payment`, скачивания `boarding-pass.pdf` и `trips.csv`, диалог выбора файла по «Attach visa» |
+| `/python-playwright/extras` | доп. услуги `.extra` со счётчиком `extras-count`, промокод `WINTER26` действует до 1 января 2027 года по часам браузера |
+
+API курса лежит под тем же префиксом и набор данных не меняет. `GET api/departures` фильтруется параметром `status`. `POST api/login` отдаёт токен `<учётка>-token` и открывает сессию браузера. `api/bookings` закрыт заголовком `Authorization: Bearer <токен>`: GET списка и записи, POST отвечает 201 (без `flight` или `passenger` 422), PUT и PATCH отвечают изменённой записью, DELETE отвечает 204.
 
 У всех трёх одинаковое устройство входа. Форма `#login` с полями `#username` и `#password` и кнопкой `button.primary[data-test=login-button]`, флеш-сообщение `#flash`, выход по `/<курс>/logout`. Приложения описаны конфигом `apps` в `custom-server/src/ui-pages.ts`, страницы лежат фрагментами в `custom-server/assets/ui-pages/<курс>/`, префикс в них записан как `{{prefix}}`.
 

@@ -1,0 +1,40 @@
+    <main class="example">
+      <h1>Extras</h1>
+      <p>Selected extras: <span data-testid="extras-count">0</span></p>
+      <ul id="extras">
+        <li class="extra"><h3>Priority boarding</h3><p class="price">15 EUR</p><button type="button">Add to trip</button></li>
+        <li class="extra"><h3>Extra legroom</h3><p class="price">30 EUR</p><button type="button">Add to trip</button></li>
+        <li class="extra"><h3>Lounge access</h3><p class="price">40 EUR</p><button type="button">Add to trip</button></li>
+        <li class="extra"><h3>Checked bag</h3><p class="price">25 EUR</p><button type="button">Add to trip</button></li>
+      </ul>
+      <form id="promo">
+        <label for="promo-code">Promo code</label>
+        <input id="promo-code" />
+        <button type="submit">Apply</button>
+      </form>
+      <p id="promo-result" role="status"></p>
+    </main>
+    <script>
+      const count = document.querySelector('[data-testid="extras-count"]');
+      for (const button of document.querySelectorAll('.extra button')) {
+        button.addEventListener('click', () => {
+          button.textContent = 'Added';
+          button.disabled = true;
+          count.textContent = String(Number(count.textContent) + 1);
+        });
+      }
+
+      // Промокод действует до конца 2026 года по часам браузера, поэтому
+      // page.clock.set_fixed_time переключает ответ без ожидания реальной даты.
+      document.getElementById('promo').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const result = document.getElementById('promo-result');
+        if (document.getElementById('promo-code').value.trim() !== 'WINTER26') {
+          result.textContent = 'Unknown promo code';
+        } else if (new Date() < new Date(2027, 0, 1)) {
+          result.textContent = '20% off';
+        } else {
+          result.textContent = 'Promo code expired';
+        }
+      });
+    </script>

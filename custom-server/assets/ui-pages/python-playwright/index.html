@@ -1,23 +1,60 @@
     <main>
-      <a href="{{prefix}}/login">My trips</a>
       <h1 class="heading">Departures</h1>
       <p id="timezone">Times are shown in your time zone.</p>
+      <p>Airport time: <span data-testid="current-time"></span></p>
+      <p><span id="flights-count" title="Flights today"></span></p>
       <table id="departures">
         <thead>
-          <tr><th>Flight</th><th>Destination</th><th>Time</th><th>Status</th></tr>
+          <tr><th>Flight</th><th>Destination</th><th>Time</th><th>Status</th><th>Gate</th></tr>
         </thead>
-        <tbody>
-          <tr data-departure="2026-01-15T08:30:00Z"><td>SK 204</td><td>Lisbon</td><td class="time"></td><td>On time</td></tr>
-          <tr data-departure="2026-01-15T09:10:00Z"><td>SK 318</td><td>Oslo</td><td class="time"></td><td>Boarding</td></tr>
-          <tr data-departure="2026-01-15T11:45:00Z"><td>SK 527</td><td>Istanbul</td><td class="time"></td><td>Delayed</td></tr>
-        </tbody>
+        <tbody></tbody>
       </table>
+      <p id="empty" hidden>No departures right now.</p>
+      <p id="error" hidden>Departures are unavailable. Try again later.</p>
     </main>
+    <aside aria-label="Travel alerts">
+      <h2>Travel alerts</h2>
+      <p>Expect longer security lines on Friday morning.</p>
+    </aside>
     <script>
       // Время вылета хранится в UTC и печатается в часовом поясе браузера, поэтому
       // timezone_id контекста Playwright меняет то, что видно на табло.
       const format = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
-      for (const row of document.querySelectorAll('#departures tbody tr')) {
-        row.querySelector('.time').textContent = format.format(new Date(row.dataset.departure));
-      }
+      const clock = document.querySelector('[data-testid="current-time"]');
+      const tick = () => {
+        clock.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      };
+      tick();
+      setInterval(tick, 1000);
+
+      // Рейсы приходят отдельным запросом: урок про моки подменяет его ответ
+      // через page.route и видит пустое табло или ошибку загрузки.
+      const render = (flights) => {
+        const body = document.querySelector('#departures tbody');
+        for (const item of flights) {
+          const row = document.createElement('tr');
+          row.dataset.departure = item.departure;
+          const slug = item.status.toLowerCase().replaceAll(' ', '-');
+          row.innerHTML = `<td data-testid="flight-number"></td><td></td><td class="time"></td><td class="status status-${slug}"></td><td></td>`;
+          const cells = row.querySelectorAll('td');
+          cells[0].textContent = item.flight;
+          cells[1].textContent = item.destination;
+          cells[2].textContent = format.format(new Date(item.departure));
+          cells[3].textContent = item.status;
+          cells[4].textContent = item.gate;
+          body.append(row);
+        }
+        document.getElementById('flights-count').textContent = `${flights.length} flights`;
+        document.getElementById('empty').hidden = flights.length > 0;
+      };
+
+      fetch('{{prefix}}/api/departures')
+        .then((response) => {
+          if (!response.ok) throw new Error(String(response.status));
+          return response.json();
+        })
+        .then(render)
+        .catch(() => {
+          document.getElementById('error').hidden = false;
+        });
     </script>

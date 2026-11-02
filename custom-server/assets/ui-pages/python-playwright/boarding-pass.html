@@ -1,0 +1,33 @@
+    <main class="example">
+      <h1>Boarding pass</h1>
+      <p>Anna Berg, flight SK 204 to Lisbon, seat 14A.</p>
+      <p><a href="{{prefix}}/boarding-pass.pdf">Download boarding pass</a></p>
+      <p><a href="{{prefix}}/trips.csv">Export trips (CSV)</a></p>
+      <p><a href="{{prefix}}/airport-map" target="_blank">Airport map</a></p>
+      <button type="button" id="add-companion">Add companion</button>
+      <p id="companion"></p>
+      <button type="button" id="attach-visa">Attach visa</button>
+      <input type="file" id="visa" hidden />
+      <p id="visa-name"></p>
+      <h2>Seat upgrade</h2>
+      <iframe id="payment" title="Payment" src="{{prefix}}/payment"></iframe>
+      <button type="button" id="cancel">Cancel check-in</button>
+      <p id="status"></p>
+    </main>
+    <script>
+      document.getElementById('cancel').addEventListener('click', () => {
+        const status = document.getElementById('status');
+        status.textContent = confirm('Cancel your check-in?') ? 'Check-in cancelled' : 'Check-in kept';
+      });
+      document.getElementById('add-companion').addEventListener('click', () => {
+        const name = prompt('Companion name');
+        if (name) document.getElementById('companion').textContent = `Companion: ${name}`;
+      });
+      // Поле файла скрыто, диалог выбора открывает кнопка: это сценарий для
+      // expect_file_chooser, set_input_files здесь искать нечего.
+      const visa = document.getElementById('visa');
+      document.getElementById('attach-visa').addEventListener('click', () => visa.click());
+      visa.addEventListener('change', () => {
+        document.getElementById('visa-name').textContent = `Attached: ${visa.files[0].name}`;
+      });
+    </script>
