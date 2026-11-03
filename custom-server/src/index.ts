@@ -16,6 +16,7 @@ import setUpPythonPlaywright from './python-playwright.ts';
 import setUpSessionCacheExamples from './session-cache-examples.ts';
 import setUpWebhookExamples from './webhook-examples.ts';
 import setUpReliabilityExamples from './reliability-examples.ts';
+import setUpWorkflowShop from './workflow-shop.ts';
 import setUpSpec from './openapi-spec.ts';
 
 // title в app.config.json нет, и документация всегда отдавалась без заголовка.
@@ -123,6 +124,7 @@ export default async (app: FastifyInstance, _options: unknown) => {
   await app.register(setUpSessionCacheExamples);
   await app.register(setUpWebhookExamples);
   await app.register(setUpReliabilityExamples);
+  await app.register(setUpWorkflowShop);
 
   await setupDocs(app);
 

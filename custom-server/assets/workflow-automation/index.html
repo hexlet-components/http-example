@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order stream API</title>
+  <style>
+    body { max-width: 960px; margin: 40px auto; padding: 0 24px; font: 17px/1.6 system-ui, sans-serif; color: #18212d; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccd3dd; padding: 10px; text-align: left; }
+    pre { padding: 16px; background: #f3f5f8; overflow-x: auto; white-space: pre-wrap; }
+    button { padding: 10px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Order stream API</h1>
+  <p><a href="/">All courses</a></p>
+  <p>API for the workflow automation course. Each learner creates an isolated shop.</p>
+  <p>A new poll generates three orders with different products, amounts and payment statuses. Existing orders keep their IDs and contents.</p>
+  <button id="create-shop" type="button">Create a shop</button>
+  <button id="poll-orders" type="button" disabled>Get new orders</button>
+  <p id="shop-info" aria-live="polite"></p>
+  <pre id="result" aria-live="polite">Create a shop to begin.</pre>
+  <h2>Endpoints</h2>
+  <p>All paths below start with <code>/workflow-automation</code>.</p>
+  <table>
+    <thead><tr><th>Method</th><th>Path</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td><code>/shops</code></td><td>A shop ID, orders URL and expiration time.</td></tr>
+      <tr><td>GET</td><td><code>/shops/{shop_id}/orders?after=0</code></td><td>New orders and pagination cursors.</td></tr>
+      <tr><td>GET</td><td><code>/shops/{shop_id}/orders/{id}</code></td><td>One previously generated order.</td></tr>
+      <tr><td>POST</td><td><code>/shops/{shop_id}/orders/{id}/process</code></td><td>Mark a paid order as processed. Repeating the request returns the same result.</td></tr>
+    </tbody>
+  </table>
+  <h2>Polling and pagination</h2>
+  <p>Start with <code>after=0</code>. Save <code>next_after</code> and send it as <code>after</code> in the next poll to receive new orders. Payment statuses are <code>paid</code>, <code>pending</code> and <code>cancelled</code>. Only paid orders can be processed.</p>
+  <p>For smaller pages, set <code>limit</code> from 1 to 100. While <code>has_more</code> is true, use <code>next_after</code> and the returned <code>through</code> for the next page. Passing <code>through</code> keeps the same batch and does not generate orders. Omit it when starting a new poll.</p>
+  <h2>Retry exercises</h2>
+  <p>Add <code>?failure=before</code> to a processing request for a single 503 before processing. Add <code>?failure=after</code> for a single 503 after the order has been processed. Both return <code>Retry-After: 1</code>. Read the order or repeat the processing request to check the outcome.</p>
+  <h2>Lifetime</h2>
+  <p>A shop lives for 24 hours and holds up to 300 orders. Its data is stored in memory and is cleared on server restart. Create a new shop after expiration, restart or the order limit. Amounts are in RUB. All products and orders are fictional.</p>
+  <script>
+    let ordersUrl;
+    let after = 0;
+    const result = document.querySelector('#result');
+    const poll = document.querySelector('#poll-orders');
+    async function showRequest(url, method) {
+      const response = await fetch(url, { method });
+      const body = await response.json();
+      result.textContent = JSON.stringify({ status: response.status, ...body }, null, 2);
+      if (!response.ok) throw new Error(body.error);
+      return body;
+    }
+    document.querySelector('#create-shop').addEventListener('click', async () => {
+      try {
+        const shop = await showRequest('/workflow-automation/shops', 'POST');
+        ordersUrl = shop.orders_url;
+        after = 0;
+        document.querySelector('#shop-info').textContent = `Shop ${shop.shop_id}. Expires ${shop.expires_at}.`;
+        poll.disabled = false;
+      } catch (error) { result.textContent = error.message; }
+    });
+    poll.addEventListener('click', async () => {
+      poll.disabled = true;
+      try {
+        const page = await showRequest(`${ordersUrl}?after=${after}`, 'GET');
+        after = page.next_after;
+      } catch (error) { result.textContent = error.message; }
+      finally { poll.disabled = false; }
+    });
+  </script>
+</body>
+</html>
