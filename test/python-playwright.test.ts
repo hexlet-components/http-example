@@ -84,6 +84,18 @@ const pages: [string, string[]][] = [
     ],
   ],
   ['/airport-map', ["document.title = 'Airport map'", '>Close</button>']],
+  [
+    '/seat-map',
+    [
+      'id="group-name"',
+      'aria-haspopup="menu"',
+      '<li role="menuitem" data-view="compact">Compact view</li>',
+      '<canvas id="overview"',
+      '<li class="passenger">Anna Berg</li>',
+      'data-testid="cabin"',
+      '<li role="menuitem">Seat details</li>',
+    ],
+  ],
   ['/extras', ['<h3>Priority boarding</h3>', '>Add to trip</button>', 'data-testid="extras-count"', "'WINTER26'"]],
 ];
 
@@ -102,6 +114,14 @@ describe('страницы Departures', () => {
     expect(reply.body).toContain('<label for="card">Card number</label>');
     expect(reply.body).toContain('>Pay 25 EUR</button>');
     expect(reply.body).not.toContain('<nav');
+  });
+
+  it('трейс для урока про отладку отдаётся архивом с разрешённым origin', async () => {
+    const reply = await client.send(`${prefix}/trace.zip`);
+    expect(reply.status).toBe(200);
+    expect(reply.headers['content-type']).toBe('application/zip');
+    expect(reply.headers['access-control-allow-origin']).toBe('*');
+    expect(reply.body.startsWith('PK')).toBe(true);
   });
 
   it('логотип отдаётся статикой', async () => {

@@ -89,6 +89,8 @@
 | `/python-playwright/check-in` | форма регистрации: подписи, `select` и множественный `select`, кастомный список «Meal», radio, чекбоксы, загрузка файлов, теневой DOM; «Checked in» появляется через секунду |
 | `/python-playwright/boarding-pass` | `confirm` и `prompt`, «Airport map» в новой вкладке, оплата во фрейме `#payment`, скачивания `boarding-pass.pdf` и `trips.csv`, диалог выбора файла по «Attach visa» |
 | `/python-playwright/extras` | доп. услуги `.extra` со счётчиком `extras-count`, промокод `WINTER26` действует до 1 января 2027 года по часам браузера |
+| `/python-playwright/seat-map` | схема салона: двойной клик по «Summer trip» открывает поле «Group name», места `Seat 14A` выбираются кликом, Shift и Ctrl, правый клик даёт меню «Seat details», клик по canvas «Cabin overview» прокручивает список `cabin` к ряду, пассажиров перетаскивают на место, меню «View» раскрывается наведением |
+| `/python-playwright/trace.zip` | трейс упавшего входа с неверным паролем для `playwright show-trace <адрес>`, отдаётся с `Access-Control-Allow-Origin: *` для trace.playwright.dev |
 
 API курса лежит под тем же префиксом и набор данных не меняет. `GET api/departures` фильтруется параметром `status`. `POST api/login` отдаёт токен `<учётка>-token` и открывает сессию браузера. `api/bookings` закрыт заголовком `Authorization: Bearer <токен>`: GET списка и записи, POST отвечает 201 (без `flight` или `passenger` 422), PUT и PATCH отвечают изменённой записью, DELETE отвечает 204.
 

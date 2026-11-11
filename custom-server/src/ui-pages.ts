@@ -182,6 +182,7 @@ export const apps: Record<string, UiApp> = {
       '/airport-map': { file: 'airport-map.html' },
       '/payment': { file: 'payment.html', bare: true },
       '/extras': { file: 'extras.html' },
+      '/seat-map': { file: 'seat-map.html' },
     },
   },
 };

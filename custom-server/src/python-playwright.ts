@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import {
@@ -57,6 +60,12 @@ trailer << /Root 1 0 R >>
 const tripsCsv = `flight,destination,seat
 SK 204,Lisbon,14A
 `;
+
+// Трейс упавшего теста входа (неверный пароль) для урока про отладку:
+// `playwright show-trace <адрес>` и trace.playwright.dev открывают его по
+// ссылке. Просмотрщик на trace.playwright.dev скачивает файл из браузера,
+// поэтому ответ разрешает чужой origin.
+const traceZip = readFileSync(path.join(import.meta.dirname, '../assets/ui-pages/python-playwright/trace.zip'));
 
 const authorized = (req: FastifyRequest) => {
   const header = req.headers.authorization ?? '';
@@ -185,6 +194,10 @@ ${rows}
       .type('application/pdf')
       .header('content-disposition', 'attachment; filename="boarding-pass.pdf"')
       .send(boardingPassPdf),
+  );
+
+  server.get(`${prefix}/trace.zip`, (_req, res) =>
+    res.type('application/zip').header('access-control-allow-origin', '*').send(traceZip),
   );
 
   server.get(`${prefix}/trips.csv`, (_req, res) =>
