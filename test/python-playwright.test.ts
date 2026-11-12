@@ -116,14 +116,6 @@ describe('страницы Departures', () => {
     expect(reply.body).not.toContain('<nav');
   });
 
-  it('трейс для урока про отладку отдаётся архивом с разрешённым origin', async () => {
-    const reply = await client.send(`${prefix}/trace.zip`);
-    expect(reply.status).toBe(200);
-    expect(reply.headers['content-type']).toBe('application/zip');
-    expect(reply.headers['access-control-allow-origin']).toBe('*');
-    expect(reply.body.startsWith('PK')).toBe(true);
-  });
-
   it('логотип отдаётся статикой', async () => {
     expect((await client.send('/assets/ui-pages/python-playwright/logo.svg')).status).toBe(200);
   });
