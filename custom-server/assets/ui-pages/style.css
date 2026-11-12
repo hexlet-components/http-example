@@ -55,3 +55,14 @@ label.choice input { display: inline; width: auto; margin: 0; }
 .extra { margin-top: 12px; }
 #passengers { width: 100%; border-collapse: collapse; }
 #passengers td, #passengers th { padding: 8px; text-align: left; border-bottom: 1px solid #d5dbe3; }
+#cabin { max-height: 240px; overflow-y: auto; border: 1px solid #9ca6b4; border-radius: 6px; padding: 8px; }
+.cabin-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+.row-label { width: 56px; }
+.seat { padding: 4px 6px; min-width: 40px; }
+.seat[aria-pressed="true"] { background: #2b5cad; color: #fff; }
+#cabin.compact .seat { padding: 0 2px; min-width: 32px; }
+.passenger { display: inline-block; padding: 4px 10px; margin-right: 8px; border: 1px solid #9ca6b4; border-radius: 12px; cursor: grab; user-select: none; }
+#passengers { padding: 0; list-style: none; }
+.view-menu { display: inline-block; position: relative; }
+[role="menu"] { margin: 4px 0 0; padding: 0; list-style: none; border: 1px solid #9ca6b4; border-radius: 6px; background: #fff; }
+[role="menuitem"] { padding: 8px 12px; cursor: pointer; }
