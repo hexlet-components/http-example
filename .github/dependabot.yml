@@ -10,11 +10,11 @@ updates:
       default-days: 7
     groups:
       all-npm-minor-patch:
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
+        patterns: ['*']
+        update-types: ['minor', 'patch']
       all-npm-major:
-        patterns: ["*"]
-        update-types: ["major"]
+        patterns: ['*']
+        update-types: ['major']
 
   - package-ecosystem: 'docker'
     directory: '/'
@@ -26,11 +26,11 @@ updates:
       default-days: 7
     groups:
       all-docker-minor-patch:
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
+        patterns: ['*']
+        update-types: ['minor', 'patch']
       all-docker-major:
-        patterns: ["*"]
-        update-types: ["major"]
+        patterns: ['*']
+        update-types: ['major']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -42,8 +42,8 @@ updates:
       default-days: 7
     groups:
       all-github-actions-minor-patch:
-        patterns: ["*"]
-        update-types: ["minor", "patch"]
+        patterns: ['*']
+        update-types: ['minor', 'patch']
       all-github-actions-major:
-        patterns: ["*"]
-        update-types: ["major"]
+        patterns: ['*']
+        update-types: ['major']
