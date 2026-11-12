@@ -1,0 +1,149 @@
+    <main class="example">
+      <h1>Seat map</h1>
+      <p>Group: <span id="group-name" title="Double-click to rename">Summer trip</span></p>
+      <p>Flight SK 204 to Lisbon. Click a seat to choose it, Shift+click to choose a range, Ctrl+click to add one more.</p>
+      <div class="view-menu">
+        <button type="button" id="view" aria-haspopup="menu">View</button>
+        <ul id="view-options" role="menu" hidden>
+          <li role="menuitem" data-view="compact">Compact view</li>
+          <li role="menuitem" data-view="">Full view</li>
+        </ul>
+      </div>
+      <h2>Cabin overview</h2>
+      <canvas id="overview" width="300" height="60" aria-label="Cabin overview"></canvas>
+      <h2>Passengers</h2>
+      <p>Drag a passenger onto a seat.</p>
+      <ul id="passengers">
+        <li class="passenger">Anna Berg</li>
+        <li class="passenger">Mark Olsen</li>
+      </ul>
+      <p id="selection" role="status">Selected: none</p>
+      <div id="cabin" data-testid="cabin"></div>
+      <ul id="seat-menu" role="menu" hidden>
+        <li role="menuitem">Seat details</li>
+      </ul>
+      <p id="seat-details"></p>
+    </main>
+    <script>
+      const rows = 30;
+      const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const cabin = document.getElementById('cabin');
+      const selection = document.getElementById('selection');
+      const seats = [];
+
+      for (let row = 1; row <= rows; row += 1) {
+        const line = document.createElement('div');
+        line.className = 'cabin-row';
+        line.innerHTML = `<span class="row-label">Row ${row}</span>`;
+        for (const letter of letters) {
+          const seat = document.createElement('button');
+          seat.type = 'button';
+          seat.className = 'seat';
+          seat.textContent = `${row}${letter}`;
+          seat.setAttribute('aria-label', `Seat ${row}${letter}`);
+          seat.setAttribute('aria-pressed', 'false');
+          line.append(seat);
+          seats.push(seat);
+        }
+        cabin.append(line);
+      }
+
+      // Выбор как в списке файлов: клик выбирает одно место, Shift+клик
+      // диапазон от прошлого выбора, Ctrl или Cmd+клик добавляет или снимает место.
+      let anchor = null;
+      const render = () => {
+        const chosen = seats.filter((seat) => seat.getAttribute('aria-pressed') === 'true');
+        selection.textContent = `Selected: ${chosen.map((seat) => seat.textContent).join(', ') || 'none'}`;
+      };
+      const choose = (seat, on) => seat.setAttribute('aria-pressed', String(on));
+      cabin.addEventListener('click', (event) => {
+        const seat = event.target.closest('.seat');
+        if (!seat) return;
+        if (event.shiftKey && anchor) {
+          const [from, to] = [seats.indexOf(anchor), seats.indexOf(seat)].sort((a, b) => a - b);
+          seats.forEach((item, index) => choose(item, index >= from && index <= to));
+        } else if (event.ctrlKey || event.metaKey) {
+          choose(seat, seat.getAttribute('aria-pressed') !== 'true');
+          anchor = seat;
+        } else {
+          seats.forEach((item) => choose(item, item === seat));
+          anchor = seat;
+        }
+        render();
+      });
+
+      // Правый клик по месту открывает своё меню вместо меню браузера.
+      const seatMenu = document.getElementById('seat-menu');
+      let menuSeat = null;
+      cabin.addEventListener('contextmenu', (event) => {
+        const seat = event.target.closest('.seat');
+        if (!seat) return;
+        event.preventDefault();
+        menuSeat = seat;
+        seatMenu.hidden = false;
+      });
+      seatMenu.addEventListener('click', () => {
+        const letter = menuSeat.textContent.slice(-1);
+        const place = { A: 'window', F: 'window', C: 'aisle', D: 'aisle' }[letter] ?? 'middle';
+        document.getElementById('seat-details').textContent = `${menuSeat.textContent}: ${place} seat`;
+        seatMenu.hidden = true;
+      });
+
+      // Двойной клик превращает название группы в поле ввода.
+      const groupName = document.getElementById('group-name');
+      groupName.addEventListener('dblclick', () => {
+        const input = document.createElement('input');
+        input.value = groupName.textContent;
+        input.setAttribute('aria-label', 'Group name');
+        groupName.replaceChildren(input);
+        input.focus();
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') groupName.textContent = input.value;
+        });
+      });
+
+      // Схема салона нарисована на canvas: ряды идут слева направо по 10 пикселей,
+      // поэтому место клика задаёт ряд, и список прокручивается к нему.
+      const overview = document.getElementById('overview');
+      const context = overview.getContext('2d');
+      for (let row = 0; row < rows; row += 1) {
+        context.fillStyle = row % 2 ? '#c9d3e6' : '#9fb1d4';
+        context.fillRect(row * 10, 0, 9, overview.height);
+      }
+      overview.addEventListener('click', (event) => {
+        const row = Math.min(rows, Math.floor(event.offsetX / 10) + 1);
+        const line = cabin.children[row - 1];
+        line.scrollIntoView({ block: 'center' });
+        selection.textContent = `Row ${row} in view`;
+      });
+
+      // Перетаскивание собрано на mousedown и mouseup, как в остальных
+      // приложениях стенда: события HTML5 drag браузер на эмуляцию мыши не шлёт.
+      let dragged = null;
+      for (const passenger of document.querySelectorAll('.passenger')) {
+        passenger.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+          dragged = passenger;
+        });
+      }
+      document.addEventListener('mouseup', (event) => {
+        const seat = event.target.closest?.('.seat');
+        if (dragged && seat) {
+          seat.textContent = `${seat.textContent.split(' ')[0]} ${dragged.textContent}`;
+          selection.textContent = `${dragged.textContent} assigned to ${seat.textContent.split(' ')[0]}`;
+        }
+        dragged = null;
+      });
+
+      // Меню вида раскрывается при наведении, пункт меняет плотность схемы.
+      const viewMenu = document.querySelector('.view-menu');
+      const viewOptions = document.getElementById('view-options');
+      viewMenu.addEventListener('mouseenter', () => (viewOptions.hidden = false));
+      viewMenu.addEventListener('mouseleave', () => (viewOptions.hidden = true));
+      for (const item of viewOptions.children) {
+        item.addEventListener('click', () => {
+          cabin.className = item.dataset.view;
+          viewOptions.hidden = true;
+        });
+      }
+    </script>

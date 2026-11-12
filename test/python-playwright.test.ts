@@ -84,6 +84,18 @@ const pages: [string, string[]][] = [
     ],
   ],
   ['/airport-map', ["document.title = 'Airport map'", '>Close</button>']],
+  [
+    '/seat-map',
+    [
+      'id="group-name"',
+      'aria-haspopup="menu"',
+      '<li role="menuitem" data-view="compact">Compact view</li>',
+      '<canvas id="overview"',
+      '<li class="passenger">Anna Berg</li>',
+      'data-testid="cabin"',
+      '<li role="menuitem">Seat details</li>',
+    ],
+  ],
   ['/extras', ['<h3>Priority boarding</h3>', '>Add to trip</button>', 'data-testid="extras-count"', "'WINTER26'"]],
 ];
 
